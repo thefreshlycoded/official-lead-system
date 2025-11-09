@@ -1,0 +1,16 @@
+<div class="container">
+  <h1 class="mb-3">Campaigns</h1>
+  <table class="table table-striped">
+    <thead><tr><th>Name</th><th>Status</th><th>Leads</th><th>Launched</th></tr></thead>
+    <tbody>
+      <% @campaigns.each do |c| %>
+        <tr>
+          <td><%= link_to c.name, c %></td>
+          <td><%= c.status %></td>
+          <td><%= c.leads_count %></td>
+          <td><%= c.launched_at ? time_ago_in_words(c.launched_at) + " ago" : "—" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

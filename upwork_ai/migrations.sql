@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS job_listings (
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    url TEXT UNIQUE NOT NULL
+);

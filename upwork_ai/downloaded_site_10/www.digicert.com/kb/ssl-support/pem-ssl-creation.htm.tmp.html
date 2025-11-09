@@ -1,0 +1,785 @@
+
+<!DOCTYPE HTML>
+<html lang="en-US">
+    <head>
+    <meta charset="UTF-8"/>
+    <title>Create a .pem File for TLS/SSL Certificate Installations</title>
+    <meta name="keywords" content="Installation,EN,TLS SSL,Certificates,Tutorials"/>
+    <meta name="description" content="SSL .pem files are frequently required for certificate installations when multiple certificates are being imported as one file."/>
+    <meta name="template" content="tutorial-template"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    
+
+    
+    
+
+	<link rel="canonical" href="/tutorials/create-pem-file-for-tls-ssl-certificate-installations"/>
+	
+
+
+<!--<link data-sly-use.page="com.adobe.cq.wcm.core.components.models.Page"
+      data-sly-test=""
+      rel="canonical" href="">
+	
+	<link data-sly-test=""
+      data-sly-repeat=""
+      rel="alternate" hreflang="" href="">-->
+
+    
+
+
+    
+<link rel="icon" href="/content/dam/digicert/images/DigiCertFavicon_16x16.png" sizes="16x16"/>
+<link rel="icon" href="/content/dam/digicert/images/DigiCertFavicon_32x32.png" sizes="32x32"/>
+<link rel="apple-touch-icon" href="/content/dam/digicert/images/DigiCertFavicon_32x32.png"/>
+<meta name="msapplication-TileImage" content="/content/dam/digicert/images/DigiCertFavicon_32x32.png"/>
+
+
+    
+    
+<link rel="stylesheet" href="/etc.clientlibs/kb/clientlibs/clientlib-dependencies.css" type="text/css">
+<link rel="stylesheet" href="/etc.clientlibs/kb/clientlibs/clientlib-base.css" type="text/css">
+<link rel="stylesheet" href="/etc.clientlibs/digicert/clientlibs/ui.search.css" type="text/css">
+<link rel="stylesheet" href="/etc.clientlibs/digicert/clientlibs/clientlib-base.css" type="text/css">
+
+
+
+
+    
+	<meta property="og:locale" content="en_US"/>
+	<meta name="keywords" content="installation, en, tls-ssl, certificates, tutorials"/>
+	<meta class="swiftype" name="published_at" data-type="date" content="05/31/2024"/>
+    <meta class="swiftype" name="tags" data-type="string" content="installation, en, tls-ssl, certificates, tutorials"/>
+	<meta class="swiftype" name="featured" data-type="integer" content="0"/>
+    <meta class="swiftype" name="download" data-type="string"/>
+    <meta class="swiftype" name="domain" data-type="integer" content="5"/>
+	<meta class="swiftype" name="langc" data-type="string" content="en_US"/>
+	
+
+
+<script>
+	  //Adobe Target prehiding snippet (must be place//Adobe Target prehiding snippet (must be placed directly above '< script src="https://assets.adobedtm.com/.../.../launch-....min.js" async> </ script>')
+	  
+	  //check if OneTrust is allowing "Personalized Experience Cookies" (i.e., Adobe Target) to load
+	  var adobeTargetOneTrustGroup = "PE";
+	  
+	  function isAdobeTargetAllowed(adobeTargetOneTrustGroup) {
+	    var OptanonConsentCookie = document.cookie.match(/OptanonConsent=.*;/);
+	    
+	    return (OptanonConsentCookie && decodeURIComponent(OptanonConsentCookie[0]).includes(adobeTargetOneTrustGroup + ":1"));
+	  }
+	  
+	  if (isAdobeTargetAllowed(adobeTargetOneTrustGroup)) {
+	    //Adobe Target prehiding snippet
+	    ;(function(win, doc, style, timeout) {
+	      var STYLE_ID = 'at-body-style';
+	      
+	      function getParent() {
+	        return doc.getElementsByTagName('head')[0];
+	      }
+	      
+	      function addStyle(parent, id, def) {
+	        if (!parent) {
+	          return;
+	        }
+	        
+	        var style = doc.createElement('style');
+	        style.id = id;
+	        style.innerHTML = def;
+	        parent.appendChild(style);
+	      }
+	      
+	      function removeStyle(parent, id) {
+	        if (!parent) {
+	          return;
+	        }
+	        
+	        var style = doc.getElementById(id);
+	        
+	        if (!style) {
+	          return;
+	        }
+	        
+	        parent.removeChild(style);
+	      }
+	      
+	      addStyle(getParent(), STYLE_ID, style);
+	      setTimeout(function() {
+	        removeStyle(getParent(), STYLE_ID);
+	      }, timeout);
+	    }(window, document, "body {opacity: 0 !important}", 3000));
+	  }
+	</script>
+<!-- Staging Adobe Tags -->
+<!--<script src="https://assets.adobedtm.com/80bda08f0087/1015fcf0b78f/launch-ENb8e5854ed93c443fa2962c8516926c96-staging.min.js" async></script>-->
+<!-- Production Adobe Tags -->
+<script src="https://assets.adobedtm.com/80bda08f0087/1015fcf0b78f/launch-EN214b022a648841a199bcc6b7b217acc1.min.js" async></script>
+
+    
+    
+    
+
+    
+
+    
+    
+<script src="/etc.clientlibs/clientlibs/granite/jquery.js"></script>
+<script src="/etc.clientlibs/kb/clientlibs/clientlib-dependencies.js"></script>
+<script src="/etc.clientlibs/clientlibs/granite/utils.js"></script>
+<script src="/etc.clientlibs/digicert/clientlibs/ui.search.js"></script>
+<script src="/etc.clientlibs/clientlibs/granite/jquery/granite.js"></script>
+<script src="/etc.clientlibs/foundation/clientlibs/jquery.js"></script>
+<script src="/etc.clientlibs/digicert/clientlibs/clientlib-dependencies.js"></script>
+
+
+
+    
+    
+<link rel="stylesheet" href="/etc.clientlibs/kb/clientlibs/clientlib-site-kb.css" type="text/css">
+
+
+
+    
+
+    
+    
+    
+    <!-- <head> -->
+	<script id="__ada" data-handle="digicert-gen" src="https://static.ada.support/embed2.js"></script>
+</head>
+    <body class="page basicpage kb-body" id="page-28e683d4ea" data-cmp-data-layer-enabled>
+        <!--  <script data-sly-test.dataLayerEnabled="">
+          window.adobeDataLayer = window.adobeDataLayer || [];
+          adobeDataLayer.push({
+              page: JSON.parse("{\x22page\u002D28e683d4ea\x22:{\x22@type\x22:\x22kb\/components\/page\x22,\x22repo:modifyDate\x22:\x222024\u002D05\u002D30T14:17:32Z\x22,\x22dc:title\x22:\x22Create a .pem File for TLS\/SSL Certificate Installations\x22,\x22dc:description\x22:\x22SSL .pem files are frequently required for certificate installations when multiple certificates are being imported as one file.\x22,\x22xdm:template\x22:\x22\/conf\/kb\/settings\/wcm\/templates\/tutorial\u002Dtemplate\x22,\x22xdm:language\x22:\x22en\u002DUS\x22,\x22xdm:tags\x22:[\x22Installation\x22,\x22EN\x22,\x22TLS SSL\x22,\x22Certificates\x22,\x22Tutorials\x22],\x22repo:path\x22:\x22\/content\/kb\/us\/en\/tutorials\/create\u002Dpem\u002Dfile\u002Dfor\u002Dtls\u002Dssl\u002Dcertificate\u002Dinstallations.html\x22}}"),
+              event:'cmp:show',
+              eventInfo: {
+                  path: 'page.page\u002D28e683d4ea'
+              }
+          });
+        </script> -->
+        
+        
+            
+
+
+
+
+            
+
+
+
+            
+<div class="root responsivegrid">
+
+
+<div class="aem-Grid aem-Grid--12 aem-Grid--default--12 ">
+    
+    <div class="experiencefragment aem-GridColumn aem-GridColumn--default--12">
+<div id="experiencefragment-5cd9e92b2f" class="cmp-experiencefragment cmp-experiencefragment--kb-header">
+
+
+    
+    
+    
+    <div id="container-64ef1fbaa6" class="cmp-container">
+        
+        <div class="header"><header class="editmode-false">
+	<div class="header__logo">
+
+
+
+<div class="site-branding">
+    <a href="/">
+    	<img src="/content/dam/kb/logos/kb-new-logo.png" alt="DigiCert KnowledgeBase - Technical Support Logo" loading="lazy" width="124" height="33"/>
+    </a>
+</div>
+
+
+    
+
+</div>
+	<div class="header__navigation">
+		<div class="navigation__primary"><img class="hamburger" src="/content/dam/thawte/icons/MenuIcon.png" data-hoversrc="/content/dam/thawte/icons/MenuIcon_Hover.png"/>
+
+<nav class="cmp-navigation cmp-navigation--mobile">
+     <ul class="cmp-navigation__group">
+          <li class="cmp-navigation__item cmp-navigation__item--level-0 navigation-header">
+               <a href="#" data-content=".header__secondary-nav-content--contact" class="cmp-navigation__item-link is-header-true">
+                    Contact Us
+               </a>
+          </li>
+          <li class="cmp-navigation__item cmp-navigation__item--level-0 navigation-header">
+               <a href="#" data-content=".header__secondary-nav-content--language" class="cmp-navigation__item-link is-header-true">
+                    Language
+               </a>
+          </li>
+     </ul>
+</nav>
+
+    
+</div>
+		<ul class="navigation__secondary clearfix" style="align-items: center;">
+			<li id="contact">
+				<a class="btn primary blue-filled" href="https://www.digicert.com/contact-us">
+					<span>Contact Us</span>
+					<i class="fa fa-phone"></i></a>
+			</li>
+			<li id="language">
+				<a href="#" class="header__secondary-nav-link header__secondary-nav-link--desktop">
+				   <img alt="language" src="/content/dam/digicert/images/navigation/header/LanguageIcon_MainNavigation.png" data-hoversrc="/content/dam/digicert/icons/Language-Icon-Hover.png"/>
+				</a>
+				<div data-layout="half" class="header__secondary-nav-content header__secondary-nav-content--language">
+					<div class="header__nav-dismiss"><i class="close"></i></div>
+					<h2 class="heading">choose your language</h2>
+					<ul class="cmp-navigation__group clearfix">
+						<li><a class="cmp-navigation__item-link txt-u-animate straight-line" href="https://knowledge.digicert.com/" id="en_US">English</a></li>
+					
+						<li><a class="cmp-navigation__item-link txt-u-animate straight-line" href="https://knowledge.digicert.com/ja/jp/home.html" id="ja_JP">Japanese</a></li>
+					</ul>
+				</div>
+			</li>
+			
+			<li id="mobile_hamburger">
+				<a href="#" class="header__secondary-nav-link header__secondary-nav-link--mobile header__secondary-nav-link--menu" data-content=".navigation__primary">
+				   <i class="fa fa-bars" id="hamburger"></i>
+				</a>
+			</li>
+		</ul>
+	</div>
+</header></div>
+
+        
+    </div>
+
+</div>
+
+    
+</div>
+<div class="custom-breadcrumb aem-GridColumn aem-GridColumn--default--12">
+<nav id="custom-breadcrumb-88bb489008" class="cmp-breadcrumb" aria-label="Breadcrumb" data-cmp-data-layer="{&#34;custom-breadcrumb-88bb489008&#34;:{&#34;@type&#34;:&#34;kb/components/custom-breadcrumb&#34;,&#34;repo:modifyDate&#34;:&#34;2023-12-18T09:19:14Z&#34;}}">
+
+    <ol class="cmp-breadcrumb__list" itemscope itemtype="http://schema.org/BreadcrumbList">
+        <li class="cmp-breadcrumb__item" data-cmp-data-layer="{&#34;custom-breadcrumb-88bb489008-item-471667c32e&#34;:{&#34;@type&#34;:&#34;kb/components/custom-breadcrumb/item&#34;,&#34;repo:modifyDate&#34;:&#34;2024-09-27T13:11:53Z&#34;,&#34;dc:title&#34;:&#34;Home&#34;,&#34;xdm:linkURL&#34;:&#34;/content/kb/us/en&#34;}}" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a href="/" class="cmp-breadcrumb__item-link txt-u-animate straight-line" itemprop="item" data-cmp-clickable>
+                <span itemprop="name">Home</span>
+            </a>
+            <meta itemprop="position" content="1"/>
+        </li>
+    
+        <li class="cmp-breadcrumb__item" data-cmp-data-layer="{&#34;custom-breadcrumb-88bb489008-item-1444ed3ab5&#34;:{&#34;@type&#34;:&#34;kb/components/custom-breadcrumb/item&#34;,&#34;repo:modifyDate&#34;:&#34;2023-11-07T18:00:12Z&#34;,&#34;dc:title&#34;:&#34;Tutorials&#34;,&#34;xdm:linkURL&#34;:&#34;/tutorials&#34;}}" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a href="/tutorials" class="cmp-breadcrumb__item-link txt-u-animate straight-line" itemprop="item" data-cmp-clickable>
+                <span itemprop="name">Tutorials</span>
+            </a>
+            <meta itemprop="position" content="2"/>
+        </li>
+    
+        <li class="cmp-breadcrumb__item cmp-breadcrumb__item--active" aria-current="page" data-cmp-data-layer="{&#34;custom-breadcrumb-88bb489008-item-28e683d4ea&#34;:{&#34;@type&#34;:&#34;kb/components/custom-breadcrumb/item&#34;,&#34;repo:modifyDate&#34;:&#34;2024-05-30T15:09:32Z&#34;,&#34;dc:title&#34;:&#34;Create a .pem File for TLS/SSL Certificate Installations&#34;,&#34;xdm:linkURL&#34;:&#34;/tutorials/create-pem-file-for-tls-ssl-certificate-installations&#34;}}" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a href="/tutorials/create-pem-file-for-tls-ssl-certificate-installations" class="cmp-breadcrumb__item-link txt-u-animate straight-line" itemprop="item" data-cmp-clickable>
+                <span itemprop="name">Create a .pem File for TLS/SSL Certificate Installations</span>
+            </a>
+            <meta itemprop="position" content="3"/>
+        </li>
+    </ol>
+</nav>
+
+    
+
+</div>
+<div class="kbheaderwithsearch aem-GridColumn aem-GridColumn--default--12">
+
+
+
+
+
+
+
+
+
+<div class="kb-header-text cmp-text--left" style="background-color:transparent;height:px;">	
+	<div class="img-container relative
+					noBgColor
+					mbg-grey">
+			 
+			 
+				
+					
+				
+					<img src="/content/dam/kb/images/homepage/Knowledge-base-hero-April23.png" alt="DigiCert KnowledgeBase - Technical Support-hero"/>
+			
+	</div>
+	<div class="search-and-text">
+		<div class="kb-header-desc"><h1 style="color: white;">Knowledge Base<br />
+</h1>
+</div>
+	       
+	        <div class="kb-search">
+	            <div data-layout="search" class="kb-search-form">
+	                <form class="search-form">
+	                    <div class="search-form__input">
+	                        <input id="hero-search-box" type="text" placeholder="How can we help?" required autofocus/>
+	                    </div>
+	                    <!--<i class="search-form__icon search"></i>-->
+	                </form>
+	            </div>
+	        </div>
+	</div>
+</div>
+
+    
+
+</div>
+<div class="article-container aem-GridColumn aem-GridColumn--default--12"><div class="title">
+<div data-cmp-data-layer="{&#34;title-4c3e22dc41&#34;:{&#34;@type&#34;:&#34;kb/components/title&#34;,&#34;dc:title&#34;:&#34;Create a .pem File for TLS/SSL Certificate Installations&#34;}}" id="title-4c3e22dc41" class="cmp-title">
+    <h2 class="cmp-title__text">Create a .pem File for TLS/SSL Certificate Installations</h2>
+</div>
+
+    
+
+</div>
+<div class="line"></div>
+<div class="article-banner">
+	
+<div class="ArticleBanner">
+	<div class="article-details">
+		<div class="docId">Solution ID : TL27</div>
+		<div class="lastModified">Last Modified : 05/31/2024</div>
+		<input type="hidden" id="article-id" name="article-id" value="TL27"/>
+	</div>
+	<div class="article-share">
+		<div class="print" onclick="window.print()">
+			<i class="article-print" aria-hidden="true"></i>
+		</div>
+		<div class="share"><i class="article-share-img" aria-hidden="true"></i>
+			<div id="socialGallery">
+		      <div class="socialToolBox">
+		        <a class="facebook" href="http://www.facebook.com/sharer.php?u=https://knowledge.digicert.com/tutorials/create-pem-file-for-tls-ssl-certificate-installations"><i class="fa fa-facebook"></i></a>
+		        <a class="twitter" href="https://twitter.com/intent/tweet?url=https://knowledge.digicert.com/tutorials/create-pem-file-for-tls-ssl-certificate-installations&text=%20%3A%20&via=&hashtags=null"><i class="fa fa-x-twitter"></i></a>
+		        <a class="linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://knowledge.digicert.com/tutorials/create-pem-file-for-tls-ssl-certificate-installations"><i class="fa fa-linkedin"></i></a>
+                	<a class="copyurl tooltip"><i class="fa fa-copy"><span class="tooltiptext">Click to copy</span></i></a>
+		      </div>
+		    </div>
+		</div>
+	</div>
+</div>
+
+
+</div>
+<div class="heading-and-image">
+	<div class="article-image">
+		
+        
+            <img class="cmp-image__image" src="/content/dam/kb/icons/Tutorial.png"/>
+        
+        
+        
+        
+	</div>
+	<div class="headings">
+		<div class="text vspacebtncomp-top section">
+
+<div class="cmp-text cmp-text--left" style="background-color:transparent;">
+     <h4>.pem TLS/SSL Creation Instructions</h4>
+<p>SSL .pem files (concatenated certificate container files), are frequently required for certificate installations when multiple certificates are being imported as one file.</p>
+<p>This article contains multiple sets of instructions that walk through various .pem file creation scenarios for certificate installation.</p>
+<ul>
+<li>Create a .pem file with the Entire TLS/SSL Certificate Trust Chain</li>
+<li>Create a .pem file with the TLS/SSL Server and Intermediate Certificates</li>
+<li>Create a .pem with the Private Key and Entire Trust Chain</li>
+</ul>
+
+        
+</div>
+
+    
+
+</div>
+<div class="pencil-banner section">
+	<div class="sub-wrapper" style="background-color:#0174c3;">
+	
+		 <div class="cmp-text rte-container right">	
+    			<p class="rte din" style="color:#fff">SECURE UP TO 250 SUBDOMAINS WITH A DIGICERT WILDCARD TLS/SSL CERTIFICATE.</p>
+    			<div class="btn-container vertical">
+		  			 <a href="https://www.digicert.com/tls-ssl/compare-wildcard-certificates" class="btn primary blue" target="_blank" style="margin-right:px;
+				    	margin-bottom:px;">
+				 		BUY NOW</a>
+	 	 		</div>
+     	</div>
+    </div>    
+    
+
+    
+</div>
+<div class="text vspacebtncomp-top section">
+
+<div class="cmp-text cmp-text--left" style="background-color:transparent;">
+     <h4>Create a .pem file with the Entire TLS/SSL Certificate Trust Chain</h4>
+<ol>
+<li>In your <a href="https://www.digicert.com/account/login.php">CertCentral account</a>, on the certificate's order details page, download your Intermediate (DigiCertCA.crt), Root (TrustedRoot.crt), and Primary Certificates (your_domain_name.crt).<br />
+<br />
+<i>See </i><a><b></b></a><a href="https://docs.digicert.com/en/certcentral/manage-certificates/get-a-copy-of-your-tls-ssl-certificate/download-a-tls-ssl-certificate-from-your-certcentral-account.html">Download a TLS/SSL certificate from your CertCentral account</a><i><br />
+ </i><br />
+</li>
+<li>Open a text editor (such as Notepad) and paste the entire body of each certificate into one text file in the following order:<ol>
+<li>Primary Certificate - <b>your_domain_name.crt</b></li>
+<li>Intermediate Certificate -<b> DigiCertCA.crt</b></li>
+<li>Root Certificate - <b>TrustedRoot.crt<br />
+ <br />
+<table cellpadding="1" cellspacing="0" border="1" style="font-weight: 400;">
+<tbody><tr><td><p><b>Note:</b> Some servers may require you to add the certificates in the reverse order in the .pem file:</p>
+<ol>
+<li>Root Certificate</li>
+<li>Intermediate Certificate</li>
+<li>Primary Certificate</li>
+</ol>
+</td>
+</tr></tbody></table>
+<br />
+  </b></li>
+</ol>
+</li>
+<li>Make sure to include the beginning and end tags on each certificate. The result should look like this:<br />
+<br />
+<table cellpadding="1" cellspacing="0" border="1" style="font-weight: 400;">
+<tbody><tr><td><p> </p>
+<p class="MsoNormal">-----BEGIN CERTIFICATE-----<br />
+<b>Your Primary TLS/SSL certificate: your_domain_name.crt</b><br />
+-----END CERTIFICATE-----</p>
+<p class="MsoNormal">-----BEGIN CERTIFICATE-----<br />
+<b>Your Intermediate certificate: DigiCertCA.crt</b><br />
+-----END CERTIFICATE-----</p>
+<p class="MsoNormal">-----BEGIN CERTIFICATE-----<br />
+<b>Your Root certificate: TrustedRoot.crt</b><br />
+-----END CERTIFICATE-----</p>
+<p> </p>
+</td>
+</tr></tbody></table>
+<br />
+</li>
+<li><b>Save </b>the combined file as <b>your_domain_name.pem</b>.<br />
+The .pem file is now ready to use.</li>
+</ol>
+<h4><br />
+Create a .pem file with the TLS/SSL Server and Intermediate Certificates<br />
+</h4>
+<ol>
+<li>In your <a href="https://www.digicert.com/account/login.php">CertCentral account</a>, on the certificate's order details page, download your Intermediate (DigiCertCA.crt) and Primary Certificates (your_domain_name.crt).<br />
+<br />
+<i>See </i><a><b></b></a><a href="https://docs.digicert.com/en/certcentral/manage-certificates/get-a-copy-of-your-tls-ssl-certificate/download-a-tls-ssl-certificate-from-your-certcentral-account.html">Download a TLS/SSL certificate from your CertCentral account</a><b><i><br />
+ </i></b><br />
+</li>
+<li>Open a text editor (such as Notepad) and paste the entire body of each certificate into one text file in the following order:<ol>
+<li>The Primary Certificate - <b>your_domain_name.crt</b></li>
+<li>The Intermediate Certificate -<b> DigiCertCA.crt</b></li>
+</ol>
+</li>
+<li>Make sure to<b> include </b>the beginning and end tags on each certificate. The result should look like this:<br />
+<br />
+<table cellpadding="1" cellspacing="0" border="1">
+<tbody><tr><td><h6><p class="MsoNormal">-----BEGIN CERTIFICATE-----<br />
+<b>Your Primary TLS/SSL certificate: your_domain_name.crt</b><br />
+-----END CERTIFICATE-----</p>
+<p class="MsoNormal">-----BEGIN CERTIFICATE-----<br />
+<b>Your Intermediate certificate: DigiCertCA.crt</b><br />
+-----END CERTIFICATE-----<br />
+</p>
+</h6>
+</td>
+</tr></tbody></table>
+<br />
+</li>
+<li>Save the combined file as <b>your_domain_name.pem</b>.<br />
+The .pem file is now ready to use.</li>
+</ol>
+<h4><br />
+Create a .pem with the Private Key and Entire Trust Chain</h4>
+<ol>
+<li>In your <a href="https://www.digicert.com/account/login.php">CertCentral account</a>, on the certificate's order details page, download your Intermediate (DigiCertCA.crt), Root (TrustedRoot.crt), and Primary Certificates (your_domain_name.crt).<br />
+<br />
+See<b> </b><a href="https://docs.digicert.com/en/certcentral/manage-certificates/get-a-copy-of-your-tls-ssl-certificate/download-a-tls-ssl-certificate-from-your-certcentral-account.html">Download a TLS/SSL certificate from your CertCentral account</a><b><br />
+ </b><br />
+</li>
+<li>Open a text editor (such as Notepad) and paste the entire body of each certificate into one text file in the following order:<ol>
+<li>The Private Key - <b>your_domain_name.key</b></li>
+<li>The Primary Certificate -<b> your_domain_name.crt</b></li>
+<li>The Intermediate Certificate -<b> DigiCertCA.crt</b></li>
+<li>The Root Certificate -<b> TrustedRoot.crt</b></li>
+</ol>
+</li>
+<li>Make<b> </b>sure to include the beginning and end tags on each certificate. The result should look like this:<br />
+<br />
+<table cellpadding="1" cellspacing="0" border="1">
+<tbody><tr><td><h6><p class="MsoNormal">-----BEGIN RSA PRIVATE KEY-----<br />
+<b>Your Private Key: your_domain_name.key</b><br />
+-----END RSA PRIVATE KEY-----</p>
+<p class="MsoNormal">-----BEGIN CERTIFICATE-----<br />
+<b>Your Primary TLS/SSL certificate: your_domain_name.crt</b><br />
+-----END CERTIFICATE-----</p>
+<p class="MsoNormal">-----BEGIN CERTIFICATE-----<br />
+<b>Your Intermediate certificate: DigiCertCA.crt</b><br />
+-----END CERTIFICATE-----</p>
+<p class="MsoNormal">-----BEGIN CERTIFICATE-----<br />
+<b>Your Root certificate: TrustedRoot.crt</b><br />
+-----END CERTIFICATE-----<br />
+</p>
+</h6>
+</td>
+</tr></tbody></table>
+<br />
+</li>
+<li>Save the combined file as <b>your_domain_name.pem</b>.<br />
+The .pem file is now ready to use.</li>
+</ol>
+<p> </p>
+
+        
+</div>
+
+    
+
+</div>
+
+
+	</div>
+</div></div>
+<div class="experiencefragment aem-GridColumn aem-GridColumn--default--12">
+<div id="experiencefragment-45cffa29e4" class="cmp-experiencefragment cmp-experiencefragment--kb-footer">
+
+
+    
+    
+    
+    <div id="container-3ae39f7af4" class="cmp-container">
+        
+        <div class="kb-footer">
+<div class="popupModal hide" id="mediaPopup">
+	 <h2 class="closeVideoPlayer" style="margin:0;"></h2>
+	 <div class="popup">
+		  <video id="popupVideoPlayer" class="videoPlayer" width="100%" controls>
+		 		 <source src=""/>
+		  </video>
+		  <iframe id="popupIframeVideoPlayer" src=""></iframe>
+	 </div>
+</div>
+
+
+<!-- Place with DigiCert Seal HTML or with other scripts -->
+<script type="text/javascript">
+	var __dcid = __dcid || [];
+		__dcid.push({"cid":"DigiCertClickID_QpVPir5r","tag":"QpVPir5r","seal_format":"dynamic"});
+		(function(){
+			var cid=document.createElement("script");
+				cid.async=true;
+				cid.src="//seal.digicert.com/seals/cascade/seal.min.js";
+			var s = document.getElementsByTagName("script");
+			var ls = s[(s.length - 1)];
+				ls.parentNode.insertBefore(cid, ls.nextSibling);
+		}());
+</script>
+
+<div class="footer-top-line"></div>
+<div class="footer-kb" am-region="Footer">
+	 <ul id="aboutus-text" class="clearfix">
+	 	 <li class="aboutus-text">
+			 
+
+
+
+<div class="site-branding">
+    <a>
+    	<img src="/content/dam/digicert/DigiCert-Logo.png" alt="DigiCert Logo" loading="lazy" width="124" height="33"/>
+    </a>
+</div>
+
+
+    
+
+
+			 <p>The most-trusted global provider of high-assurance TLS/SSL, PKI, IoT and signing solutions. <br />
+</p>
+
+		</li>
+		<li id="digicert-seal" class="digicert-seal">
+			
+			
+			<div id="DigiCertClickID_QpVPir5r"></div>
+			
+		</li>
+		<li class="socialMedia">
+			<a href="https://www.linkedin.com/company/digicert-inc-/">
+			   <img src="/content/dam/digicert/icons/LinkedInIcon.svg" alt="Linkedin"/>
+		    </a>
+		
+			<a href="https://twitter.com/digicert?s=20">
+			   <img src="/content/dam/kb/icons/twitter.svg" alt="Twitter"/>
+		    </a>
+		
+			<a href="https://www.youtube.com/user/DigiCertSSL">
+			   <img src="/content/dam/digicert/icons/YouTubeIcon.svg" alt="Youtube"/>
+		    </a>
+		</li>	
+	 </ul>
+	 <ul id="footer-menu" class="menu clearfix">
+		 <li>
+			<h6 class="footer-label">
+				Support
+			</h6>
+			<i class="fa fa-angle-down"></i>
+			<ul class="sub-menu clearfix">
+				<li><a href="https://www.digicert.com/support" class=" txt-u-animate straight-line">TLS/SSL Support</a></li>
+			
+				<li><a href="https://www.digicert.com/support/pki-support" class=" txt-u-animate straight-line">PKI Support</a></li>
+			
+				<li><a href="https://www.digicert.com/help/" class=" txt-u-animate straight-line">SSL Checker</a></li>
+			
+				<li><a href="https://www.digicert.com/support/tools/certificate-utility-for-windows" class=" txt-u-animate straight-line">Certificate Utility</a></li>
+			
+				<li><a href="https://www.digicert.com/kb/csr-creation.htm" class=" txt-u-animate straight-line">Generate CSR</a></li>
+			
+				<li><a href="https://problemreport.digicert.com/" class=" txt-u-animate straight-line">Report Certificate Misuse</a></li>
+			</ul>
+		 </li>
+	
+		 <li>
+			<h6 class="footer-label">
+				Products
+			</h6>
+			<i class="fa fa-angle-down"></i>
+			<ul class="sub-menu clearfix">
+				<li><a href="https://www.digicert.com/tls-ssl/compare-certificates" class=" txt-u-animate straight-line">Compare Certificates</a></li>
+			
+				<li><a href="https://www.digicert.com/tls-ssl/tls-ssl-certificates" class=" txt-u-animate straight-line">TLS/SSL Certificates</a></li>
+			
+				<li><a href="https://www.digicert.com/tls-ssl/secure-site-pro-ssl" class=" txt-u-animate straight-line">Pro TLS/SSL Certificates</a></li>
+			
+				<li><a href="https://www.digicert.com/tls-ssl/multi-domain-ssl-certificates" class=" txt-u-animate straight-line">Multi-Domain SSL</a></li>
+			
+				<li><a href="https://www.digicert.com/tls-ssl/wildcard-ssl-certificates" class=" txt-u-animate straight-line">Wildcard Certificates</a></li>
+			
+				<li><a href="https://www.digicert.com/signing/document-signing-certificates" class=" txt-u-animate straight-line">Document Signing</a></li>
+			
+				<li><a href="https://www.digicert.com/signing/code-signing-certificates" class=" txt-u-animate straight-line">Code Signing</a></li>
+			</ul>
+		 </li>
+	
+		 <li>
+			<h6 class="footer-label">
+				Solutions
+			</h6>
+			<i class="fa fa-angle-down"></i>
+			<ul class="sub-menu clearfix">
+				<li><a href="https://www.digicert.com/tls-ssl/certcentral-tls-ssl-manager" class=" txt-u-animate straight-line">CertCentral</a></li>
+			
+				<li><a href="https://www.digicert.com/trust-lifecycle-manager" class=" txt-u-animate straight-line">DigiCert® Trust Lifecycle Manager</a></li>
+			
+				<li><a href="https://www.digicert.com/device-trust-manager" class=" txt-u-animate straight-line">DigiCert® Device Trust Manager</a></li>
+			
+				<li><a href="https://www.digicert.com/software-trust-manager" class=" txt-u-animate straight-line">DigiCert® Software Trust Manager</a></li>
+			
+				<li><a href="https://www.digicert.com/document-trust-manager" class=" txt-u-animate straight-line">DigiCert® Document Trust Manager</a></li>
+			
+				<li><a href="https://www.digicert.com/solutions/solutions-overview" class=" txt-u-animate straight-line">Solutions Overview</a></li>
+			
+				<li><a href="https://www.digicert.com/digicert-one" class=" txt-u-animate straight-line">DigiCert ONE</a></li>
+			</ul>
+		 </li>
+	</ul>
+	<ul id="mobile-socialMedia" class="clearfix">
+		<li>
+			<a href="https://www.linkedin.com/company/digicert-inc-/" style="max-width:50px;max-height:50px;">
+			   <img src="/content/dam/digicert/icons/LinkedInIcon.svg" alt="Linkedin"/>
+		    </a>
+		
+			<a href="https://twitter.com/digicert?s=20" style="max-width:50px;max-height:50px;">
+			   <img src="/content/dam/kb/icons/twitter.svg" alt="Twitter"/>
+		    </a>
+		
+			<a href="https://www.youtube.com/user/DigiCertSSL" style="max-width:50px;max-height:50px;">
+			   <img src="/content/dam/digicert/icons/YouTubeIcon.svg" alt="Youtube"/>
+		    </a>
+		</li>
+	</ul>
+	<ul id="copyright" class="clearfix">
+		<li>
+			<p>© 2022-2024, DigiCert, Inc. All rights reserved.</p>
+
+			
+				
+					<a href="javascript:void(0);" onclick="transcend.showConsentManager({ viewState: 'CompleteOptions' });">Cookie Settings</a>
+                
+				
+			
+		</li>
+	</ul>
+</div></div>
+<div class="back-to-top"><button class="backtotop" id="myBtn" title="Go to top"><i class="arrow-updated up"></i>&nbsp;&nbsp;TO TOP</button>
+
+    
+</div>
+
+        
+    </div>
+
+</div>
+
+    
+</div>
+
+    
+</div>
+</div>
+
+
+            
+    
+    
+<script src="/etc.clientlibs/kb/clientlibs/clientlib-site.js"></script>
+<script src="/etc.clientlibs/kb/clientlibs/clientlib-site-kb.js"></script>
+
+
+
+    
+
+    
+    
+<script src="/etc.clientlibs/core/wcm/components/commons/site/clientlibs/container.js"></script>
+<script src="/etc.clientlibs/kb/clientlibs/clientlib-base.js"></script>
+<script src="/libs/dam/components/scene7/common/clientlibs/viewer.js"></script>
+<script src="/etc.clientlibs/digicert/clientlibs/clientlib-base.js"></script>
+
+
+
+
+
+
+	<div class="back-to-top" style="display:none;">
+		<div class="back-to-top-container">
+			<div class="inner-container">
+				<div class="icon-container">
+					<img src="/content/dam/kb/logos/back-to-top.svg"/>
+				</div>
+	            <div class="container-text">TO TOP</div>
+			</div>
+		</div>
+	</div>
+
+
+    
+
+    
+
+    
+    
+
+
+
+    
+    
+   <!-- <div data-sly-unwrap="true"><sly data-sly-resource="kbratingform"></sly></div> -->
+
+            
+
+
+        
+    <script type="text/javascript" src="/_Incapsula_Resource?SWJIYLWA=719d34d31c8e3a6e6fffd425f7e032f3&ns=3&cb=845047448" async></script></body>
+</html>

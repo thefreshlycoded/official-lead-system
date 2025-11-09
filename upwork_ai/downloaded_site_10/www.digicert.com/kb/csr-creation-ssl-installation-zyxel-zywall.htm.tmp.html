@@ -1,0 +1,831 @@
+<!doctype html>
+<html lang="en">
+<head><script src="/bry-Say-I-double-We-well-Mighties-in-finde-And-i" async></script>
+		<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<title>Zyxel ZyWall USG 300 SSL Install and CSR Creation Guide</title>
+	<meta name="DESCRIPTION" content="SSL CSR Creation &amp; Certificate Installation on Zyxel ZyWall USG 300 Get Guides and Instructions for Zyxel SSL" />			<link rel="canonical" href="https://www.digicert.com/kb/csr-creation-ssl-installation-zyxel-zywall.htm" />
+
+	<!-- CSS -->
+	<link href="https://www.digicert.com/kb/css/ks.css.php?CBR=CB6396092" rel="stylesheet" type="text/css" />
+		
+	<!--[if IE 7]>
+		<link rel="stylesheet" type="text/css" href="/css/ie7.css">
+	<![endif]-->
+
+	<!-- Inline JS -->
+	<script type="text/javascript"></script>
+
+	<!-- Scripts -->
+		<script type="text/javascript" src="/kb/js/ks.base.js.php?CBR=1CB6396092" charset="utf-8"></script>
+	
+	
+	
+
+    <script>
+        !function(e,t,n,s,u,a){e.twq||(s=e.twq=function()
+        {s.exe?s.exe.apply(s,arguments):s.queue.push(arguments); }
+            ,s.version='1.1',s.queue=[],u=t.createElement,u.async=!0,u.src='//static.ads-twitter.com/uwt.js',
+            a=t.getElementsByTagName[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
+        // Insert Twitter Pixel ID and Standard Event data below
+        twq('init','nvj49');
+        twq('track','PageView');
+    </script>
+
+	<!-- Alligators -->
+	
+	<!-- <link rel="shortcut icon" href="/kb/images/new-digicert-favicon.ico" > -->
+	<link rel="shortcut icon" href="/content/dam/digicert/images/DigiCertFavicon_32x32.png" >
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-Q35G17LVRX"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+	
+	  gtag('config', 'G-Q35G17LVRX');
+	</script>
+
+	        <script src="//assets.adobedtm.com/launch-ENabd44b5f5bf84d2490c24875509a34a5.min.js"></script>
+    	
+			</head>
+<body class="navlesspage wp-header" >
+
+<h1 >Zyxel ZyWall USG 300 CSR Creation &amp; SSL Install Instructions</h1>
+<div id="mainContainer">
+
+
+<div id="mainContent" class="main-content">
+<div class="container">
+<h2>Zyxel ZyWall USG 300 SSL Management Instructions</h2>
+<p><strong>Zyxel ZyWall USG 300 CSR Creation</strong></p>
+
+<p>To get started, you will want log in to the Web Configurator. Once open, click on <span>Object</span>, <span>Certificate</span>, then <span>My Orders</span>. The My Certificates section should give you an overall detailed view of any certificates or requests that are on the machine. Under the My Certificates section, click the <span>Add</span> button. This will allow us to begin creating the CSR:</p>
+<p><span>Name</span>: This is a personal identifier. The name will appear under the My Certificates section and should be named in a way that would help you remember which cert it is.</p>
+<p><span>Common Name</span>: If the connection will be made through a domain name, select Host Domain Name, If it will be accessed directly from the IP address, select Host IP Address.</p>
+<p><span>Organizational Unit</span>: This is optional, but is often filled in with names like IT Department or Headquarters. I can really be anything that describes your situation.</p>
+<p><span>Organization</span>: Enter your legal business name.</p>
+<p><span>Country</span>: While optional, a 2-digit country code would be fine (i.e. US).</p>
+<p><span>Key Type</span>: Select RSA.</p>
+<p><span>Key Length</span>: Select a minimum of 2048 bits.</p>
+<p><span>Enrollment Options</span>: Select to, "Create a certification request and save it locally for later manual enrollment". This should be the last thing we need to do on this page and should make the CSR, which can then be retrieved from the <span>My Certificate Details</span> screen. Once you retrieve the CSR, you can copy and paste it to the DigiCert order form or upload it to a pending order.</p>
+<a name="install"></a><p><strong>Installation from Certificate Files (.cer, .p7b, .crt/.pem)</strong></p>
+<span id="answer">Once you receive the .zip containing the certificate  files, extract the &ldquo;certs&rdquo; folder somewhere on your machine. </span>Depending on the type of certificate file you received back from us, will determine what to do next.<br /><b>Note</b>: The file you will import cannot contain any space in the file name. Also, you cannot import a file that has the same name as a previous certificate file that is currently on the machine.<br /><br /><b>.cer or .p7b </b>- You will go <b>Object</b>, <b>Certificate</b>, <b>My Certificates</b>,  then click on <b>Import</b> in the Web Configurator. Click Browse and locate the certificate file. Leave the password field blank, then click OK. The certificate should now be installed.<br /><br /><b>.crt</b> - We will be combining  the files you received in to a .pem format. To create the .pem file, you  can reference our .PEM instructions:&nbsp;<a href="/kb/ssl-support/pem-ssl-creation.htm">https://www.digicert.com/ssl-support/pem-ssl-creation.htm</a>
+<p style="color: rgb(0, 0, 0);">With a text editor (such as wordpad),  copy and paste the entire body of each certificate into one text file in  the following order:</p>
+<ol style="color: rgb(0, 0, 0);">
+<li>The Primary Certificate -&nbsp;<b>your_domain_name.crt</b></li>
+<li>The First Intermediate Certificate -&nbsp;<b>DigiCertCA.crt</b></li>
+<li>The Second Intermediate Certificate(if a 2<sup>nd</sup>&nbsp;intermediate  cert is supplied) &ndash;&nbsp;<b>DigiCertCA2.crt</b></li>
+<li>The Root Certificate -&nbsp;<b>TrustedRoot.crt</b></li>
+</ol>
+<p>Make sure to include the beginning and  end tags on each certificate. The result should look like this:</p>
+<p><font color="#888888"><b></b></font><b><font color="#ff6600">-----BEGIN  CERTIFICATE-----&nbsp;<br /></font></b><b><font color="#ff6600">(Your Primary  SSL certificate: your_domain_name.crt)&nbsp;<br /></font></b><b><font color="#ff6600">-----END CERTIFICATE-----&nbsp;<br /></font></b><b><font color="#008000">-----BEGIN CERTIFICATE-----&nbsp;<br /></font></b><b><font color="#008000">(Your First Intermediate certificate: DigiCertCA.crt)&nbsp;<br /></font></b><b><font color="#008000">-----END CERTIFICATE-----&nbsp;<br /></font></b><b><font color="#ff0000">-----BEGIN CERTIFICATE-----&nbsp;<br /></font></b><b><font color="#ff0000">(Your Second Intermediate certificate (if applicable):  DigiCertCA2.crt)<br />-----END CERTIFICATE-----&nbsp;</font><br /></b><font color="#0000ff"><b>-----BEGIN CERTIFICATE-----&nbsp;<br /></b><b>(Your Root  certificate: TrustedRoot.crt)&nbsp;<br /></b><b>-----END CERTIFICATE-----</b><b>&nbsp;</b></font></p>
+<p>
+	Save the combined file as&nbsp;<b>your_domain_name.pem</b>.  Your .pem file should be ready for use. You will go <b>Object</b>, <b>Certificate</b>, <b>My Certificates</b>,
+	then click on <b>Import</b> in the Web Configurator. Click Browse and locate the certificate file. Leave the password field  blank, then click OK. The certificate should now be
+	installed.
+</p>
+<p><strong>Installation from a .pfx File</strong></p>
+<p>
+	If you have machine that is capable of exporting an installed certificate to a .pfx, such as a Windows server, then this might be the easiest option for the
+	certificate installation. You can reference our certificate export instructions for creating the .pfx file:
+	<a href="/kb/import-export-ssl-certificate.htm">https://www.digicert.com/import-export-ssl-certificate.htm</a>
+</p>
+<p>
+	Once you get a .pfx file created, you will go <b>Object</b>, <b>Certificate</b>, <b>My Certificates</b>,  then  click on <b>Import</b> in the Web Configurator. Click Browse and locate
+	the .pfx file. You will need to put in the password that was used to create the .pfx file for the import to work. The certificate should now be installed.
+</p>
+<h2>SSL Certificate CSR Creation in Zyxel ZyWall USG 300</h2>
+<p>
+How to generate a CSR or Install a Certificate on a Zyxel ZyWall USG 300
+</p>
+		<p>
+			<a class="ks-button tertiary" href="https://order.digicert.com/step1/ssl_basic">BUY NOW</a>
+		</p>
+
+</div>
+	<div class="container-inset">
+		<div class="container">
+			<div class="columns">
+			
+				<div class="column">
+				<h4>Related Links</h4>
+					<ul><li><a href="/kb/csr-creation.htm">Generate Certificate Signing Request</a></li>
+					</ul>
+				</div>
+
+				<div class="column">
+				<h4>SSL Certificate</h4>
+					<ul><li><a href="/tls-ssl/compare-certificates" class="selected">SSL Plus</a></li><li><a href="/tls-ssl/wildcard-ssl-certificates">Wildcard SSL</a></li>
+					<li><a href="/tls-ssl/multi-domain-ssl-certificates">Multi-Domain</a></li>
+					<li><a href="/tls-ssl/basic-tls-ssl-certificates">Extended Validation</a></li>
+					<li><a href="https://www.digicert.com/code-signing/">Code Signing Certificates</a></li>
+
+					</ul>
+				</div>
+			
+
+		</div>
+	</div>
+
+</div>
+
+</div><!-- end #mainContainer -->
+
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900" rel="stylesheet">
+<link rel="stylesheet" id="wp-block-library-css" href="/wp-includes/css/dist/block-library/style.min.css?ver=6.1.1" type="text/css" media="all">
+<link rel="stylesheet" id="classic-theme-styles-css" href="/wp-includes/css/classic-themes.min.css?ver=1" type="text/css" media="all">
+<link rel="stylesheet" id="jquery-ui-smoothness-css" href="/wp-content/plugins/digicert-reviews/jquery-ui.min.css?ver=6.1.1" type="text/css" media="all">
+<link rel="stylesheet" id="digicert-reviews-css" href="/wp-content/plugins/digicert-reviews/digicert-reviews.css?ver=6.1.1" type="text/css" media="all">
+<link rel="stylesheet" id="wp-pagenavi-css" href="/wp-content/plugins/wp-pagenavi/pagenavi-css.css?ver=2.70" type="text/css" media="all">
+<link rel="stylesheet" id="digicert_custom-style-css" href="/wp-content/themes/digicert_custom/style.css?ver=6.1.1" type="text/css" media="all">
+<link rel="stylesheet" id="polylang-css" href="/wp-content/themes/digicert_custom/polylang.css?ver=6.1.1" type="text/css" media="all">
+<link rel="stylesheet" id="owl-styles-css" href="/wp-content/themes/digicert_custom/css/owl.carousel.css?ver=6.1.1" type="text/css" media="all">
+<link rel="stylesheet" id="mean-styles-css" href="/wp-content/themes/digicert_custom/css/meanmenu.css?ver=6.1.1" type="text/css" media="all">
+<link rel="stylesheet" id="just-styles-css" href="/wp-content/themes/digicert_custom/just.css?ver=6.1.1" type="text/css" media="all">
+<link rel="stylesheet" id="featherlight-css-css" href="/wp-content/themes/digicert_custom/css/featherlight.css?ver=6.1.1" type="text/css" media="all">
+<link rel="stylesheet" id="featherlight-gallery-css-css" href="/wp-content/themes/digicert_custom/js/featherlight.gallery.min.css?ver=6.1.1" type="text/css" media="all">
+<link rel="stylesheet" id="animate-css" href="/wp-content/themes/digicert_custom/css/animate.css?ver=6.1.1" type="text/css" media="all">
+<link rel="stylesheet" href="/wp-content/themes/digicert_custom/aos.css">
+<link rel="stylesheet" href="/wp-content/themes/digicert_custom/custom-style.css?v=7.24.20">
+<link rel="stylesheet" href="/wp-content/themes/digicert_custom/custom-style1.css?v=7.24.20">
+<link rel="stylesheet" href="/wp-content/themes/digicert_custom/mpki_style.css">
+<link rel="stylesheet" href="/wp-content/themes/digicert_custom/iot.css"><link rel="stylesheet" type="text/css" media="all" href="/kb/css/wp-transitional.css?CBR=CB6396092" />
+<header id="masthead" class="site-header" role="banner"><div class="relative-fix">
+         <div class="container">
+            <div class="site-branding">
+               <a href="/">
+                  <img src="/wp-content/uploads/2018/10/DigiCert-Logo.png" height="33" width="124" alt="DigiCert"><!--<img id="site-logo"
+                             src="/img/DigiCert-Logo.svg"
+                             alt="">--></a>
+            </div>
+<!-- .site-branding -->
+            
+            
+            <nav id="site-navigation" class="main-navigation" role="navigation"><div class="menu-menu-1-container"><ul id="primary-menu" class="menu">
+<li id="menu-item-21350" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-21350">
+<a>TLS/SSL</a>
+<ul class="sub-menu">
+<li id="menu-item-11855" class="container no-link menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-11855">
+<a>WRAPPER</a>
+	<ul class="sub-menu">
+<li id="menu-item-23999" class="no-padding hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-23999"><div class="menu-widget menu-widget-small menu-widget-id-23999">
+<h3>Identity on the brink</h3>
+<a class="featherlink blend" style="font-size: 14px; margin-left: 10px;" href="#" data-featherlight="&lt;iframe src='//player.vimeo.com/video/390559024?autoplay=1&amp;api=1' frameborder='0' width='800' height='450' allowfullscreen&gt;"><img src="/wp-content/uploads/2020/02/identity.jpg" alt="Identity on the brink"><span class="icon-PlayButton_Filled"></span></a> </div></li>
+		<li id="menu-item-46020" class="fourth menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-46020">
+<a href="https://www.digicert.com/tls-ssl/secure-site-pro-ssl">Pro TLS/SSL Certificates</a>
+		<ul class="sub-menu">
+<li id="menu-item-46021" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-46021"><a href="https://www.digicert.com/tls-ssl/secure-site-pro-ssl">Secure Site Pro SSL</a></li>
+			<li id="menu-item-46022" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-46022"><a href="https://www.digicert.com/secure-site-pro-ssl/">Secure Site Pro EV SSL</a></li>
+			<li id="menu-item-52606" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52606"><a href="https://www.digicert.com/tls-ssl/post-quantum-cryptography"><nobr class="desktop">Post Quantum Cryptography</nobr></a></li>
+			<li id="menu-item-52574" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52574"><a href="https://www.digicert.com/tls-ssl/certcentral-tls-ssl-manager">Management Tools</a></li>
+		</ul>
+</li>
+		<li id="menu-item-52611" class="fourth menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52611">
+<a href="https://www.digicert.com/tls-ssl/business-tls-ssl-certificates">Business TLS/SSL Certificates</a>
+		<ul class="sub-menu">
+<li id="menu-item-52615" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52615"><a href="https://www.digicert.com/tls-ssl/business-tls-ssl-certificates">Secure Site SSL</a></li>
+			<li id="menu-item-52613" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52613"><a href="https://www.digicert.com/tls-ssl/business-tls-ssl-certificates">Secure Site EV SSL</a></li>
+			<li id="menu-item-52614" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52614"><a href="https://www.digicert.com/tls-ssl/multi-domain-ssl-certificates">Secure Site Multi-Domain SSL</a></li>
+			<li id="menu-item-52612" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52612"><a href="https://www.digicert.com/tls-ssl/multi-domain-ssl-certificates">Secure Site EV Multi-Domain SSL</a></li>
+			<li id="menu-item-52616" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52616"><a href="https://www.digicert.com/tls-ssl/wildcard-ssl-certificates">Secure Site Wildcard SSL</a></li>
+			<li id="menu-item-52575" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52575"><a href="https://www.digicert.com/tls-ssl/certcentral-tls-ssl-manager">Management Tools</a></li>
+		</ul>
+</li>
+		<li id="menu-item-52620" class="toggle fourth menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52620">
+<a href="https://www.digicert.com/what-is-an-ssl-certificate">Basic TLS/SSL Certificates</a>
+		<ul class="sub-menu">
+<li id="menu-item-52621" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52621"><a href="https://www.digicert.com/tls-ssl/basic-tls-ssl-certificates">Standard SSL</a></li>
+			<li id="menu-item-52593" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52593"><a href="https://www.digicert.com/tls-ssl/basic-tls-ssl-certificates">Extended Validation SSL</a></li>
+			<li id="menu-item-52603" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52603"><a href="https://www.digicert.com/tls-ssl/multi-domain-ssl-certificates">Multi-Domain SSL</a></li>
+			<li id="menu-item-52592" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52592"><a href="https://www.digicert.com/tls-ssl/multi-domain-ssl-certificates">EV Multi-Domain SSL</a></li>
+			<li id="menu-item-52624" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52624"><a href="https://www.digicert.com/tls-ssl/wildcard-ssl-certificates">Wildcard SSL</a></li>
+			<li id="menu-item-52576" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52576"><a href="https://www.digicert.com/tls-ssl/certcentral-tls-ssl-manager">Management Tools</a></li>
+		</ul>
+</li>
+		<li id="menu-item-52588" class="toggle fourth menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52588">
+<a href="https://www.digicert.com/tls-ssl/digital-certificates">Other Certificates</a>
+		<ul class="sub-menu">
+<li id="menu-item-53130" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-53130"><a href="https://www.digicert.com/solutions/security-solutions-for-psd2-compliance">PSD2 Compliance</a></li>
+			<li id="menu-item-52579" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52579"><a href="https://www.digicert.com/signing/code-signing-certificates">Code Signing</a></li>
+			<li id="menu-item-52580" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52580"><a href="https://www.digicert.com/signing/code-signing-certificates">EV Code Signing</a></li>
+			<li id="menu-item-52642" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52642"><a href="https://www.digicert.com/document-trust-manager">DigiCert® Document Trust Manager</a></li>
+			<li id="menu-item-52578" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52578"><a href="https://www.digicert.com/tls-ssl/client-certificates">Client (S/MIME)</a></li>
+			<li id="menu-item-52585" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52585"><a href="https://www.digicert.com/solutions/security-solutions-for-devices">Device</a></li>
+			<li id="menu-item-52594" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52594"><a href="https://www.digicert.com/solutions/security-solutions-for-google-amp">TLS for Google AMP</a></li>
+			<li id="menu-item-52623" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52623"><a href="https://www.digicert.com/tls-ssl/verified-mark-certificates"><nobr>Verified Mark Certificates (VMC)</nobr></a></li>
+		</ul>
+</li>
+		<li id="menu-item-11865" class="no-label menu-item-object-yawp_wim menu-item menu-item-type-custom menu-item-object-custom menu-item-11865"><div class="menu-widget menu-widget-full menu-widget-id-11865">
+<h3>Submenu Footer – Buttons</h3>
+<p style="text-align: center;"><a class="button buy" href="https://order.digicert.com/">Buy</a><a class="button blend" href="https://docs.digicert.com/en/certcentral/manage-certificates/renew-an-ssl-tls-certificate.html">Renew</a><a class="button blend" href="https://www.digicert.com/tls-ssl/compare-certificates">COMPARE</a><a class="button blend" href="https://www.digicert.com/what-is-ssl-tls-and-https">WHAT ARE SSL, TLS &amp; HTTPS?</a></p>
+<style>header#masthead #primary-menu > li#menu-item-39578 > ul.sub-menu > li > ul.sub-menu > li{
+    padding-left: 10px;
+    padding-right: 10px;
+}</style>
+</div></li>
+	</ul>
+</li>
+</ul>
+</li>
+<li id="menu-item-21997" class="toggle pki menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-21997">
+<a>PKI</a>
+<ul class="sub-menu">
+<li id="menu-item-21998" class="container no-link menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-21998">
+<a href="#">WRAPPER</a>
+	<ul class="sub-menu">
+<li id="menu-item-41186" class="no-padding hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-41186"><div class="menu-widget menu-widget-small menu-widget-id-41186">
+<h3>It’s time to redefine PKI</h3>
+<a class="featherlink blend" style="font-size: 14px; margin-left: 10px;" href="#" data-featherlight="&lt;iframe src='//player.vimeo.com/video/390554299?autoplay=1&amp;api=1' frameborder='0' width='800' height='450' allowfullscreen&gt;"><img src="/wp-content/uploads/2020/02/snowbird_image-1.jpg" alt="It's time to redefine PKI"><span class="icon-PlayButton_Filled"></span></a> </div></li>
+		<li id="menu-item-52587" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52587">
+<a href="https://www.digicert.com/trust-lifecycle-manager">DigiCert® Trust Lifecycle Manager</a>
+		<ul class="sub-menu">
+<li id="menu-item-52609" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52609"><a href="https://www.digicert.com/pki/enterprise-pki-manager/secure-email">Secure Email Use Case</a></li>
+			<li id="menu-item-52610" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52610"><a href="https://www.digicert.com/pki/enterprise-pki-manager/secure-network-access">Secure Network Access Use Case</a></li>
+			<li id="menu-item-52617" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52617"><a href="https://www.digicert.com/pki/enterprise-pki-manager/secure-smart-cards">Secure Smart Card Use Case</a></li>
+			<li id="menu-item-52607" class="hide-on-desktop menu-item menu-item-type-custom menu-item-object-custom menu-item-52607"><a href="https://www.digicert.com/pki/enterprise-pki-manager/secure-devices">Secure Device Use Case</a></li>
+			<li id="menu-item-52608" class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-52608"><a href="https://www.digicert.com/pki/enterprise-pki-manager/secure-devices">Secure Device Use Case</a></li>
+		</ul>
+</li>
+		<li id="menu-item-22000" class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-22000">
+<a> </a>
+		<ul class="sub-menu">
+<li id="menu-item-52618" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52618"><a href="https://www.digicert.com/software-trust-manager">DigiCert® Software Trust Manager</a></li>
+		</ul>
+</li>
+		<li id="menu-item-22001" class="no-label menu-item-object-yawp_wim menu-item menu-item-type-custom menu-item-object-custom menu-item-22001"><div class="menu-widget menu-widget-full menu-widget-id-22001">
+<h3>MPKI-footer</h3>
+<p style="text-align: center; padding: 20px;">Contact a PKI Specialist 1.801.701.9600</p> </div></li>
+	</ul>
+</li>
+</ul>
+</li>
+<li id="menu-item-22014" class="toggle pki iot menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-22014">
+<a>IoT</a>
+<ul class="sub-menu">
+<li id="menu-item-22015" class="container no-link menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-22015">
+<a href="#">WRAPPER</a>
+	<ul class="sub-menu">
+<li id="menu-item-24001" class="no-padding hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-24001"><div class="menu-widget menu-widget-small menu-widget-id-24001">
+<h3>Panasonic Trusts DigiCert for IoT Solutions</h3>
+<a class="featherlink blend" style="font-size: 14px; margin-left: 10px;" href="#" data-featherlight="&lt;iframe src='//player.vimeo.com/video/307750809?autoplay=1&amp;api=1' frameborder='0' width='800' height='450' allowfullscreen&gt;"><img src="/wp-content/uploads/2019/04/panasonic.png" alt="Panasonic Tusts DigiCert for IoT Solutions"><span class="icon-PlayButton_Filled"></span></a> </div></li>
+		<li id="menu-item-52595" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52595">
+<a href="https://www.digicert.com/iot-trust-manager">DigiCert® IoT Trust Manager</a>
+		<ul class="sub-menu">
+<li id="menu-item-52596" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52596"><a href="https://www.digicert.com/iot/iot-device-manager/iot-of-healthcare">IoT of Healthcare</a></li>
+			<li id="menu-item-52599" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52599"><a href="https://www.digicert.com/iot/iot-device-manager/industrial-iot">Industrial IoT</a></li>
+			<li id="menu-item-52600" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52600"><a href="https://www.digicert.com/iot/iot-device-manager/smart-city">Smart City</a></li>
+			<li id="menu-item-52601" class="hide-on-desktop menu-item menu-item-type-custom menu-item-object-custom menu-item-52601"><a href="https://www.digicert.com/iot/iot-device-manager/iot-of-transportation">IoT of Transportation</a></li>
+			<li id="menu-item-52597" class="hide-on-desktop menu-item menu-item-type-custom menu-item-object-custom menu-item-52597"><a href="https://www.digicert.com/iot/iot-device-manager/iot-home-and-consumer">IoT Home and Consumer</a></li>
+		</ul>
+</li>
+		<li id="menu-item-22087" class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-22087">
+<a> </a>
+		<ul class="sub-menu">
+<li id="menu-item-52598" class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-52598"><a href="https://www.digicert.com/iot/iot-device-manager/iot-home-and-consumer">IoT Home and Consumer</a></li>
+			<li id="menu-item-52602" class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-52602"><a href="https://www.digicert.com/iot/iot-device-manager/iot-of-transportation">IoT of Transportation</a></li>
+			<li id="menu-item-52584" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52584"><a href="https://www.digicert.com/pki/enterprise-pki-manager">Custom Certificate Profiles</a></li>
+		</ul>
+</li>
+		<li id="menu-item-22024" class="no-label menu-item-object-yawp_wim menu-item menu-item-type-custom menu-item-object-custom menu-item-22024"><div class="menu-widget menu-widget-full menu-widget-id-22024">
+<h3>Submenu Footer – IoT</h3>
+<p style="text-align: center; padding: 20px;">Contact an IoT Specialist 1.801.701.9600</p> </div></li>
+	</ul>
+</li>
+</ul>
+</li>
+<li id="menu-item-11866" class="toggle menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-11866">
+<a>Solutions</a>
+<ul class="sub-menu">
+<li id="menu-item-22013" class="container no-link menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-22013">
+<a href="#">WRAPPER</a>
+	<ul class="sub-menu">
+<li id="menu-item-24002" class="no-padding hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-24002"><div class="menu-widget menu-widget-small menu-widget-id-24002">
+<h3>DigiCert Finds a Better Way</h3>
+<a class="featherlink blend" style="font-size: 14px; margin-left: 10px;" href="#" data-featherlight="&lt;iframe src='//player.vimeo.com/video/290279420?autoplay=1&amp;api=1' frameborder='0' width='800' height='450' allowfullscreen&gt;"><img src="/wp-content/uploads/2019/04/betterway-1.png" alt="DigiCert Finds a Better Way"><span class="icon-PlayButton_Filled"></span></a> </div></li>
+		<li id="menu-item-30336" class="toggle fourth menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-30336">
+<a>Solutions Overview</a>
+		<ul class="sub-menu">
+<li id="menu-item-30337" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-30337"><a href="https://www.digicert.com/solutions/security-solutions-for-websites">Solutions for Websites</a></li>
+			<li id="menu-item-30338" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-30338"><a href="https://www.digicert.com/solutions/security-solutions-for-networks">Solutions for Networks</a></li>
+			<li id="menu-item-30339" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-30339"><a href="https://www.digicert.com/solutions/security-solutions-for-email">Solutions for Email</a></li>
+			<li id="menu-item-52586" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52586"><a href="https://www.digicert.com/solutions/security-solutions-for-devices">Solutions for Devices</a></li>
+			<li id="menu-item-30341" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-30341"><a href="https://www.digicert.com/solutions/security-solutions-for-users">Solutions for Users</a></li>
+			<li id="menu-item-30342" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-30342"><a href="https://www.digicert.com/solutions/security-solutions-for-documents">Solutions for Documents</a></li>
+			<li id="menu-item-30343" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-30343"><a href="https://www.digicert.com/solutions/security-solutions-for-code">Solutions for Code</a></li>
+			<li id="menu-item-30344" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-30344"><a href="https://www.digicert.com/solutions/security-solutions-for-automation">Solutions for Automation</a></li>
+		</ul>
+</li>
+		<li id="menu-item-52604" class="toggle fourth menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52604">
+<a href="https://www.digicert.com/partners">Partner Program</a>
+		<ul class="sub-menu">
+<li id="menu-item-52605" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52605"><a href="https://www.digicert.com/partners/tls-ssl/reseller-program">Resellers &amp; Affiliates</a></li>
+			<li id="menu-item-52577" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52577"><a href="https://www.digicert.com/solutions/security-solutions-for-ci-plus">CI Plus</a></li>
+			<li id="menu-item-39951" class="no-label menu-item-object-yawp_wim menu-item menu-item-type-custom menu-item-object-custom menu-item-39951"><div class="menu-widget menu-widget-full menu-widget-id-39951">
+<h3>Submenu- Footer</h3>
+<p></p> </div></li>
+		</ul>
+</li>
+	</ul>
+</li>
+</ul>
+</li>
+<li id="menu-item-23963" class="toggle about-menu menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-23963">
+<a href="/about-digicert/">About</a>
+<ul class="sub-menu">
+<li id="menu-item-52645" class="hide-on-desktop menu-item menu-item-type-custom menu-item-object-custom menu-item-52645"><a href="https://www.digicert.com/partners">Partner</a></li>
+	<li id="menu-item-52583" class="hide-on-desktop menu-item menu-item-type-custom menu-item-object-custom menu-item-52583"><a href="https://www.digicert.com/contact-us">Contact</a></li>
+	<li id="menu-item-35545" class="hide-on-desktop menu-item menu-item-type-custom menu-item-object-custom menu-item-35545"><a href="https://www.digicert.com/careers">Careers</a></li>
+	<li id="menu-item-22091" class="hide-on-desktop menu-item menu-item-type-post_type menu-item-object-page menu-item-22091"><a href="/company/leadership/">Leadership</a></li>
+	<li id="menu-item-22092" class="hide-on-desktop menu-item menu-item-type-post_type menu-item-object-page menu-item-22092"><a href="/newsroom/">Newsroom</a></li>
+	<li id="menu-item-52648" class="hide-on-desktop menu-item menu-item-type-custom menu-item-object-custom menu-item-52648"><a href="https://www.digicert.com/blog">Blog</a></li>
+	<li id="menu-item-52590" class="hide-on-desktop menu-item menu-item-type-custom menu-item-object-custom menu-item-52590"><a href="https://www.digicert.com/about/events">Events &amp; Webinars</a></li>
+	<li id="menu-item-11913" class="container no-link menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-11913">
+<a>WRAPPER</a>
+	<ul class="sub-menu">
+<li id="menu-item-24068" class="no-padding hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-24068"><div class="menu-widget menu-widget-small menu-widget-id-24068">
+<h3>Doing What’s Right for Digital Security</h3>
+<a class="featherlink blend" style="font-size: 14px; margin-left: 10px;" href="#" data-featherlight="&lt;iframe src='//player.vimeo.com/video/295633035?autoplay=1&amp;api=1' frameborder='0' width='800' height='450' allowfullscreen&gt;"><img src="/wp-content/uploads/2019/04/ValuesVideo.png" alt="Doing What’s Right for Digital Security"><span class="icon-PlayButton_Filled"></span></a> </div></li>
+		<li id="menu-item-52646" class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52646">
+<a href="https://www.digicert.com/partners">Partner</a>
+		<ul class="sub-menu">
+<li id="menu-item-52647" class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-52647"><a href="https://www.digicert.com/blog">Blog</a></li>
+			<li id="menu-item-53132" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-53132"><a href="https://www.digicert.com/news">News</a></li>
+			<li id="menu-item-52573" class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-52573"><a href="https://www.digicert.com/about">About</a></li>
+		</ul>
+</li>
+		<li id="menu-item-11952" class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-11952">
+<a href="https://www.digicert.com/leadership">Leadership</a>
+		<ul class="sub-menu">
+<li id="menu-item-35544" class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-35544"><a href="/careers/">Careers</a></li>
+			<li id="menu-item-52582" class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-52582"><a href="https://www.digicert.com/contact-us">Contact</a></li>
+			<li id="menu-item-52591" class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-52591"><a href="https://www.digicert.com/events">Events &amp; Webinars</a></li>
+		</ul>
+</li>
+		<li id="menu-item-40355" class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-40355"><a href="https://www.digicert.com/tls-ssl/tls-certification-program">Expert Certification</a></li>
+		<li id="menu-item-11922" class="no-label menu-item-object-yawp_wim menu-item menu-item-type-custom menu-item-object-custom menu-item-11922"><div class="menu-widget menu-widget-full menu-widget-id-11922">
+<h3>Submenu Footer – About us</h3>
+<p style="text-align: center; padding: 20px;">Connect with DigiCert 1.801.701.9600</p> </div></li>
+	</ul>
+</li>
+</ul>
+</li>
+<li id="menu-item-11923" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-11923">
+<a>Support</a>
+<ul class="sub-menu">
+<li id="menu-item-11924" class="container no-link menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-11924">
+<a>WRAPPER</a>
+	<ul class="sub-menu">
+<li id="menu-item-11925" class="no-padding hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-11925"><div class="menu-widget menu-widget-small menu-widget-id-11925">
+<h3>Get Help</h3>Talk to a support representative.
+<span class="onlineChatNow" id="liveagent_button_online_support_menu_5730z0000008OtS" style="display: none; border: 0px none; cursor: pointer;" onclick="liveagent.startChat('5730z0000008OtS')"></span><span class="oflineChatNow" id="liveagent_button_offline_support_menu_5730z0000008OtS" style="display: none; border: 0px none;"></span>
+	 </div></li>
+		<li id="menu-item-11926" class="toggle menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-11926">
+<a href="/tools/">Tools</a>
+		<ul class="sub-menu">
+<li id="menu-item-11936" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-11936"><a href="https://www.digicert.com/help/">SSL Install Diagnostic</a></li>
+			<li id="menu-item-11927" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-11927"><a href="https://www.digicert.com/support/tools/certificate-utility-for-windows">Certificate Utility for Windows</a></li>
+			<li id="menu-item-22146" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-22146"><a href="https://www.digicert.com/kb/csr-creation.htm">CSR Generator</a></li>
+		</ul>
+</li>
+		<li id="menu-item-52622" class="toggle menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52622">
+<a href="https://www.digicert.com/support">Digital Certificate Support</a>
+		<ul class="sub-menu">
+<li id="menu-item-52619" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52619">
+<a href="https://www.digicert.com/support">SSL Support</a>
+			<ul class="sub-menu">
+<li id="menu-item-11951" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-11951"><a href="https://www.digicert.com/kb/ssl-certificate-installation.htm">Certificate Installation</a></li>
+				<li id="menu-item-52581" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52581"><a href="https://www.digicert.com/dc/code-signing/support/">Code Signing Support</a></li>
+				<li id="menu-item-52589" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52589"><a href="https://www.digicert.com/support">Document Signing Support</a></li>
+			</ul>
+</li>
+		</ul>
+</li>
+		<li id="menu-item-19289" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-19289">
+<a href="/resources/">Resources</a>
+		<ul class="sub-menu">
+<li id="menu-item-22012" class="blog-menu menu-item menu-item-type-custom menu-item-object-custom menu-item-22012"><a href="https://www.digicert.com/blog">Blog</a></li>
+			<li id="menu-item-23996" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-23996"><a href="https://docs.digicert.com/">Documentation</a></li>
+			<li id="menu-item-30263" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-30263"><a href="https://dev.digicert.com/">API Documentation</a></li>
+		</ul>
+</li>
+		<li id="menu-item-24070" class="no-label menu-item-object-yawp_wim menu-item menu-item-type-custom menu-item-object-custom menu-item-24070"><div class="menu-widget menu-widget-full menu-widget-id-24070">
+<h3>Submenu Footer – Resources</h3>
+<p style="text-align: center;"><a class="button blend" href="tel:1.801.701.9600">CALL SUPPORT</a><a class="button blend" href="mailto:support@digicert.com">EMAIL SUPPORT</a>
+<a class="button blend" href="https://knowledge.digicert.com/" target="_blank">KNOWLEDGEBASE</a>
+<a class="button blend" href="https://docs.digicert.com/" target="_blank">DOCUMENTATION</a>
+</p> </div></li>
+	</ul>
+</li>
+</ul>
+</li>
+<li id="menu-item-19380" class="account-login-link menu-item menu-item-type-custom menu-item-object-custom menu-item-19380"><a href="https://www.digicert.com/account/login.php">Account Login</a></li>
+</ul></div>               <!--     Contact               <svg version="1.1" id="company_contact" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"  viewBox="0 0 65 65" style="enable-background:new 0 0 65 65;" xml:space="preserve"><path class="st0" d="M23.6,27.4c-0.3-1.6,0.6-2.2,0.6-2.2s0,0,1.3-0.9s2.1,0,2.1,0l2,3c0,0,0.6,0.6,0,1.3l-0.7,0.8  c0,0-0.7,1.2,0.1,2.9s3.6,4.5,6.4,4.5c0,0,0.6,0,1.3-0.8c0,0,0.6-0.8,1.5-0.2s2.7,1.7,2.7,1.7s1.3,0.9,0.4,2.2l-1.1,1.4 c0,0-0.9,1.1-2.2,0.7C37.9,41.8,26.2,39.8,23.6,27.4z"/></svg>-->
+               <!-- about <svg version="1.1" id="company_about" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"    viewBox="0 0 65 65" style="enable-background:new 0 0 65 65;" xml:space="preserve"><g>  <g>     <polygon class="st0" points="39.8,44 25.2,44 25.2,36.8 25.2,21 39.8,21      "/> </g>    <line class="st1" x1="28.9" y1="25" x2="36.2" y2="25"/> <line class="st1" x1="28.9" y1="28.4" x2="36.2" y2="28.4"/> <line class="st1" x1="28.9" y1="31.8" x2="36.2" y2="31.8"/> <polyline class="st0" points="34.9,43.5 34.9,37 30.1,37 30.1,43.5   "/></g></svg> -->
+               <!-- careers <svg version="1.1" id="company_careers" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"    viewBox="0 0 65 65" style="enable-background:new 0 0 65 65;" xml:space="preserve"><g>  <g>     <path class="st0" d="M41.8,40.5H23.9c-1.1,0-2-0.9-2-2V30c0-1.1,0.9-2,2-2h17.8c1.1,0,2,0.9,2,2v8.5           C43.8,39.6,42.9,40.5,41.8,40.5z"/>      <line class="st1" x1="35.9" y1="34.1" x2="43.5" y2="34.1"/>     <line class="st1" x1="21.9" y1="34.1" x2="29.5" y2="34.1"/>     <path class="st1" d="M28,27.9v-2.1c0-0.3,0.3-0.6,0.6-0.6h8.6c0.3,0,0.6,0.3,0.6,0.6v2.1"/>       <path class="st0" d="M34.9,35.7h-4.2c-0.6,0-1-0.5-1-1v-1.3c0-0.5,0.4-1,1-1h4.2c0.5,0,1,0.5,1,1v1.3          C35.9,35.3,35.5,35.7,34.9,35.7z"/>  </g></g></svg> -->
+            
+            </nav><!-- #site-navigation --><div class="account-nav">
+               <div class="menu-account-menu-container">
+                  <ul id="account-menu" class="menu">
+<!-- Language Switcher & hide/show --><li class="pll-parent-menu-item menu-item">
+                        <a class="img-wrap">
+                           <img alt="language switcher icon" src="/wp-content/themes/digicert_custom/language-icon.png"></a>
+                        <ul class="sub-menu  english german dutch spanish french italian portuguese chinese_cn chinese_tw japanese korean">
+<li class="lang-item lang-item-163 lang-item-en current-lang lang-item-first"><a lang="en-US" hreflang="en-US" href="/ssl-certificate/">English</a></li>
+	<li class="lang-item lang-item-322 lang-item-kr"><a lang="ko-KR" hreflang="ko-KR" href="/kr/ssl-certificate/">한국어</a></li>
+	<li class="lang-item lang-item-278 lang-item-es"><a lang="es-ES" hreflang="es-ES" href="/es/ssl-certificate/">Español</a></li>
+	<li class="lang-item lang-item-1309 lang-item-ar no-translation"><a lang="ar" hreflang="ar" href="/ar/">العربية</a></li>
+	<li class="lang-item lang-item-282 lang-item-nl no-translation"><a lang="nl-NL" hreflang="nl-NL" href="/nl/">Dutch</a></li>
+	<li class="lang-item lang-item-286 lang-item-de"><a lang="de-DE" hreflang="de-DE" href="/de/ssl-certificate/">Deutsch</a></li>
+	<li class="lang-item lang-item-290 lang-item-fr"><a lang="fr-FR" hreflang="fr-FR" href="/fr/ssl-certificate/">Français</a></li>
+	<li class="lang-item lang-item-298 lang-item-it"><a lang="it-IT" hreflang="it-IT" href="/it/ssl-certificate/">Italiano</a></li>
+	<li class="lang-item lang-item-302 lang-item-pt no-translation"><a lang="pt-BR" hreflang="pt-BR" href="/pt/">Português</a></li>
+	<li class="lang-item lang-item-306 lang-item-ru no-translation"><a lang="ru-RU" hreflang="ru-RU" href="/ru/">Русский</a></li>
+	<li class="lang-item lang-item-310 lang-item-cn"><a lang="zh-CN" hreflang="zh-CN" href="/cn/ssl-certificate/">中文 (中国)</a></li>
+	<li class="lang-item lang-item-314 lang-item-tw"><a lang="zh-TW" hreflang="zh-TW" href="/tw/ssl-certificate/">中文 (台灣)</a></li>
+	<li class="lang-item lang-item-318 lang-item-jp"><a lang="ja-JP" hreflang="ja-JP" href="/jp/ssl-certificate/">日本語</a></li>
+                        </ul>
+</li>
+                     
+                     
+                     <li class="busness-address menu-item">
+                        <a><span class="icon-Phone"></span></a>
+                        <div id="contact-hover" class="hover-box">
+                           <div class="col-md-3 menu-widget menu-widget-small">
+                              <h3 style="text-align: left;padding-bottom:0;">Live Chat</h3>
+                              <div class="nav-chat-buttons">
+<p style="text-align: left;">
+                                Technical<br>Support
+                              </p>
+<span class="onlineChatNow" id="chat_tech_online" style="display: none; border: 0px none; cursor: pointer;" onclick="startChatTech()"></span><span class="oflineChatNow" id="chat_tech_offline" style="display: none; border: 0px none;"></span>
+</div>
+                              <div class="nav-chat-buttons">
+<p style="text-align: left;">
+                                Validation
+                              </p>
+<span class="onlineChatNow" id="chat_val_online" style="display: none; border: 0px none; cursor: pointer;" onclick="startChatVal()"></span><span class="oflineChatNow" id="chat_val_offline" style="display: none; border: 0px none;"></span>
+</div>
+                              <div class="nav-chat-buttons">
+<p style="text-align: left;">
+                                Sales
+                              </p>
+<span class="onlineChatNow" id="chat_sales_online" style="display: none; border: 0px none; cursor: pointer;" onclick="startChatSales()"></span><span class="oflineChatNow" id="chat_sales_offline" style="display: none; border: 0px none;"></span>
+</div>
+                           </div>
+                           <div class="col-md-3">
+                                        <h4>Americas</h4>
+<p class="drop-icon"><a href="tel:1.800.896.7973"> 1.800.896.7973</a><br>
+(Toll Free US and Canada)<br><a style="margin-top: 10px;" href="tel:1.801.701.9600">1.801.701.9600</a><br><a style="margin-top: 10px;" href="tel:1.877.438.8776">1.877.438.8776</a> (Sales Only)</p>
+                           </div>
+                           <div class="col-md-3">
+                                        <h4>Asia Pacific, Japan</h4>
+<p class="drop-icon"><a href="tel:61.3.9674.5500"> +61.3.9674.5500</a></p>
+                           </div>
+                           <div class="col-md-3">
+                                        <h4>Europe, Middle East Africa</h4>
+<p class="drop-icon"><a href="tel:44.203.788.7741"> +44.203.788.7741</a></p>
+                           </div>
+                           <div class="bussiness-address-bottom">
+                              <a class="button blend" href="mailto:sales@digicert.com">EMAIL SALES</a>
+                              <a class="button blend" href="mailto:support@digicert.com">EMAIL SUPPORT</a>
+                           </div>
+                        </div>
+                     </li>
+                     <li class="busness-address menu-item">
+                        <a><span class="icon-Chat"></span></a>
+                        <div id="contact-hover" class="hover-box">
+                           <div class="col-md-3 menu-widget menu-widget-small">
+                              <h3 style="text-align: left;padding-bottom:0;">Live Chat</h3>
+                              <div class="nav-chat-buttons">
+<p style="text-align: left;">
+                                Technical<br>Support
+                              </p>
+<span class="onlineChatNow" id="chat_tech_online_2" style="display: none; border: 0px none; cursor: pointer;" onclick="startChatTech()"></span><span class="oflineChatNow" id="chat_tech_offline_2" style="display: none; border: 0px none;"></span>
+</div>
+                              <div class="nav-chat-buttons">
+<p style="text-align: left;">
+                                Validation
+                              </p>
+<span class="onlineChatNow" id="chat_val_online_2" style="display: none; border: 0px none; cursor: pointer;" onclick="startChatVal()"></span><span class="oflineChatNow" id="chat_val_offline_2" style="display: none; border: 0px none;"></span>
+</div>
+                              <div class="nav-chat-buttons">
+<p style="text-align: left;">
+                                Sales
+                              </p>
+<span class="onlineChatNow" id="chat_sales_online_2" style="display: none; border: 0px none; cursor: pointer;" onclick="startChatSales()"></span><span class="oflineChatNow" id="chat_sales_offline_2" style="display: none; border: 0px none;"></span>
+</div>
+                           </div>
+                           <div class="col-md-3">
+                                        <h4>Americas</h4>
+<p class="drop-icon"><a href="tel:1.800.896.7973"> 1.800.896.7973</a><br>
+(Toll Free US and Canada)<br><a style="margin-top: 10px;" href="tel:1.801.701.9600">1.801.701.9600</a><br><a style="margin-top: 10px;" href="tel:1.877.438.8776">1.877.438.8776</a> (Sales Only)</p>
+                           </div>
+                           <div class="col-md-3">
+                                        <h4>Asia Pacific, Japan</h4>
+<p class="drop-icon"><a href="tel:61.3.9674.5500"> +61.3.9674.5500</a></p>
+                           </div>
+                           <div class="col-md-3">
+                                        <h4>Europe, Middle East Africa</h4>
+<p class="drop-icon"><a href="tel:44.203.788.7741"> +44.203.788.7741</a></p>
+                           </div>
+                           <div class="bussiness-address-bottom">
+                              <a class="button blend" href="mailto:sales@digicert.com">EMAIL SALES</a>
+                              <a class="button blend" href="mailto:support@digicert.com">EMAIL SUPPORT</a>
+                           </div>
+                        </div>
+                     </li>
+                     
+                     <!--                            <li class="menu-item">-->
+                     <!--                                <a ><span class="icon-Language"></span></a>-->
+                     <!--                                <div id='language-hover' class="hover-box">-->
+                     <!--                                    <ul>-->
+                     <!--                                        <li>Spanish</li>-->
+                     <!--                                        <li>German</li>-->
+                     <!--                                    </ul>-->
+                     <!--                                </div>-->
+                     <!--                            </li>-->
+                     <li class="menu-item search">
+                        <a><span class="icon-Search"></span></a>
+                        <div id="search-hover" class="hover-box">
+                           <script>
+                             (function () {
+                               var cx = '018320234474456204950:m5rnlvt4dvw';
+                               var gcse = document.createElement('script');
+                               gcse.type = 'text/javascript';
+                               gcse.async = true;
+                               gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;
+                               var s = document.getElementsByTagName('script')[0];
+                               s.parentNode.insertBefore(gcse, s);
+                               setTimeout(function () {
+                                   jQuery(".gsc-input").attr("placeholder", "Search...");
+                                   jQuery(".hero-bar input.gsc-search-button").addClass("visibleButton").attr( "src" , "" ).attr( "type" , "text" ).attr("value", "Ask");
+                                 }
+                                 , 2500);
+                             })();
+                           
+                           </script><searchbox-only resultsurl="/search-results/"></searchbox-only>
+</div>
+                     </li>
+                     <li class="menu-item account">
+                        <a href="https://www.digicert.com/account/login.php"><span class="icon-LogIn"></span></a>
+                        <div id="account-box" class="hover-box">
+                           <p><a href="https://www.digicert.com/account/login.php">Account Login</a></p>
+                        </div>
+                     </li>
+                  </ul>
+</div>
+            </div>
+            
+            <nav id="menu" class="mobile hidden"><div class="menu-menu-1-container"><ul id="mobile-menu" class="menu">
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-21350">
+<a>TLS/SSL</a>
+<ul class="sub-menu">
+<li class="container no-link menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-11855">
+<a>WRAPPER</a>
+	<ul class="sub-menu">
+<li class="no-padding hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-23999"><a href="#">Identity on the brink</a></li>
+		<li class="fourth menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-46020">
+<a href="https://www.digicert.com/tls-ssl/secure-site-pro-ssl">Pro TLS/SSL Certificates</a>
+		<ul class="sub-menu">
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-46021"><a href="https://www.digicert.com/tls-ssl/secure-site-pro-ssl">Secure Site Pro SSL</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-46022"><a href="https://www.digicert.com/secure-site-pro-ssl/">Secure Site Pro EV SSL</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52606"><a href="https://www.digicert.com/tls-ssl/post-quantum-cryptography"><nobr class="desktop">Post Quantum Cryptography</nobr></a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52574"><a href="https://www.digicert.com/tls-ssl/certcentral-tls-ssl-manager">Management Tools</a></li>
+		</ul>
+</li>
+		<li class="fourth menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52611">
+<a href="https://www.digicert.com/tls-ssl/business-tls-ssl-certificates">Business TLS/SSL Certificates</a>
+		<ul class="sub-menu">
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52615"><a href="https://www.digicert.com/tls-ssl/business-tls-ssl-certificates">Secure Site SSL</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52613"><a href="https://www.digicert.com/tls-ssl/business-tls-ssl-certificates">Secure Site EV SSL</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52614"><a href="https://www.digicert.com/tls-ssl/multi-domain-ssl-certificates">Secure Site Multi-Domain SSL</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52612"><a href="https://www.digicert.com/tls-ssl/multi-domain-ssl-certificates">Secure Site EV Multi-Domain SSL</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52616"><a href="https://www.digicert.com/tls-ssl/wildcard-ssl-certificates">Secure Site Wildcard SSL</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52575"><a href="https://www.digicert.com/tls-ssl/certcentral-tls-ssl-manager">Management Tools</a></li>
+		</ul>
+</li>
+		<li class="toggle fourth menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52620">
+<a href="https://www.digicert.com/what-is-an-ssl-certificate">Basic TLS/SSL Certificates</a>
+		<ul class="sub-menu">
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52621"><a href="https://www.digicert.com/tls-ssl/basic-tls-ssl-certificates">Standard SSL</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52593"><a href="https://www.digicert.com/tls-ssl/basic-tls-ssl-certificates">Extended Validation SSL</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52603"><a href="https://www.digicert.com/tls-ssl/multi-domain-ssl-certificates">Multi-Domain SSL</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52592"><a href="https://www.digicert.com/tls-ssl/multi-domain-ssl-certificates">EV Multi-Domain SSL</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52624"><a href="https://www.digicert.com/tls-ssl/wildcard-ssl-certificates">Wildcard SSL</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52576"><a href="https://www.digicert.com/tls-ssl/certcentral-tls-ssl-manager">Management Tools</a></li>
+		</ul>
+</li>
+		<li class="toggle fourth menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52588">
+<a href="https://www.digicert.com/tls-ssl/digital-certificates">Other Certificates</a>
+		<ul class="sub-menu">
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-53130"><a href="https://www.digicert.com/solutions/security-solutions-for-psd2-compliance">PSD2 Compliance</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52579"><a href="https://www.digicert.com/signing/code-signing-certificates">Code Signing</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52580"><a href="https://www.digicert.com/signing/code-signing-certificates">EV Code Signing</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52642"><a href="https://www.digicert.com/document-trust-manager">DigiCert® Document Trust Manager</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52578"><a href="https://www.digicert.com/tls-ssl/client-certificates">Client (S/MIME)</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52585"><a href="https://www.digicert.com/solutions/security-solutions-for-devices">Device</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52594"><a href="https://www.digicert.com/solutions/security-solutions-for-google-amp">TLS for Google AMP</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52623"><a href="https://www.digicert.com/tls-ssl/verified-mark-certificates"><nobr>Verified Mark Certificates (VMC)</nobr></a></li>
+		</ul>
+</li>
+		<li class="no-label menu-item-object-yawp_wim menu-item menu-item-type-custom menu-item-object-custom menu-item-11865"><a href="#">Submenu Footer – Buttons</a></li>
+	</ul>
+</li>
+</ul>
+</li>
+<li class="toggle pki menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-21997">
+<a>PKI</a>
+<ul class="sub-menu">
+<li class="container no-link menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-21998">
+<a href="#">WRAPPER</a>
+	<ul class="sub-menu">
+<li class="no-padding hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-41186"><a href="#">It’s time to redefine PKI</a></li>
+		<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52587">
+<a href="https://www.digicert.com/trust-lifecycle-manager">DigiCert® Trust Lifecycle Manager</a>
+		<ul class="sub-menu">
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52609"><a href="https://www.digicert.com/pki/enterprise-pki-manager/secure-email">Secure Email Use Case</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52610"><a href="https://www.digicert.com/pki/enterprise-pki-manager/secure-network-access">Secure Network Access Use Case</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52617"><a href="https://www.digicert.com/pki/enterprise-pki-manager/secure-smart-cards">Secure Smart Card Use Case</a></li>
+			<li class="hide-on-desktop menu-item menu-item-type-custom menu-item-object-custom menu-item-52607"><a href="https://www.digicert.com/pki/enterprise-pki-manager/secure-devices">Secure Device Use Case</a></li>
+			<li class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-52608"><a href="https://www.digicert.com/pki/enterprise-pki-manager/secure-devices">Secure Device Use Case</a></li>
+		</ul>
+</li>
+		<li class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-22000">
+<a> </a>
+		<ul class="sub-menu">
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52618"><a href="https://www.digicert.com/software-trust-manager">DigiCert® Software Trust Manager</a></li>
+		</ul>
+</li>
+		<li class="no-label menu-item-object-yawp_wim menu-item menu-item-type-custom menu-item-object-custom menu-item-22001"><a>MPKI-footer</a></li>
+	</ul>
+</li>
+</ul>
+</li>
+<li class="toggle pki iot menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-22014">
+<a>IoT</a>
+<ul class="sub-menu">
+<li class="container no-link menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-22015">
+<a href="#">WRAPPER</a>
+	<ul class="sub-menu">
+<li class="no-padding hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-24001"><a href="#">Panasonic Trusts DigiCert for IoT Solutions</a></li>
+		<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52595">
+<a href="https://www.digicert.com/iot-trust-manager">DigiCert® IoT Trust Manager</a>
+		<ul class="sub-menu">
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52596"><a href="https://www.digicert.com/iot/iot-device-manager/iot-of-healthcare">IoT of Healthcare</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52599"><a href="https://www.digicert.com/iot/iot-device-manager/industrial-iot">Industrial IoT</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52600"><a href="https://www.digicert.com/iot/iot-device-manager/smart-city">Smart City</a></li>
+			<li class="hide-on-desktop menu-item menu-item-type-custom menu-item-object-custom menu-item-52601"><a href="https://www.digicert.com/iot/iot-device-manager/iot-of-transportation">IoT of Transportation</a></li>
+			<li class="hide-on-desktop menu-item menu-item-type-custom menu-item-object-custom menu-item-52597"><a href="https://www.digicert.com/iot/iot-device-manager/iot-home-and-consumer">IoT Home and Consumer</a></li>
+		</ul>
+</li>
+		<li class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-22087">
+<a> </a>
+		<ul class="sub-menu">
+<li class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-52598"><a href="https://www.digicert.com/iot/iot-device-manager/iot-home-and-consumer">IoT Home and Consumer</a></li>
+			<li class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-52602"><a href="https://www.digicert.com/iot/iot-device-manager/iot-of-transportation">IoT of Transportation</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52584"><a href="https://www.digicert.com/pki/enterprise-pki-manager">Custom Certificate Profiles</a></li>
+		</ul>
+</li>
+		<li class="no-label menu-item-object-yawp_wim menu-item menu-item-type-custom menu-item-object-custom menu-item-22024"><a href="#">Submenu Footer – IoT</a></li>
+	</ul>
+</li>
+</ul>
+</li>
+<li class="toggle menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-11866">
+<a>Solutions</a>
+<ul class="sub-menu">
+<li class="container no-link menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-22013">
+<a href="#">WRAPPER</a>
+	<ul class="sub-menu">
+<li class="no-padding hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-24002"><a href="#">DigiCert Finds a Better Way</a></li>
+		<li class="toggle fourth menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-30336">
+<a>Solutions Overview</a>
+		<ul class="sub-menu">
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-30337"><a href="https://www.digicert.com/solutions/security-solutions-for-websites">Solutions for Websites</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-30338"><a href="https://www.digicert.com/solutions/security-solutions-for-networks">Solutions for Networks</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-30339"><a href="https://www.digicert.com/solutions/security-solutions-for-email">Solutions for Email</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52586"><a href="https://www.digicert.com/solutions/security-solutions-for-devices">Solutions for Devices</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-30341"><a href="https://www.digicert.com/solutions/security-solutions-for-users">Solutions for Users</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-30342"><a href="https://www.digicert.com/solutions/security-solutions-for-documents">Solutions for Documents</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-30343"><a href="https://www.digicert.com/solutions/security-solutions-for-code">Solutions for Code</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-30344"><a href="https://www.digicert.com/solutions/security-solutions-for-automation">Solutions for Automation</a></li>
+		</ul>
+</li>
+		<li class="toggle fourth menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52604">
+<a href="https://www.digicert.com/partners">Partner Program</a>
+		<ul class="sub-menu">
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52605"><a href="https://www.digicert.com/partners/tls-ssl/reseller-program">Resellers &amp; Affiliates</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52577"><a href="https://www.digicert.com/solutions/security-solutions-for-ci-plus">CI Plus</a></li>
+			<li class="no-label menu-item-object-yawp_wim menu-item menu-item-type-custom menu-item-object-custom menu-item-39951"><a>Submenu- Footer</a></li>
+		</ul>
+</li>
+	</ul>
+</li>
+</ul>
+</li>
+<li class="toggle about-menu menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-23963">
+<a href="/about-digicert/">About</a>
+<ul class="sub-menu">
+<li class="hide-on-desktop menu-item menu-item-type-custom menu-item-object-custom menu-item-52645"><a href="https://www.digicert.com/partners">Partner</a></li>
+	<li class="hide-on-desktop menu-item menu-item-type-custom menu-item-object-custom menu-item-52583"><a href="https://www.digicert.com/contact-us">Contact</a></li>
+	<li class="hide-on-desktop menu-item menu-item-type-custom menu-item-object-custom menu-item-35545"><a href="https://www.digicert.com/careers">Careers</a></li>
+	<li class="hide-on-desktop menu-item menu-item-type-post_type menu-item-object-page menu-item-22091"><a href="/company/leadership/">Leadership</a></li>
+	<li class="hide-on-desktop menu-item menu-item-type-post_type menu-item-object-page menu-item-22092"><a href="/newsroom/">Newsroom</a></li>
+	<li class="hide-on-desktop menu-item menu-item-type-custom menu-item-object-custom menu-item-52648"><a href="https://www.digicert.com/blog">Blog</a></li>
+	<li class="hide-on-desktop menu-item menu-item-type-custom menu-item-object-custom menu-item-52590"><a href="https://www.digicert.com/about/events">Events &amp; Webinars</a></li>
+	<li class="container no-link menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-11913">
+<a>WRAPPER</a>
+	<ul class="sub-menu">
+<li class="no-padding hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-24068"><a href="#">Doing What’s Right for Digital Security</a></li>
+		<li class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52646">
+<a href="https://www.digicert.com/partners">Partner</a>
+		<ul class="sub-menu">
+<li class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-52647"><a href="https://www.digicert.com/blog">Blog</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-53132"><a href="https://www.digicert.com/news">News</a></li>
+			<li class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-52573"><a href="https://www.digicert.com/about">About</a></li>
+		</ul>
+</li>
+		<li class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-11952">
+<a href="https://www.digicert.com/leadership">Leadership</a>
+		<ul class="sub-menu">
+<li class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-35544"><a href="/careers/">Careers</a></li>
+			<li class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-52582"><a href="https://www.digicert.com/contact-us">Contact</a></li>
+			<li class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-52591"><a href="https://www.digicert.com/events">Events &amp; Webinars</a></li>
+		</ul>
+</li>
+		<li class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-40355"><a href="https://www.digicert.com/tls-ssl/tls-certification-program">Expert Certification</a></li>
+		<li class="no-label menu-item-object-yawp_wim menu-item menu-item-type-custom menu-item-object-custom menu-item-11922"><a href="#">Submenu Footer – About us</a></li>
+	</ul>
+</li>
+</ul>
+</li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-11923">
+<a>Support</a>
+<ul class="sub-menu">
+<li class="container no-link menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-11924">
+<a>WRAPPER</a>
+	<ul class="sub-menu">
+<li class="no-padding hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-11925"><a href="#">Get Help</a></li>
+		<li class="toggle menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-11926">
+<a href="/tools/">Tools</a>
+		<ul class="sub-menu">
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-11936"><a href="https://www.digicert.com/help/">SSL Install Diagnostic</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-11927"><a href="https://www.digicert.com/support/tools/certificate-utility-for-windows">Certificate Utility for Windows</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-22146"><a href="https://www.digicert.com/kb/csr-creation.htm">CSR Generator</a></li>
+		</ul>
+</li>
+		<li class="toggle menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52622">
+<a href="https://www.digicert.com/support">Digital Certificate Support</a>
+		<ul class="sub-menu">
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52619">
+<a href="https://www.digicert.com/support">SSL Support</a>
+			<ul class="sub-menu">
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-11951"><a href="https://www.digicert.com/kb/ssl-certificate-installation.htm">Certificate Installation</a></li>
+				<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52581"><a href="https://www.digicert.com/dc/code-signing/support/">Code Signing Support</a></li>
+				<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52589"><a href="https://www.digicert.com/support">Document Signing Support</a></li>
+			</ul>
+</li>
+		</ul>
+</li>
+		<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-19289">
+<a href="/resources/">Resources</a>
+		<ul class="sub-menu">
+<li class="blog-menu menu-item menu-item-type-custom menu-item-object-custom menu-item-22012"><a href="https://www.digicert.com/blog">Blog</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-23996"><a href="https://docs.digicert.com/">Documentation</a></li>
+			<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-30263"><a href="https://dev.digicert.com/">API Documentation</a></li>
+		</ul>
+</li>
+		<li class="no-label menu-item-object-yawp_wim menu-item menu-item-type-custom menu-item-object-custom menu-item-24070"><a href="#">Submenu Footer – Resources</a></li>
+	</ul>
+</li>
+</ul>
+</li>
+<li class="account-login-link menu-item menu-item-type-custom menu-item-object-custom menu-item-19380"><a href="https://www.digicert.com/account/login.php">Account Login</a></li>
+</ul></div>            </nav>
+</div>
+      </div>
+   </header>
+<footer style="min-height:100px;">
+	<div class="container">
+		<div class="copyright">
+			<a class="spm spm-logo-footer" href="/index.html" style="display:inline"><img class="spm-logo-footer" src="/kb/images/digi-footer-logo.svg" border="0" style="display:inline"></a>
+			&copy; 2003-2024 DigiCert&reg; Inc &#8226; <i>SSL Certificate Authority</i> &#8226; All Rights Reserved | All trademarks displayed on this web site are the exclusive property of the respective holders.						<div class="social-tiny">
+<!--				<a href="https://plus.google.com/+DigiCertIncLehi/posts" rel="me" id="icon_googleplus">&nbsp;</a>-->
+				<a href="https://facebook.com/digicert" rel="me" id="icon_facebook">&nbsp;</a>
+				<a href="https://www.youtube.com/user/DigiCertSSL" rel="me" id="icon_youtube">&nbsp;</a>
+				<a href="https://twitter.com/digicert" rel="me" id="icon_twitter">&nbsp;</a>
+				<a href="https://www.linkedin.com/company/digicert-inc-" rel="me" id="icon_linkedin">&nbsp;</a>
+			</div>
+					</div>
+	</div>
+			<div class="container footer-nav" style="border-bottom:none;">
+			<ul style="padding-left:0;">
+				<li style="margin:0;"><a href="https://www.digicert.com/security-terms/">Terms of Use</a></li><li style="margin:0;"><a href="/digital-certificate-guarantee.htm">Money Back Guarantee</a></li><li style="margin:0;"><a href="https://www.digicert.com/digicert-privacy-policy/">Privacy Policy</a></li><li style="margin:0;"><a href="https://www.digicert.com/digicert-cookie-policy/">Cookie Policy</a></li><li style="margin:0;"><a href="https://www.digicert.com/legal-repository/">Legal Repository</a></li><li style="margin:0;"><a href="https://www.digicert.com/newsroom/">Newsroom</a></li><li style="margin:0;"><a href="https://www.digicert.com/sitemap.html">Site Map</a></li><li style="margin:0;"><a href="https://www.digicert.com/webtrust-audits/">Webtrust Audits</a></li>			</ul>
+		</div>
+	</footer>
+
+
+<!-- Adobe Tag Manager Footer Code-->
+<script type="text/javascript">_satellite.pageBottom();</script>
+
+</body>
+</html>

@@ -1,0 +1,10 @@
+undetected-chromedriver>=3.5.5
+selenium>=4.0.0
+sqlalchemy>=2.0.0
+pg8000
+selenium-stealth
+beautifulsoup4
+spacy
+wget
+openai
+requests

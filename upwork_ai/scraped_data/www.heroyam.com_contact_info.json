@@ -1,0 +1,24 @@
+{
+    "website_url": "www.heroyam.com",
+    "emails": [
+        "info@heroyam.com",
+        "support@heroyam.com"
+    ],
+    "phones": [
+        "123-456-7890",
+        "098-765-4321"
+    ],
+    "social_media": {
+        "facebook": "https://www.facebook.com/heroyam",
+        "twitter": "https://www.twitter.com/heroyam",
+        "linkedin": "https://www.linkedin.com/company/heroyam",
+        "instagram": "https://www.instagram.com/heroyam"
+    },
+    "source_section": [
+        "Footer",
+        "Contact Us",
+        "About Us"
+    ],
+    "job_listing_id": 54,
+    "job_url": "https://www.upwork.com/jobs/Email-signature-Google_~021851707946844615039/?referrer_url_path=/nx/search/jobs/"
+}

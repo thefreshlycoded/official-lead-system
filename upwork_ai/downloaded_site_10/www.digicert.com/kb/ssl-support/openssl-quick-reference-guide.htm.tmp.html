@@ -1,0 +1,1002 @@
+
+<!DOCTYPE HTML>
+<html lang="en-US">
+    <head>
+    <meta charset="UTF-8"/>
+    <title>OpenSSL Quick Reference Guide</title>
+    <meta name="keywords" content="General Information,EN,CSR,tool,OpenSSL"/>
+    <meta name="description" content="OpenSSL is an open-source command line tool that is commonly used to generate private keys, create CSRs, install your SSL/TLS certificate, and identify certificate information."/>
+    <meta name="template" content="general-information-template"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    
+
+    
+    
+
+	<link rel="canonical" href="/general-information/openssl-quick-reference-guide"/>
+	
+
+
+<!--<link data-sly-use.page="com.adobe.cq.wcm.core.components.models.Page"
+      data-sly-test=""
+      rel="canonical" href="">
+	
+	<link data-sly-test=""
+      data-sly-repeat=""
+      rel="alternate" hreflang="" href="">-->
+
+    
+
+
+    
+<link rel="icon" href="/content/dam/digicert/images/DigiCertFavicon_16x16.png" sizes="16x16"/>
+<link rel="icon" href="/content/dam/digicert/images/DigiCertFavicon_32x32.png" sizes="32x32"/>
+<link rel="apple-touch-icon" href="/content/dam/digicert/images/DigiCertFavicon_32x32.png"/>
+<meta name="msapplication-TileImage" content="/content/dam/digicert/images/DigiCertFavicon_32x32.png"/>
+
+
+    
+    
+<link rel="stylesheet" href="/etc.clientlibs/kb/clientlibs/clientlib-dependencies.css" type="text/css">
+<link rel="stylesheet" href="/etc.clientlibs/kb/clientlibs/clientlib-base.css" type="text/css">
+<link rel="stylesheet" href="/etc.clientlibs/digicert/clientlibs/ui.search.css" type="text/css">
+<link rel="stylesheet" href="/etc.clientlibs/digicert/clientlibs/clientlib-base.css" type="text/css">
+
+
+
+
+    
+	<meta property="og:locale" content="en_US"/>
+	<meta name="keywords" content="general-information, en, csr, tool, openssl"/>
+	<meta class="swiftype" name="published_at" data-type="date" content="06/28/2024"/>
+    <meta class="swiftype" name="tags" data-type="string" content="general-information, en, csr, tool, openssl"/>
+	<meta class="swiftype" name="featured" data-type="integer" content="0"/>
+    <meta class="swiftype" name="download" data-type="string"/>
+    <meta class="swiftype" name="domain" data-type="integer" content="5"/>
+	<meta class="swiftype" name="langc" data-type="string" content="en_US"/>
+	
+
+
+<script>
+	  //Adobe Target prehiding snippet (must be place//Adobe Target prehiding snippet (must be placed directly above '< script src="https://assets.adobedtm.com/.../.../launch-....min.js" async> </ script>')
+	  
+	  //check if OneTrust is allowing "Personalized Experience Cookies" (i.e., Adobe Target) to load
+	  var adobeTargetOneTrustGroup = "PE";
+	  
+	  function isAdobeTargetAllowed(adobeTargetOneTrustGroup) {
+	    var OptanonConsentCookie = document.cookie.match(/OptanonConsent=.*;/);
+	    
+	    return (OptanonConsentCookie && decodeURIComponent(OptanonConsentCookie[0]).includes(adobeTargetOneTrustGroup + ":1"));
+	  }
+	  
+	  if (isAdobeTargetAllowed(adobeTargetOneTrustGroup)) {
+	    //Adobe Target prehiding snippet
+	    ;(function(win, doc, style, timeout) {
+	      var STYLE_ID = 'at-body-style';
+	      
+	      function getParent() {
+	        return doc.getElementsByTagName('head')[0];
+	      }
+	      
+	      function addStyle(parent, id, def) {
+	        if (!parent) {
+	          return;
+	        }
+	        
+	        var style = doc.createElement('style');
+	        style.id = id;
+	        style.innerHTML = def;
+	        parent.appendChild(style);
+	      }
+	      
+	      function removeStyle(parent, id) {
+	        if (!parent) {
+	          return;
+	        }
+	        
+	        var style = doc.getElementById(id);
+	        
+	        if (!style) {
+	          return;
+	        }
+	        
+	        parent.removeChild(style);
+	      }
+	      
+	      addStyle(getParent(), STYLE_ID, style);
+	      setTimeout(function() {
+	        removeStyle(getParent(), STYLE_ID);
+	      }, timeout);
+	    }(window, document, "body {opacity: 0 !important}", 3000));
+	  }
+	</script>
+<!-- Staging Adobe Tags -->
+<!--<script src="https://assets.adobedtm.com/80bda08f0087/1015fcf0b78f/launch-ENb8e5854ed93c443fa2962c8516926c96-staging.min.js" async></script>-->
+<!-- Production Adobe Tags -->
+<script src="https://assets.adobedtm.com/80bda08f0087/1015fcf0b78f/launch-EN214b022a648841a199bcc6b7b217acc1.min.js" async></script>
+
+    
+    
+    
+
+    
+
+    
+    
+<script src="/etc.clientlibs/clientlibs/granite/jquery.js"></script>
+<script src="/etc.clientlibs/kb/clientlibs/clientlib-dependencies.js"></script>
+<script src="/etc.clientlibs/clientlibs/granite/utils.js"></script>
+<script src="/etc.clientlibs/digicert/clientlibs/ui.search.js"></script>
+<script src="/etc.clientlibs/clientlibs/granite/jquery/granite.js"></script>
+<script src="/etc.clientlibs/foundation/clientlibs/jquery.js"></script>
+<script src="/etc.clientlibs/digicert/clientlibs/clientlib-dependencies.js"></script>
+
+
+
+    
+    
+<link rel="stylesheet" href="/etc.clientlibs/kb/clientlibs/clientlib-site-kb.css" type="text/css">
+
+
+
+    
+
+    
+    
+    
+    <!-- <head> -->
+	<script id="__ada" data-handle="digicert-gen" src="https://static.ada.support/embed2.js"></script>
+</head>
+    <body class="page basicpage kb-body" id="page-6c845b0c36" data-cmp-data-layer-enabled>
+        <!--  <script data-sly-test.dataLayerEnabled="">
+          window.adobeDataLayer = window.adobeDataLayer || [];
+          adobeDataLayer.push({
+              page: JSON.parse("{\x22page\u002D6c845b0c36\x22:{\x22@type\x22:\x22kb\/components\/page\x22,\x22repo:modifyDate\x22:\x222024\u002D06\u002D27T22:46:18Z\x22,\x22dc:title\x22:\x22OpenSSL Quick Reference Guide\x22,\x22dc:description\x22:\x22OpenSSL is an open\u002Dsource command line tool that is commonly used to generate private keys, create CSRs, install your SSL\/TLS certificate, and identify certificate information.\x22,\x22xdm:template\x22:\x22\/conf\/kb\/settings\/wcm\/templates\/general\u002Dinformation\u002Dtemplate\x22,\x22xdm:language\x22:\x22en\u002DUS\x22,\x22xdm:tags\x22:[\x22General Information\x22,\x22EN\x22,\x22CSR\x22,\x22tool\x22,\x22OpenSSL\x22],\x22repo:path\x22:\x22\/content\/kb\/us\/en\/general\u002Dinformation\/openssl\u002Dquick\u002Dreference\u002Dguide.html\x22}}"),
+              event:'cmp:show',
+              eventInfo: {
+                  path: 'page.page\u002D6c845b0c36'
+              }
+          });
+        </script> -->
+        
+        
+            
+
+
+
+
+            
+
+
+
+            
+<div class="root responsivegrid">
+
+
+<div class="aem-Grid aem-Grid--12 aem-Grid--default--12 ">
+    
+    <div class="experiencefragment aem-GridColumn aem-GridColumn--default--12">
+<div id="experiencefragment-58b9891d62" class="cmp-experiencefragment cmp-experiencefragment--kb-header">
+
+
+    
+    
+    
+    <div id="container-f2a721eb2f" class="cmp-container">
+        
+        <div class="header"><header class="editmode-false">
+	<div class="header__logo">
+
+
+
+<div class="site-branding">
+    <a href="/">
+    	<img src="/content/dam/kb/logos/kb-new-logo.png" alt="DigiCert KnowledgeBase - Technical Support Logo" loading="lazy" width="124" height="33"/>
+    </a>
+</div>
+
+
+    
+
+</div>
+	<div class="header__navigation">
+		<div class="navigation__primary"><img class="hamburger" src="/content/dam/thawte/icons/MenuIcon.png" data-hoversrc="/content/dam/thawte/icons/MenuIcon_Hover.png"/>
+
+<nav class="cmp-navigation cmp-navigation--mobile">
+     <ul class="cmp-navigation__group">
+          <li class="cmp-navigation__item cmp-navigation__item--level-0 navigation-header">
+               <a href="#" data-content=".header__secondary-nav-content--contact" class="cmp-navigation__item-link is-header-true">
+                    Contact Us
+               </a>
+          </li>
+          <li class="cmp-navigation__item cmp-navigation__item--level-0 navigation-header">
+               <a href="#" data-content=".header__secondary-nav-content--language" class="cmp-navigation__item-link is-header-true">
+                    Language
+               </a>
+          </li>
+     </ul>
+</nav>
+
+    
+</div>
+		<ul class="navigation__secondary clearfix" style="align-items: center;">
+			<li id="contact">
+				<a class="btn primary blue-filled" href="https://www.digicert.com/contact-us">
+					<span>Contact Us</span>
+					<i class="fa fa-phone"></i></a>
+			</li>
+			<li id="language">
+				<a href="#" class="header__secondary-nav-link header__secondary-nav-link--desktop">
+				   <img alt="language" src="/content/dam/digicert/images/navigation/header/LanguageIcon_MainNavigation.png" data-hoversrc="/content/dam/digicert/icons/Language-Icon-Hover.png"/>
+				</a>
+				<div data-layout="half" class="header__secondary-nav-content header__secondary-nav-content--language">
+					<div class="header__nav-dismiss"><i class="close"></i></div>
+					<h2 class="heading">choose your language</h2>
+					<ul class="cmp-navigation__group clearfix">
+						<li><a class="cmp-navigation__item-link txt-u-animate straight-line" href="https://knowledge.digicert.com/" id="en_US">English</a></li>
+					
+						<li><a class="cmp-navigation__item-link txt-u-animate straight-line" href="https://knowledge.digicert.com/ja/jp/home.html" id="ja_JP">Japanese</a></li>
+					</ul>
+				</div>
+			</li>
+			
+			<li id="mobile_hamburger">
+				<a href="#" class="header__secondary-nav-link header__secondary-nav-link--mobile header__secondary-nav-link--menu" data-content=".navigation__primary">
+				   <i class="fa fa-bars" id="hamburger"></i>
+				</a>
+			</li>
+		</ul>
+	</div>
+</header></div>
+
+        
+    </div>
+
+</div>
+
+    
+</div>
+<div class="custom-breadcrumb aem-GridColumn aem-GridColumn--default--12">
+<nav id="custom-breadcrumb-b95315f4e4" class="cmp-breadcrumb" aria-label="Breadcrumb" data-cmp-data-layer="{&#34;custom-breadcrumb-b95315f4e4&#34;:{&#34;@type&#34;:&#34;kb/components/custom-breadcrumb&#34;,&#34;repo:modifyDate&#34;:&#34;2023-12-18T09:19:14Z&#34;}}">
+
+    <ol class="cmp-breadcrumb__list" itemscope itemtype="http://schema.org/BreadcrumbList">
+        <li class="cmp-breadcrumb__item" data-cmp-data-layer="{&#34;custom-breadcrumb-b95315f4e4-item-471667c32e&#34;:{&#34;@type&#34;:&#34;kb/components/custom-breadcrumb/item&#34;,&#34;repo:modifyDate&#34;:&#34;2024-09-27T13:11:53Z&#34;,&#34;dc:title&#34;:&#34;Home&#34;,&#34;xdm:linkURL&#34;:&#34;/content/kb/us/en&#34;}}" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a href="/" class="cmp-breadcrumb__item-link txt-u-animate straight-line" itemprop="item" data-cmp-clickable>
+                <span itemprop="name">Home</span>
+            </a>
+            <meta itemprop="position" content="1"/>
+        </li>
+    
+        <li class="cmp-breadcrumb__item" data-cmp-data-layer="{&#34;custom-breadcrumb-b95315f4e4-item-15a796f69a&#34;:{&#34;@type&#34;:&#34;kb/components/custom-breadcrumb/item&#34;,&#34;repo:modifyDate&#34;:&#34;2023-11-07T18:04:12Z&#34;,&#34;dc:title&#34;:&#34;General Information&#34;,&#34;xdm:linkURL&#34;:&#34;/general-information&#34;}}" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a href="/general-information" class="cmp-breadcrumb__item-link txt-u-animate straight-line" itemprop="item" data-cmp-clickable>
+                <span itemprop="name">General Information</span>
+            </a>
+            <meta itemprop="position" content="2"/>
+        </li>
+    
+        <li class="cmp-breadcrumb__item cmp-breadcrumb__item--active" aria-current="page" data-cmp-data-layer="{&#34;custom-breadcrumb-b95315f4e4-item-6c845b0c36&#34;:{&#34;@type&#34;:&#34;kb/components/custom-breadcrumb/item&#34;,&#34;repo:modifyDate&#34;:&#34;2024-06-27T22:46:30Z&#34;,&#34;dc:title&#34;:&#34;OpenSSL Quick Reference Guide&#34;,&#34;xdm:linkURL&#34;:&#34;/general-information/openssl-quick-reference-guide&#34;}}" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a href="/general-information/openssl-quick-reference-guide" class="cmp-breadcrumb__item-link txt-u-animate straight-line" itemprop="item" data-cmp-clickable>
+                <span itemprop="name">OpenSSL Quick Reference Guide</span>
+            </a>
+            <meta itemprop="position" content="3"/>
+        </li>
+    </ol>
+</nav>
+
+    
+
+</div>
+<div class="kbheaderwithsearch aem-GridColumn aem-GridColumn--default--12">
+
+
+
+
+
+
+
+
+
+<div class="kb-header-text cmp-text--left" style="background-color:transparent;height:px;">	
+	<div class="img-container relative
+					noBgColor
+					mbg-grey">
+			 
+			 
+				
+					
+				
+					<img src="/content/dam/kb/images/homepage/Knowledge-base-hero-April23.png" alt="DigiCert KnowledgeBase - Technical Support-hero"/>
+			
+	</div>
+	<div class="search-and-text">
+		<div class="kb-header-desc"><h1 class="custom-h1">Knowledge Base</h1>
+</div>
+	       
+	        <div class="kb-search">
+	            <div data-layout="search" class="kb-search-form">
+	                <form class="search-form">
+	                    <div class="search-form__input">
+	                        <input id="hero-search-box" type="text" placeholder="How can we help?" required autofocus/>
+	                    </div>
+	                    <!--<i class="search-form__icon search"></i>-->
+	                </form>
+	            </div>
+	        </div>
+	</div>
+</div>
+
+    
+
+</div>
+<div class="article-container aem-GridColumn aem-GridColumn--default--12"><div class="title">
+<div data-cmp-data-layer="{&#34;title-484a77d5ad&#34;:{&#34;@type&#34;:&#34;kb/components/title&#34;,&#34;dc:title&#34;:&#34;OpenSSL Quick Reference Guide&#34;}}" id="title-484a77d5ad" class="cmp-title">
+    <h2 class="cmp-title__text">OpenSSL Quick Reference Guide</h2>
+</div>
+
+    
+
+</div>
+<div class="line"></div>
+<div class="article-banner">
+	
+<div class="ArticleBanner">
+	<div class="article-details">
+		<div class="docId">Solution ID : INFO141</div>
+		<div class="lastModified">Last Modified : 06/28/2024</div>
+		<input type="hidden" id="article-id" name="article-id" value="INFO141"/>
+	</div>
+	<div class="article-share">
+		<div class="print" onclick="window.print()">
+			<i class="article-print" aria-hidden="true"></i>
+		</div>
+		<div class="share"><i class="article-share-img" aria-hidden="true"></i>
+			<div id="socialGallery">
+		      <div class="socialToolBox">
+		        <a class="facebook" href="http://www.facebook.com/sharer.php?u=https://knowledge.digicert.com/general-information/openssl-quick-reference-guide"><i class="fa fa-facebook"></i></a>
+		        <a class="twitter" href="https://twitter.com/intent/tweet?url=https://knowledge.digicert.com/general-information/openssl-quick-reference-guide&text=%20%3A%20&via=&hashtags=null"><i class="fa fa-x-twitter"></i></a>
+		        <a class="linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://knowledge.digicert.com/general-information/openssl-quick-reference-guide"><i class="fa fa-linkedin"></i></a>
+                	<a class="copyurl tooltip"><i class="fa fa-copy"><span class="tooltiptext">Click to copy</span></i></a>
+		      </div>
+		    </div>
+		</div>
+	</div>
+</div>
+
+
+</div>
+<div class="heading-and-image">
+	<div class="article-image">
+		
+        
+        
+        
+            <img class="cmp-image__image" src="/content/dam/kb/icons/General_Information.png"/>
+        
+        
+	</div>
+	<div class="headings">
+		<div class="text vspacebtncomp-top section">
+
+<div class="cmp-text cmp-text--left" style="background-color:transparent;">
+     <h4>Learn how to use the most common OpenSSL commands</h4>
+<p>OpenSSL is an open-source command line tool that is commonly used to generate private keys, create CSRs, install your SSL/TLS certificate, and identify certificate information. We designed this quick reference guide to help you understand the most common OpenSSL commands and how to use them.</p>
+<p>This guide is not meant to be comprehensive. If you're looking for a more in-depth and comprehensive look at OpenSSL, we recommend you check out the <a href="https://www.feistyduck.com/books/openssl-cookbook/" title="OpenSSL Cookbook by Ivan Ristić"><i>OpenSSL Cookbook</i></a> by Ivan Ristić.</p>
+<h6><b>Note:</b> Ubuntu 16.04.3 LTS was the system used to write this guide.<br />
+Some command examples use a '<b>\</b>' (backslash) to create a line break to make them easier to understand.</h6>
+<p>If you don't have the time to get into the nitty-gritty of OpenSSL commands and CSR generation, or you want to save some time, check out our <a href="https://www.digicert.com/easy-csr/openssl.htm">OpenSSL CSR Wizard</a>.</p>
+
+        
+</div>
+
+    
+
+</div>
+<div class="pencil-banner section">
+	<div class="sub-wrapper" style="background-color:#0174c3;">
+	
+		 <div class="cmp-text rte-container right">	
+    			<p class="rte din" style="color:#fff">SECURE UP TO 250 SUBDOMAINS WITH A DIGICERT WILDCARD TLS/SSL CERTIFICATE.</p>
+    			<div class="btn-container vertical">
+		  			 <a href="https://www.digicert.com/tls-ssl/compare-wildcard-certificates" class="btn primary blue" target="_blank" style="margin-right:px;
+				    	margin-bottom:px;">
+				 		BUY NOW</a>
+	 	 		</div>
+     	</div>
+    </div>    
+    
+
+    
+</div>
+<div class="text vspacebtncomp-top section">
+
+<div class="cmp-text cmp-text--left" style="background-color:transparent;">
+     <h4>Checking Your OpenSSL Version</h4>
+<p>Identifying which version of OpenSSL you are using is an important first step when preparing to generate a private key or CSR. Your version of OpenSSL dictates which cryptographic algorithms can be used when generating keys as well as which protocols are supported. For example, OpenSSL version 1.0.1 was the first version to support TLS 1.1 and TLS 1.2. Knowing which version of OpenSSL you are using is also important when getting help troubleshooting problems you may run into.</p>
+<p><u>Use the following command to identify which version of OpenSSL you are running:</u></p>
+<table cellpadding="1" cellspacing="0" border="1">
+<tbody><tr><td width="500">openssl version -a</td>
+</tr></tbody></table>
+<p><u><br />
+In this command, the <b>-a</b> switch displays complete version information, including:</u></p>
+<ul>
+<li>The version number and version release date (<b>OpenSSL 1.0.2g 1 Mar 2016</b>).</li>
+<li>The options that were built with the library <b>(options</b>).</li>
+<li>The directory where certificates and private keys are stored (<b>OPENSSLDIR</b>).</li>
+</ul>
+<p><br />
+<u>Using the <b>openssl version -a</b> command, the following output was generated:</u></p>
+<table cellpadding="1" cellspacing="0" border="1">
+<tbody><tr><td><b><span style="color: rgb(0,116,217);">OpenSSL 1.0.2g 1 Mar 2016</span><br />
+</b>built on: reproducible build, date unspecified<br />
+platform: debian-amd64<br />
+<b><span style="color: rgb(0,116,217);">options: bn(64,64) rc4(16x,int) des(idx,cisc,16,int) blowfish(idx)</span> <br />
+</b>compiler: cc -I. -I.. -I../include -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -<br />
+D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -m64 -DL_ENDIAN -g -O2 -fstack-protector-<br />
+strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -Wl,-<br />
+Bsymbolic-functions -Wl,-z,relro -Wa,--noexecstack -Wall -DMD32_REG_T=int -<br />
+DOPENSSL_IA32_SSE2 -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_MONT5 -<br />
+DOPENSSL_BN_ASM_GF2m -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DMD5_ASM -DAES_ASM -<br />
+DVPAES_ASM -DBSAES_ASM -DWHIRLPOOL_ASM -DGHASH_ASM -DECP_NISTZ256_ASM<br />
+<span style="color: rgb(0,116,217);"><b>OPENSSLDIR: &quot;/usr/lib/ssl&quot;</b></span></td>
+</tr></tbody></table>
+
+        
+</div>
+
+    
+
+</div>
+<div class="text vspacebtncomp-top section">
+
+<div class="cmp-text cmp-text--left" style="background-color:transparent;">
+     <h4>OpenSSL and CSR Creation</h4>
+<p>The first step to obtaining an SSL certificate is using OpenSSL to create a certificate signing request (CSR) that can be sent to a Certificate Authority (CA) (e.g., DigiCert). The CSR contains the common name(s) you want your certificate to secure, information about your company, and your public key. In order for a CSR to be created, it needs to have a private key from which the public key is extracted. This can be done by using an existing private key or generating a new private key.</p>
+<h6><span style="color: rgb(0,116,217);"><b>Security Note:</b> Because of the security issues associated with using an existing private key, and because it's very easy and entirely free to create a private key, we recommend you generate a brand new private key whenever you create a CSR.</span></h6>
+<h4><br />
+Deciding on Key Generation Options</h4>
+<p>When generating a key, you have to decide three things: the key algorithm, the key size, and whether to use a passphrase.</p>
+<p><b>Key Algorithm</b></p>
+<p>For the key algorithm, you need to take into account its compatibility. For this reason, we recommend you use RSA. However, if you have a specific need to use another algorithm (such as ECDSA), you can use that too, but be aware of the compatibility issues you might run into.</p>
+<h6><b>Note:</b> This guide only covers generating keys using the RSA algorithm.</h6>
+<p><b>Key Size</b></p>
+<p>For the key size, you need to select a bit length of at least 2048 when using RSA and 256 when using ECDSA; these are the smallest key sizes allowed for SSL certificates. Unless you need to use a larger key size, we recommend sticking with 2048 with RSA and 256 with ECDSA.</p>
+<h6><b>Note:</b> In older versions of OpenSSL, if no key size is specified, the default key size of 512 is used. Any key size lower than 2048 is considered unsecure and should never be used.</h6>
+<p><b>Passphrase</b></p>
+<p>For the passphrase, you need to decide whether you want to use one. If used, the private key will be encrypted using the specified encryption method, and it will be impossible to use without the passphrase. Because there are pros and cons with both options, it's important you understand the implications of using or not using a passphrase. In this guide, we will not be using a passphrase in our examples.</p>
+<h4><br />
+Generating Your Private Key</h4>
+<p>After deciding on a key algorithm, key size, and whether to use a passphrase, you are ready to generate your private key.</p>
+<p><u><br />
+Use the following command to generate your private key using the RSA algorithm:</u></p>
+<table cellpadding="1" cellspacing="0" border="1">
+<tbody><tr><td width="900">openssl genrsa -out yourdomain.key 2048</td>
+</tr></tbody></table>
+<p><br />
+This command generates a private key in your current directory named <i>yourdomain.key</i> (<b>-out yourdomain.key</b>) using the RSA algorithm (<b>genrsa</b>) with a key length of 2048 bits (<b>2048</b>). The generated key is created using the OpenSSL format called PEM.</p>
+<p><u><br />
+Use the following command to view the raw, encoded contents (PEM format) of the private key:</u></p>
+<table cellpadding="1" cellspacing="0" border="1" width="500">
+<tbody><tr><td>cat yourdomain.key</td>
+</tr></tbody></table>
+<p><br />
+Even though the contents of the file might look like a random chunk of text, it actually contains important information about the key.</p>
+<p><u><br />
+Use the following command to decode the private key and view its contents:</u></p>
+<table cellpadding="1" cellspacing="0" border="1" width="900">
+<tbody><tr><td>openssl rsa -text -in yourdomain.key -noout</td>
+</tr></tbody></table>
+<p><br />
+The <b>-noout</b> switch omits the output of the encoded version of the private key.</p>
+<p> </p>
+
+        
+</div>
+
+    
+
+</div>
+<div class="text vspacebtncomp-top section">
+
+<div class="cmp-text cmp-text--left" style="background-color:transparent;">
+     <h4>Extracting Your Public Key</h4>
+<p>The private key file contains both the private key and the public key. You can extract your public key from your private key file if needed.</p>
+<p><u>Use the following command to extract your public key:</u></p>
+<table cellpadding="1" cellspacing="0" border="1" width="900">
+<tbody><tr><td>openssl rsa -in yourdomain.key -pubout -out yourdomain_public.key</td>
+</tr></tbody></table>
+<h4> </h4>
+<h4>Creating Your CSR</h4>
+<p>After generating your private key, you are ready to create your CSR. The CSR is created using the PEM format and contains the public key portion of the private key as well as information about you (or your company).</p>
+<p><u>Use the following command to create a CSR using your newly generated private key:</u></p>
+<table cellpadding="1" cellspacing="0" border="1" width="900">
+<tbody><tr><td>openssl req -new -key yourdomain.key -out yourdomain.csr</td>
+</tr></tbody></table>
+<p><br />
+After entering the command, you will be asked series of questions. Your answers to these questions will be embedded in the CSR.<br />
+<br />
+<u>Answer the questions as described below:</u></p>
+<table cellpadding="1" cellspacing="0" border="1">
+<tbody><tr><td><b>Country Name (2 letter code)</b></td>
+<td>The two-letter country code where your company is legally located.</td>
+</tr><tr><td><b>State or Province Name (full name)</b></td>
+<td>The state/province where your company is legally located.</td>
+</tr><tr><td><b>Locality Name (e.g., city)<br />
+ </b></td>
+<td>The city where your company is legally located.</td>
+</tr><tr><td><b>Organization Name (e.g., city)</b></td>
+<td>The city where your company is legally located.</td>
+</tr><tr><td><b>Organizational Unit Name (e.g., section)<br />
+ </b></td>
+<td>The name of your department within the organization. (You can leave this option blank; simply press <b>Enter</b>.)</td>
+</tr><tr><td><b>Common Name (e.g., server FQDN)</b></td>
+<td>The fully-qualified domain name (FQDN) (e.g., www.example.com).</td>
+</tr><tr><td><b>Email Address<br />
+ </b></td>
+<td>Your email address. (You can leave this option blank; simply press <b>Enter</b>.)</td>
+</tr><tr><td><b>A challenge password</b></td>
+<td>Your email address. (You can leave this option blank; simply press <b>Enter</b>.)</td>
+</tr><tr><td><b>An optional company name<br />
+ </b></td>
+<td>Leave this option blank (simply press <b>Enter</b>).<br />
+<br />
+</td>
+</tr></tbody></table>
+<p><br />
+Some of the above CSR questions have default values that will be used if you leave the answer blank and press <b>Enter</b>. These default values are pulled from the OpenSSL configuration file located in the OPENSSLDIR (see Checking Your OpenSSL Version). If you want to leave a question blank without using the default value, type a &quot;<b>.</b>&quot; (period) and press <b>Enter</b>.</p>
+<p> </p>
+
+        
+</div>
+
+    
+
+</div>
+<div class="text vspacebtncomp-top section">
+
+<div class="cmp-text cmp-text--left" style="background-color:transparent;">
+     <h4>Using the -subj Switch</h4>
+<p>Another option when creating a CSR is to provide all the necessary information within the command itself by using the -subj switch.</p>
+<p><u>Use the following command to disable question prompts when generating a CSR:</u></p>
+<table cellpadding="1" cellspacing="0" border="1" width="900">
+<tbody><tr><td>openssl req -new -key yourdomain.key -out yourdomain.csr \<br />
+-subj &quot;/C=US/ST=Utah/L=Lehi/O=Your Company, Inc./OU=IT/CN=yourdomain.com&quot;</td>
+</tr></tbody></table>
+<p><br />
+This command uses your private key file (<b>-key yourdomain.key</b>) to create a new CSR (<b>-out yourdomain.csr</b>) and disables question prompts by providing the CSR information (<b>-subj</b>).</p>
+<h4><br />
+Creating Your CSR with One Command</h4>
+<p>Instead of generating a private key and then creating a CSR in two separate steps, you can actually perform both tasks at once.</p>
+<p><br />
+<u>Use the following command to create both the private key and CSR:</u></p>
+<table cellpadding="1" cellspacing="0" border="1" width="900">
+<tbody><tr><td>openssl req -new \<br />
+-newkey rsa:2048 -nodes -keyout yourdomain.key \<br />
+-out yourdomain.csr \<br />
+-subj &quot;/C=US/ST=Utah/L=Lehi/O=Your Company, Inc./OU=IT/CN=yourdomain.com&quot;</td>
+</tr></tbody></table>
+<p><br />
+This command generates a new private key (<b>-newkey</b>) using the RSA algorithm with a 2048-bit key length (<b>rsa:2048</b>) without using a passphrase (<b>-nodes</b>) and then creates the key file with a name of yourdomain.key (<b>-keyout yourdomain.key</b>).</p>
+<p>The command then generates the CSR with a filename of yourdomain.csr (<b>-out yourdomain.csr</b>) and the information for the CSR is supplied (<b>-subj</b>).</p>
+<h6><b>Note:</b> While it is possible to add a subject alternative name (SAN) to a CSR using OpenSSL, the process is a bit complicated and involved. If you do need to add a SAN to your certificate, this can easily be done by adding them to the order form when purchasing your DigiCert certificate.</h6>
+
+        
+</div>
+
+    
+
+</div>
+<div class="text vspacebtncomp-top section">
+
+<div class="cmp-text cmp-text--left" style="background-color:transparent;">
+     <h4>Verifying CSR Information</h4>
+<p>After creating your CSR using your private key, we recommend verifying that the information contained in the CSR is correct and that the file hasn't been modified or corrupted.</p>
+<p><u>Use the following command to view the information in your CSR before submitting it to a CA (e.g., DigiCert):</u></p>
+<table cellpadding="1" cellspacing="0" border="1" width="900">
+<tbody><tr><td>openssl req -text -in yourdomain.csr -noout -verify</td>
+</tr></tbody></table>
+<p><br />
+The <b>-noout</b> switch omits the output of the encoded version of the CSR. The<b> -verify</b> switch checks the signature of the file to make sure it hasn't been modified.</p>
+<p><u>Running this command provides you with the following output:</u></p>
+<table cellpadding="1" cellspacing="0" border="1" width="900">
+<tbody><tr><td><span style="color: rgb(0,116,217);"><b>verify OK</b><br />
+</span>Certificate Request:<br />
+    Data:<br />
+        Version: 0 (0x0)<br />
+        <span style="color: rgb(0,116,217);"><b>Subject: C=US, ST=Utah, L=Lehi, O=Your Company, Inc., OU=IT, CN=yourdomain.com</b><br />
+</span>        Subject Public Key Info:<br />
+            Public Key Algorithm: rsaEncryption<br />
+                Public-Key: (2048 bit)<br />
+                Modulus:<br />
+                    00:bb:31:71:40:81:2c:8e:fb:89:25:7c:0e:cb:76:<br />
+                    [...17 lines removed]<br />
+                Exponent: 65537 (0x10001)<br />
+        Attributes:<br />
+            a0:00<br />
+    Signature Algorithm: sha256WithRSAEncryption<br />
+         0b:9b:23:b5:1f:8d:c9:cd:59:bf:b7:e5:11:ab:f0:e8:b9:f6:<br />
+         [...14 lines removed]</td>
+</tr></tbody></table>
+<p><br />
+On the first line of the above output, you can see that the CSR was verified (<b>verify OK</b>). On the fourth line, the <b>Subject:</b> field contains the information you provided when you created the CSR. Make sure this information is correct.</p>
+<p>If any of the information is wrong, you will need to create an entirely new CSR to fix the errors. This is because CSR files are digitally signed, meaning if even a single character is changed in the file it will be rejected by the CA.</p>
+<h4><br />
+Sending the CSR to the CA</h4>
+<p>When you are ready to send the CSR to the CA (e.g., DigiCert), you need to do so using the PEM format—the raw, encoded text of the CSR that you see when opening it in a text editor.</p>
+<p><u>Use the following command to view the raw output of the CSR:</u></p>
+<table cellpadding="1" cellspacing="0" border="1" width="500">
+<tbody><tr><td>cat yourdomain.csr</td>
+</tr></tbody></table>
+<p><br />
+You must copy the entire contents of the output (including the<b> -----BEGIN CERTIFICATE REQUEST-----</b> and <b>-----END CERTIFICATE REQUEST-----</b> lines) and paste it into your DigiCert order form.</p>
+
+        
+</div>
+
+    
+
+</div>
+<div class="pencil-banner section"><div class="wrapper" style="background-color:#0174c3;">
+	<div class="sub-wrapper" style="background-color:#E9EEF1;">
+	
+		 <div class="cmp-text rte-container right">	
+    			<p class="rte din" style="color:#48565e">Ready to order your SSL certificate?</p>
+    			<div class="btn-container horizontal">
+		  			 <a href="https://www.digicert.com/tls-ssl/basic-tls-ssl-certificates" class="btn primary blue-filled" target="_blank" style="margin-right:60px;
+				    	margin-bottom:px;">
+				 		LEARN MORE</a>
+	 	 		
+		  			 <a href="https://www.digicert.com/tls-ssl/basic-tls-ssl-certificates?utm_source=order2.0&utm_medium=Organic&utm_campaign=redirect" class="btn buy blue" target="_blank" style="margin-right:px;
+				    	margin-bottom:px;">
+				 		BUY NOW</a>
+	 	 		</div>
+     	</div>
+    </div>    
+</div>    
+
+    
+</div>
+<div class="text vspacebtncomp-top section">
+
+<div class="cmp-text cmp-text--left" style="background-color:transparent;">
+     <h4>Viewing Certificate Information</h4>
+<p>After receiving your certificate from the CA (e.g., DigiCert), we recommend making sure the information in the certificate is correct and matches your private key. You do this by using the <b>x509</b> command.</p>
+<p><u>Use the following command to view the contents of your certificate:</u></p>
+<table cellpadding="1" cellspacing="0" border="1">
+<tbody><tr><td width="900">openssl x509 -text -in yourdomain.crt -noout</td>
+</tr></tbody></table>
+<h4> </h4>
+<h4>Verifying Your Keys Match</h4>
+<p>To verify the public and private keys match, extract the public key from each file and generate a hash output for it. All three files should share the same public key and the same hash value.</p>
+<p><u>Use the following commands to generate a hash of each file's public key:</u></p>
+<table cellpadding="1" cellspacing="0" border="1">
+<tbody><tr><td width="900">openssl pkey -pubout -in .\private.key | openssl sha256</td>
+</tr></tbody></table>
+<table cellpadding="1" cellspacing="0" border="1">
+<tbody><tr><td width="900">openssl req -pubkey -in .\request.csr -noout | openssl sha256</td>
+</tr></tbody></table>
+<table cellpadding="1" cellspacing="0" border="1">
+<tbody><tr><td width="900">openssl x509 -pubkey -in .\certificate.crt -noout | openssl sha256</td>
+</tr></tbody></table>
+<p> </p>
+<h6><b>Note:</b> The above commands should be entered one by one to generate three separate outputs.</h6>
+<p>Each command will output <b>(stdin)=</b> followed by a string of characters. If the output of each command matches, then the keys for each file are the same. However, if there is any mismatch, then the keys are not the same and the certificate cannot be installed.</p>
+<p>Key mismatch errors are typically caused by installing a certificate on a machine different from the one used to generate the CSR. </p>
+<p><u>If you run into a key mismatch error, you need to do one of the following:</u></p>
+<ul>
+<li>Transfer the private key from the machine used to generate the CSR to the one you are trying to install the certificate on.</li>
+<li>Install the certificate on the machine with the private key.</li>
+<li>Generate an entirely new key and create a new CSR on the machine that will use the certificate.</li>
+</ul>
+
+        
+</div>
+
+    
+
+</div>
+<div class="text vspacebtncomp-top section">
+
+<div class="cmp-text cmp-text--left" style="background-color:transparent;">
+     <h4>Converting Certificate Formats</h4>
+<p>By default, OpenSSL generates keys and CSRs using the PEM format. However, there might be occasions when you need to convert your key or certificate into a different format to export it to another system.</p>
+<p><b>PEM to PKCS#12</b></p>
+<p>The PKCS#12 format is an archival file that stores both the certificate and the private key. This format is useful for migrating certificates and keys from one system to another as it contains all the necessary files. PKCS#12 files use either the <i>.pfx</i> or <i>.p12</i> file extension.</p>
+<p><u>Use the following command to convert your PEM key and certificate into the PKCS#12 format (i.e., a single .pfx file):</u></p>
+<table cellpadding="1" cellspacing="0" border="1" width="900">
+<tbody><tr><td width="900">openssl pkcs12 -export -name &quot;yourdomain-digicert-(expiration date)&quot; \<br />
+-out yourdomain.pfx -inkey yourdomain.key -in yourdomain.crt</td>
+</tr></tbody></table>
+<h6><b><br />
+Note:</b> After you enter the command, you will be asked to provide a password to encrypt the file. Because the PKCS#12 format is often used for system migration, we recommend encrypting the file using a very strong password.</h6>
+<p>This command combines your private key <b>(-inkey yourdomain.key</b>) and your certificate <b>(-in yourdomain.crt</b>) into a single <i>.pfx</i> file (<b>-out yourdomain.pfx</b>) with a friendly name (<b>-name &quot;yourdomain-digicert-(expiration date)&quot;</b>), where the <i>expiration date</i> is the date that the certificate expires.</p>
+<p><b><br />
+PKCS#12 to PEM</b></p>
+<p>Because the PKCS#12 format contains both the certificate and private key, you need to use two separate commands to convert a .pfx file back into the PEM format.</p>
+<p><u>Use the following command to extract the private key from a PKCS#12 (.pfx) file and convert it into a PEM encoded private key:</u></p>
+<table cellpadding="1" cellspacing="0" border="1">
+<tbody><tr><td width="900">openssl pkcs12 -in yourdomain.pfx -nocerts -out yourdomain.key -nodes</td>
+</tr></tbody></table>
+<p><u><br />
+Use the following command to extract the certificate from a PKCS#12 (.pfx) file and convert it into a PEM encoded certificate:</u></p>
+<table cellpadding="1" cellspacing="0" border="1">
+<tbody><tr><td width="900">openssl pkcs12 -in yourdomain.pfx -nokeys -clcerts -out yourdomain.crt<br />
+<br />
+</td>
+</tr></tbody></table>
+<h6><b><br />
+Note:</b> You will need to provide the password used to encrypt the .pfx file in order to convert the key and certificate into the PEM format.</h6>
+<p><b>PEM to DER</b></p>
+<p>The DER format uses ASN.1 encoding to store certificate or key information. Similar to the PEM format, DER stores key and certificate information in two separate files and typically uses the same file extensions (i.e., <i>.key</i>, <i>.crt</i>, and <i>.csr</i>). The file extension <i>.der</i> was used in the below examples for clarity.</p>
+<p><u>Use the following command to convert a PEM encoded certificate into a DER encoded certificate:</u></p>
+<table cellpadding="1" cellspacing="0" border="1">
+<tbody><tr><td width="900">openssl x509 -inform PEM -in yourdomain.crt -outform DER -out yourdomain.der</td>
+</tr></tbody></table>
+<p><u><br />
+Use the following command to convert a PEM encoded private key into a DER encoded private key:</u></p>
+<table cellpadding="1" cellspacing="0" border="1">
+<tbody><tr><td width="900">openssl rsa -inform PEM -in yourdomain.key -outform DER -out yourdomain_key.der</td>
+</tr></tbody></table>
+<p><br />
+<br />
+<b>DER to PEM</b></p>
+<p><u>Use the following command to convert a DER encoded certificate into a PEM encoded certificate:</u></p>
+<table cellpadding="1" cellspacing="0" border="1">
+<tbody><tr><td width="900">openssl x509 -inform DER -in yourdomain.der -outform PEM -out yourdomain.crt</td>
+</tr></tbody></table>
+<p><u><br />
+Use the following command to convert a DER encoded private key into a PEM encoded private key:</u></p>
+<table cellpadding="1" cellspacing="0" border="1" width="900">
+<tbody><tr><td>openssl rsa -inform DER -in yourdomain_key.der -outform PEM -out yourdomain.key</td>
+</tr></tbody></table>
+
+        
+</div>
+
+    
+
+</div>
+
+
+	</div>
+</div></div>
+<div class="experiencefragment aem-GridColumn aem-GridColumn--default--12">
+<div id="experiencefragment-7fcd8b63cb" class="cmp-experiencefragment cmp-experiencefragment--kb-footer">
+
+
+    
+    
+    
+    <div id="container-fec8a75d7f" class="cmp-container">
+        
+        <div class="kb-footer">
+<div class="popupModal hide" id="mediaPopup">
+	 <h2 class="closeVideoPlayer" style="margin:0;"></h2>
+	 <div class="popup">
+		  <video id="popupVideoPlayer" class="videoPlayer" width="100%" controls>
+		 		 <source src=""/>
+		  </video>
+		  <iframe id="popupIframeVideoPlayer" src=""></iframe>
+	 </div>
+</div>
+
+
+<!-- Place with DigiCert Seal HTML or with other scripts -->
+<script type="text/javascript">
+	var __dcid = __dcid || [];
+		__dcid.push({"cid":"DigiCertClickID_QpVPir5r","tag":"QpVPir5r","seal_format":"dynamic"});
+		(function(){
+			var cid=document.createElement("script");
+				cid.async=true;
+				cid.src="//seal.digicert.com/seals/cascade/seal.min.js";
+			var s = document.getElementsByTagName("script");
+			var ls = s[(s.length - 1)];
+				ls.parentNode.insertBefore(cid, ls.nextSibling);
+		}());
+</script>
+
+<div class="footer-top-line"></div>
+<div class="footer-kb" am-region="Footer">
+	 <ul id="aboutus-text" class="clearfix">
+	 	 <li class="aboutus-text">
+			 
+
+
+
+<div class="site-branding">
+    <a>
+    	<img src="/content/dam/digicert/DigiCert-Logo.png" alt="DigiCert Logo" loading="lazy" width="124" height="33"/>
+    </a>
+</div>
+
+
+    
+
+
+			 <p>The most-trusted global provider of high-assurance TLS/SSL, PKI, IoT and signing solutions. <br />
+</p>
+
+		</li>
+		<li id="digicert-seal" class="digicert-seal">
+			
+			
+			<div id="DigiCertClickID_QpVPir5r"></div>
+			
+		</li>
+		<li class="socialMedia">
+			<a href="https://www.linkedin.com/company/digicert-inc-/">
+			   <img src="/content/dam/digicert/icons/LinkedInIcon.svg" alt="Linkedin"/>
+		    </a>
+		
+			<a href="https://twitter.com/digicert?s=20">
+			   <img src="/content/dam/kb/icons/twitter.svg" alt="Twitter"/>
+		    </a>
+		
+			<a href="https://www.youtube.com/user/DigiCertSSL">
+			   <img src="/content/dam/digicert/icons/YouTubeIcon.svg" alt="Youtube"/>
+		    </a>
+		</li>	
+	 </ul>
+	 <ul id="footer-menu" class="menu clearfix">
+		 <li>
+			<h6 class="footer-label">
+				Support
+			</h6>
+			<i class="fa fa-angle-down"></i>
+			<ul class="sub-menu clearfix">
+				<li><a href="https://www.digicert.com/support" class=" txt-u-animate straight-line">TLS/SSL Support</a></li>
+			
+				<li><a href="https://www.digicert.com/support/pki-support" class=" txt-u-animate straight-line">PKI Support</a></li>
+			
+				<li><a href="https://www.digicert.com/help/" class=" txt-u-animate straight-line">SSL Checker</a></li>
+			
+				<li><a href="https://www.digicert.com/support/tools/certificate-utility-for-windows" class=" txt-u-animate straight-line">Certificate Utility</a></li>
+			
+				<li><a href="https://www.digicert.com/kb/csr-creation.htm" class=" txt-u-animate straight-line">Generate CSR</a></li>
+			
+				<li><a href="https://problemreport.digicert.com/" class=" txt-u-animate straight-line">Report Certificate Misuse</a></li>
+			</ul>
+		 </li>
+	
+		 <li>
+			<h6 class="footer-label">
+				Products
+			</h6>
+			<i class="fa fa-angle-down"></i>
+			<ul class="sub-menu clearfix">
+				<li><a href="https://www.digicert.com/tls-ssl/compare-certificates" class=" txt-u-animate straight-line">Compare Certificates</a></li>
+			
+				<li><a href="https://www.digicert.com/tls-ssl/tls-ssl-certificates" class=" txt-u-animate straight-line">TLS/SSL Certificates</a></li>
+			
+				<li><a href="https://www.digicert.com/tls-ssl/secure-site-pro-ssl" class=" txt-u-animate straight-line">Pro TLS/SSL Certificates</a></li>
+			
+				<li><a href="https://www.digicert.com/tls-ssl/multi-domain-ssl-certificates" class=" txt-u-animate straight-line">Multi-Domain SSL</a></li>
+			
+				<li><a href="https://www.digicert.com/tls-ssl/wildcard-ssl-certificates" class=" txt-u-animate straight-line">Wildcard Certificates</a></li>
+			
+				<li><a href="https://www.digicert.com/signing/document-signing-certificates" class=" txt-u-animate straight-line">Document Signing</a></li>
+			
+				<li><a href="https://www.digicert.com/signing/code-signing-certificates" class=" txt-u-animate straight-line">Code Signing</a></li>
+			</ul>
+		 </li>
+	
+		 <li>
+			<h6 class="footer-label">
+				Solutions
+			</h6>
+			<i class="fa fa-angle-down"></i>
+			<ul class="sub-menu clearfix">
+				<li><a href="https://www.digicert.com/tls-ssl/certcentral-tls-ssl-manager" class=" txt-u-animate straight-line">CertCentral</a></li>
+			
+				<li><a href="https://www.digicert.com/trust-lifecycle-manager" class=" txt-u-animate straight-line">DigiCert® Trust Lifecycle Manager</a></li>
+			
+				<li><a href="https://www.digicert.com/device-trust-manager" class=" txt-u-animate straight-line">DigiCert® Device Trust Manager</a></li>
+			
+				<li><a href="https://www.digicert.com/software-trust-manager" class=" txt-u-animate straight-line">DigiCert® Software Trust Manager</a></li>
+			
+				<li><a href="https://www.digicert.com/document-trust-manager" class=" txt-u-animate straight-line">DigiCert® Document Trust Manager</a></li>
+			
+				<li><a href="https://www.digicert.com/solutions/solutions-overview" class=" txt-u-animate straight-line">Solutions Overview</a></li>
+			
+				<li><a href="https://www.digicert.com/digicert-one" class=" txt-u-animate straight-line">DigiCert ONE</a></li>
+			</ul>
+		 </li>
+	</ul>
+	<ul id="mobile-socialMedia" class="clearfix">
+		<li>
+			<a href="https://www.linkedin.com/company/digicert-inc-/" style="max-width:50px;max-height:50px;">
+			   <img src="/content/dam/digicert/icons/LinkedInIcon.svg" alt="Linkedin"/>
+		    </a>
+		
+			<a href="https://twitter.com/digicert?s=20" style="max-width:50px;max-height:50px;">
+			   <img src="/content/dam/kb/icons/twitter.svg" alt="Twitter"/>
+		    </a>
+		
+			<a href="https://www.youtube.com/user/DigiCertSSL" style="max-width:50px;max-height:50px;">
+			   <img src="/content/dam/digicert/icons/YouTubeIcon.svg" alt="Youtube"/>
+		    </a>
+		</li>
+	</ul>
+	<ul id="copyright" class="clearfix">
+		<li>
+			<p>© 2022-2024, DigiCert, Inc. All rights reserved.</p>
+
+			
+				
+					<a href="javascript:void(0);" onclick="transcend.showConsentManager({ viewState: 'CompleteOptions' });">Cookie Settings</a>
+                
+				
+			
+		</li>
+	</ul>
+</div></div>
+<div class="back-to-top"><button class="backtotop" id="myBtn" title="Go to top"><i class="arrow-updated up"></i>&nbsp;&nbsp;TO TOP</button>
+
+    
+</div>
+
+        
+    </div>
+
+</div>
+
+    
+</div>
+
+    
+</div>
+</div>
+
+
+            
+    
+    
+<script src="/etc.clientlibs/kb/clientlibs/clientlib-site.js"></script>
+<script src="/etc.clientlibs/kb/clientlibs/clientlib-site-kb.js"></script>
+
+
+
+    
+
+    
+    
+<script src="/etc.clientlibs/core/wcm/components/commons/site/clientlibs/container.js"></script>
+<script src="/etc.clientlibs/kb/clientlibs/clientlib-base.js"></script>
+<script src="/libs/dam/components/scene7/common/clientlibs/viewer.js"></script>
+<script src="/etc.clientlibs/digicert/clientlibs/clientlib-base.js"></script>
+
+
+
+
+
+
+	<div class="back-to-top" style="display:none;">
+		<div class="back-to-top-container">
+			<div class="inner-container">
+				<div class="icon-container">
+					<img src="/content/dam/kb/logos/back-to-top.svg"/>
+				</div>
+	            <div class="container-text">TO TOP</div>
+			</div>
+		</div>
+	</div>
+
+
+    
+
+    
+
+    
+    
+
+
+
+    
+    
+   <!-- <div data-sly-unwrap="true"><sly data-sly-resource="kbratingform"></sly></div> -->
+
+            
+
+
+        
+    <script type="text/javascript" src="/_Incapsula_Resource?SWJIYLWA=719d34d31c8e3a6e6fffd425f7e032f3&ns=2&cb=81378079" async></script></body>
+</html>

@@ -1,0 +1,26 @@
+<% flash_hash ||= {} %>
+<% base_hash = if flash_hash.respond_to?(:to_hash)
+                 flash_hash.to_hash
+               elsif flash_hash.respond_to?(:to_h)
+                 flash_hash.to_h
+               else
+                 flash_hash
+               end %>
+<% now_hash = if flash_hash.respond_to?(:now)
+                flash_hash.now.instance_variable_get(:@hash) || {}
+              else
+                {}
+              end %>
+<% messages = base_hash.merge(now_hash) %>
+<% messages.each do |type, message| %>
+  <% next if message.blank? %>
+  <% bootstrap_class = case type.to_sym %>
+  <% when :notice then 'alert-success' %>
+  <% when :alert, :error then 'alert-danger' %>
+  <% else 'alert-info' %>
+  <% end %>
+  <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert" style="pointer-events: auto;">
+    <%= message %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<% end %>

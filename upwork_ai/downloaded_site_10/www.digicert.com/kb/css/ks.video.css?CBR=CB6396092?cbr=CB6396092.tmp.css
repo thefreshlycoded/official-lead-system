@@ -1,0 +1,197 @@
+/* General Styles */
+
+/* Video Lightbox Styles */
+.lightbox-backdrop {
+	z-index: 1408;
+	position: fixed;
+	top: 0;
+	width: 100%;
+	background-color: #333333;
+}
+.lightbox-container {
+	position: fixed;
+	z-index: 1409;
+	border: 16px solid white;
+	background: white;
+	border-radius: 8px;
+	box-shadow: 0 0 36px black;
+}
+.lightbox-close-circle {
+	position: absolute;
+	top: -32px; /* twice the border width of .lightbox-container */
+	right: -32px;
+	cursor: pointer;
+}
+.lightbox-video-iframe {
+	background: black;
+	box-shadow: 0 0 6px black;
+}
+
+/* Videobox Styles */
+.videobox {
+	width: 414px;
+	height: 206px;
+	cursor: pointer;
+}
+.videobox {
+	background: red; /* backup style to point out videos with bad links or splash images, will be overridden with specific styles below */
+}
+.videobox.training-video, .videobox.play-video {
+	background: url(/kb/images/video-overlay/video-play.png) top left;
+}
+
+/* Page-specific and video-specific styles */
+
+/* about-digicert.htm */
+#video-customer-service {
+	float: left;
+	background: url(/kb/images/video-overlay/customer-service_up.png) top left;
+}
+#video-customer-service:hover {
+	background: url(/kb/images/video-overlay/customer-service_hover.png) top left;
+}
+#video-customer-service-text {
+	width: 440px;
+}
+#video-setup-support {
+	background: url(/kb/images/video-overlay/setup-support_up.png) top left;
+}
+#video-setup-support:hover {
+	background: url(/kb/images/video-overlay/setup-support_hover.png) top left;
+}
+
+/* code-signing/index.html */
+#perfect-code {
+	background: url(/kb/images/video-overlay/perfect-code_up.png) top left;
+}
+#perfect-code:hover {
+	background: url(/kb/images/video-overlay/perfect-code_hover.png) top left;
+}
+
+/* managed-pki-ssl.htm */
+#digicert-difference {
+	background: url(/kb/images/video-overlay/managed-pki_up.png) top left;
+}
+#digicert-difference:hover {
+	background: url(/kb/images/video-overlay/managed-pki_hover.png) top left;
+}
+
+/* web-pki-manager-tutorial.htm */
+#pki-overview {
+	background: none;
+}
+#pki-overview:hover {
+	background: none;
+}
+
+/* ssl-certificate.htm */
+#digicert-ssl {
+	background: url(/kb/images/video-overlay/car-salesman_up.png) top left;
+}
+#digicert-ssl:hover {
+	background: url(/kb/images/video-overlay/car-salesman_hover.png) top left;
+}
+
+/* support.htm */
+#support-comparison {
+	background: url(/kb/images/video-overlay/digicert-support_up.png) top left;
+}
+#support-comparison:hover {
+	background: url(/kb/images/video-overlay/digicert-support_hover.png) top left;
+}
+
+/* security-certificate-support.htm */
+#real-support {
+	background: url(/kb/images/video-overlay/real-support_up.png) top left;
+}
+#real-support:hover {
+	background: url(/kb/images/video-overlay/real-support_hover.png) top left;
+}
+
+/* welcome/ssl-plus.htm */
+#ssl-intro {
+	background: url(/kb/images/video-overlay/best-value-ssl_up.png) top left;
+}
+#ssl-intro:hover {
+	background: url(/kb/images/video-overlay/best-value-ssl_hover.png) top left;
+}
+#space-video {
+	background: url(/kb/images/video-overlay/ssl-universe_up.png) top left;
+}
+#space-video:hover {
+	background: url(/kb/images/video-overlay/ssl-universe_hover.png) top left;
+}
+
+/* ev-ssl-certification.htm */
+/* ALSO: #space-video */
+#greenbar-assurance {
+	background: url(/kb/images/video-overlay/ev-ssl_up.png) top left;
+}
+#greenbar-assurance:hover {
+	background: url(/kb/images/video-overlay/ev-ssl_hover.png) top left;
+}
+
+/* wildcard-ssl-certificates.htm */
+/* ALSO: #space-video */
+#wildcard-plus {
+	background: url(/kb/images/video-overlay/wildcard-ssl_up.png) top left;
+}
+#wildcard-plus:hover {
+	background: url(/kb/images/video-overlay/wildcard-ssl_hover.png) top left;
+}
+#outstanding-reputation {
+	background: url(/kb/images/video-overlay/customer-love_up.png) top left;
+}
+#outstanding-reputation:hover {
+	background: url(/kb/images/video-overlay/customer-love_hover.png) top left;
+}
+
+/* unified-communications-ssl-tls.htm */
+/* ALSO: #space-video */
+#ucc-certificates {
+	background: url(/kb/images/video-overlay/uc-certs_up.png) top left;
+}
+#ucc-certificates:hover {
+	background: url(/kb/images/video-overlay/uc-certs_hover.png) top left;
+}
+
+/* ev-multi-domain-ssl.htm */
+/* ALSO: #greenbar-assurance */
+/* ALSO: #ucc-certificates */
+/* ALSO: #space-video */
+
+
+#client-cert {
+	background: url(/kb/images/video-overlay/client-cert_up.png) top left;
+}
+#client-cert:hover {
+	background: url(/kb/images/video-overlay/client-cert_hover.png) top left;
+}
+
+#anniversary-support {
+	background: url(/kb/images/video-overlay/anniversary-support_up.png) top left;
+}
+#anniversary-support:hover {
+	background: url(/kb/images/video-overlay/anniversary-support_hover.png) top left;
+}
+
+#found-dad {
+	background: url(/kb/images/video-overlay/found-dad_up.png) top left;
+}
+#found-dad:hover {
+	background: url(/kb/images/video-overlay/found-dad_hover.png) top left;
+}
+
+#utah-business {
+	background: url(/kb/images/video-overlay/utah-business_up.png) top left;
+}
+#utah-business:hover {
+	background: url(/kb/images/video-overlay/utah-business_hover.png) top left;
+}
+
+#mpki-tutorial {
+	background: url(/kb/images/video-overlay/mpki-tut_up.png) top left;
+}
+#mpki-tutorial:hover {
+	background: url(/kb/images/video-overlay/mpki-tut_hover.png) top left;
+}

@@ -1,0 +1,710 @@
+
+<!DOCTYPE HTML>
+<html lang="en-US">
+    <head>
+    <meta charset="UTF-8"/>
+    <title>CSR creation instructions for Microsoft servers</title>
+    <meta name="keywords" content="EN,Microsoft,CSR,Tutorials"/>
+    <meta name="description" content="Create a CSR for Microsoft servers using the DigiCert® Certificate Utility for Windows."/>
+    <meta name="template" content="tutorial-template"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    
+
+    
+    
+
+	<link rel="canonical" href="/tutorials/csr-creation-instructions-for-microsoft-servers"/>
+	
+
+
+<!--<link data-sly-use.page="com.adobe.cq.wcm.core.components.models.Page"
+      data-sly-test=""
+      rel="canonical" href="">
+	
+	<link data-sly-test=""
+      data-sly-repeat=""
+      rel="alternate" hreflang="" href="">-->
+
+    
+
+
+    
+<link rel="icon" href="/content/dam/digicert/images/DigiCertFavicon_16x16.png" sizes="16x16"/>
+<link rel="icon" href="/content/dam/digicert/images/DigiCertFavicon_32x32.png" sizes="32x32"/>
+<link rel="apple-touch-icon" href="/content/dam/digicert/images/DigiCertFavicon_32x32.png"/>
+<meta name="msapplication-TileImage" content="/content/dam/digicert/images/DigiCertFavicon_32x32.png"/>
+
+
+    
+    
+<link rel="stylesheet" href="/etc.clientlibs/kb/clientlibs/clientlib-dependencies.css" type="text/css">
+<link rel="stylesheet" href="/etc.clientlibs/kb/clientlibs/clientlib-base.css" type="text/css">
+<link rel="stylesheet" href="/etc.clientlibs/digicert/clientlibs/ui.search.css" type="text/css">
+<link rel="stylesheet" href="/etc.clientlibs/digicert/clientlibs/clientlib-base.css" type="text/css">
+
+
+
+
+    
+	<meta property="og:locale" content="en_US"/>
+	<meta name="keywords" content="en, microsoft, csr, tutorials"/>
+	<meta class="swiftype" name="published_at" data-type="date" content="05/11/2024"/>
+    <meta class="swiftype" name="tags" data-type="string" content="en, microsoft, csr, tutorials"/>
+	<meta class="swiftype" name="featured" data-type="integer" content="0"/>
+    <meta class="swiftype" name="download" data-type="string"/>
+    <meta class="swiftype" name="domain" data-type="integer" content="5"/>
+	<meta class="swiftype" name="langc" data-type="string" content="en_US"/>
+	
+
+
+<script>
+	  //Adobe Target prehiding snippet (must be place//Adobe Target prehiding snippet (must be placed directly above '< script src="https://assets.adobedtm.com/.../.../launch-....min.js" async> </ script>')
+	  
+	  //check if OneTrust is allowing "Personalized Experience Cookies" (i.e., Adobe Target) to load
+	  var adobeTargetOneTrustGroup = "PE";
+	  
+	  function isAdobeTargetAllowed(adobeTargetOneTrustGroup) {
+	    var OptanonConsentCookie = document.cookie.match(/OptanonConsent=.*;/);
+	    
+	    return (OptanonConsentCookie && decodeURIComponent(OptanonConsentCookie[0]).includes(adobeTargetOneTrustGroup + ":1"));
+	  }
+	  
+	  if (isAdobeTargetAllowed(adobeTargetOneTrustGroup)) {
+	    //Adobe Target prehiding snippet
+	    ;(function(win, doc, style, timeout) {
+	      var STYLE_ID = 'at-body-style';
+	      
+	      function getParent() {
+	        return doc.getElementsByTagName('head')[0];
+	      }
+	      
+	      function addStyle(parent, id, def) {
+	        if (!parent) {
+	          return;
+	        }
+	        
+	        var style = doc.createElement('style');
+	        style.id = id;
+	        style.innerHTML = def;
+	        parent.appendChild(style);
+	      }
+	      
+	      function removeStyle(parent, id) {
+	        if (!parent) {
+	          return;
+	        }
+	        
+	        var style = doc.getElementById(id);
+	        
+	        if (!style) {
+	          return;
+	        }
+	        
+	        parent.removeChild(style);
+	      }
+	      
+	      addStyle(getParent(), STYLE_ID, style);
+	      setTimeout(function() {
+	        removeStyle(getParent(), STYLE_ID);
+	      }, timeout);
+	    }(window, document, "body {opacity: 0 !important}", 3000));
+	  }
+	</script>
+<!-- Staging Adobe Tags -->
+<!--<script src="https://assets.adobedtm.com/80bda08f0087/1015fcf0b78f/launch-ENb8e5854ed93c443fa2962c8516926c96-staging.min.js" async></script>-->
+<!-- Production Adobe Tags -->
+<script src="https://assets.adobedtm.com/80bda08f0087/1015fcf0b78f/launch-EN214b022a648841a199bcc6b7b217acc1.min.js" async></script>
+
+    
+    
+    
+
+    
+
+    
+    
+<script src="/etc.clientlibs/clientlibs/granite/jquery.js"></script>
+<script src="/etc.clientlibs/kb/clientlibs/clientlib-dependencies.js"></script>
+<script src="/etc.clientlibs/clientlibs/granite/utils.js"></script>
+<script src="/etc.clientlibs/digicert/clientlibs/ui.search.js"></script>
+<script src="/etc.clientlibs/clientlibs/granite/jquery/granite.js"></script>
+<script src="/etc.clientlibs/foundation/clientlibs/jquery.js"></script>
+<script src="/etc.clientlibs/digicert/clientlibs/clientlib-dependencies.js"></script>
+
+
+
+    
+    
+<link rel="stylesheet" href="/etc.clientlibs/kb/clientlibs/clientlib-site-kb.css" type="text/css">
+
+
+
+    
+
+    
+    
+    
+    <!-- <head> -->
+	<script id="__ada" data-handle="digicert-gen" src="https://static.ada.support/embed2.js"></script>
+</head>
+    <body class="page basicpage kb-body" id="page-0e33a2e045" data-cmp-data-layer-enabled>
+        <!--  <script data-sly-test.dataLayerEnabled="">
+          window.adobeDataLayer = window.adobeDataLayer || [];
+          adobeDataLayer.push({
+              page: JSON.parse("{\x22page\u002D0e33a2e045\x22:{\x22@type\x22:\x22kb\/components\/page\x22,\x22repo:modifyDate\x22:\x222024\u002D05\u002D10T18:25:25Z\x22,\x22dc:title\x22:\x22CSR creation instructions for Microsoft servers\x22,\x22dc:description\x22:\x22Create a CSR for Microsoft servers using the DigiCert® Certificate Utility for Windows.\x22,\x22xdm:template\x22:\x22\/conf\/kb\/settings\/wcm\/templates\/tutorial\u002Dtemplate\x22,\x22xdm:language\x22:\x22en\u002DUS\x22,\x22xdm:tags\x22:[\x22EN\x22,\x22Microsoft\x22,\x22CSR\x22,\x22Tutorials\x22],\x22repo:path\x22:\x22\/content\/kb\/us\/en\/tutorials\/csr\u002Dcreation\u002Dinstructions\u002Dfor\u002Dmicrosoft\u002Dservers.html\x22}}"),
+              event:'cmp:show',
+              eventInfo: {
+                  path: 'page.page\u002D0e33a2e045'
+              }
+          });
+        </script> -->
+        
+        
+            
+
+
+
+
+            
+
+
+
+            
+<div class="root responsivegrid">
+
+
+<div class="aem-Grid aem-Grid--12 aem-Grid--default--12 ">
+    
+    <div class="experiencefragment aem-GridColumn aem-GridColumn--default--12">
+<div id="experiencefragment-5cd9e92b2f" class="cmp-experiencefragment cmp-experiencefragment--kb-header">
+
+
+    
+    
+    
+    <div id="container-64ef1fbaa6" class="cmp-container">
+        
+        <div class="header"><header class="editmode-false">
+	<div class="header__logo">
+
+
+
+<div class="site-branding">
+    <a href="/">
+    	<img src="/content/dam/kb/logos/kb-new-logo.png" alt="DigiCert KnowledgeBase - Technical Support Logo" loading="lazy" width="124" height="33"/>
+    </a>
+</div>
+
+
+    
+
+</div>
+	<div class="header__navigation">
+		<div class="navigation__primary"><img class="hamburger" src="/content/dam/thawte/icons/MenuIcon.png" data-hoversrc="/content/dam/thawte/icons/MenuIcon_Hover.png"/>
+
+<nav class="cmp-navigation cmp-navigation--mobile">
+     <ul class="cmp-navigation__group">
+          <li class="cmp-navigation__item cmp-navigation__item--level-0 navigation-header">
+               <a href="#" data-content=".header__secondary-nav-content--contact" class="cmp-navigation__item-link is-header-true">
+                    Contact Us
+               </a>
+          </li>
+          <li class="cmp-navigation__item cmp-navigation__item--level-0 navigation-header">
+               <a href="#" data-content=".header__secondary-nav-content--language" class="cmp-navigation__item-link is-header-true">
+                    Language
+               </a>
+          </li>
+     </ul>
+</nav>
+
+    
+</div>
+		<ul class="navigation__secondary clearfix" style="align-items: center;">
+			<li id="contact">
+				<a class="btn primary blue-filled" href="https://www.digicert.com/contact-us">
+					<span>Contact Us</span>
+					<i class="fa fa-phone"></i></a>
+			</li>
+			<li id="language">
+				<a href="#" class="header__secondary-nav-link header__secondary-nav-link--desktop">
+				   <img alt="language" src="/content/dam/digicert/images/navigation/header/LanguageIcon_MainNavigation.png" data-hoversrc="/content/dam/digicert/icons/Language-Icon-Hover.png"/>
+				</a>
+				<div data-layout="half" class="header__secondary-nav-content header__secondary-nav-content--language">
+					<div class="header__nav-dismiss"><i class="close"></i></div>
+					<h2 class="heading">choose your language</h2>
+					<ul class="cmp-navigation__group clearfix">
+						<li><a class="cmp-navigation__item-link txt-u-animate straight-line" href="https://knowledge.digicert.com/" id="en_US">English</a></li>
+					
+						<li><a class="cmp-navigation__item-link txt-u-animate straight-line" href="https://knowledge.digicert.com/ja/jp/home.html" id="ja_JP">Japanese</a></li>
+					</ul>
+				</div>
+			</li>
+			
+			<li id="mobile_hamburger">
+				<a href="#" class="header__secondary-nav-link header__secondary-nav-link--mobile header__secondary-nav-link--menu" data-content=".navigation__primary">
+				   <i class="fa fa-bars" id="hamburger"></i>
+				</a>
+			</li>
+		</ul>
+	</div>
+</header></div>
+
+        
+    </div>
+
+</div>
+
+    
+</div>
+<div class="custom-breadcrumb aem-GridColumn aem-GridColumn--default--12">
+<nav id="custom-breadcrumb-88bb489008" class="cmp-breadcrumb" aria-label="Breadcrumb" data-cmp-data-layer="{&#34;custom-breadcrumb-88bb489008&#34;:{&#34;@type&#34;:&#34;kb/components/custom-breadcrumb&#34;,&#34;repo:modifyDate&#34;:&#34;2023-12-18T09:19:14Z&#34;}}">
+
+    <ol class="cmp-breadcrumb__list" itemscope itemtype="http://schema.org/BreadcrumbList">
+        <li class="cmp-breadcrumb__item" data-cmp-data-layer="{&#34;custom-breadcrumb-88bb489008-item-471667c32e&#34;:{&#34;@type&#34;:&#34;kb/components/custom-breadcrumb/item&#34;,&#34;repo:modifyDate&#34;:&#34;2024-09-27T13:11:53Z&#34;,&#34;dc:title&#34;:&#34;Home&#34;,&#34;xdm:linkURL&#34;:&#34;/content/kb/us/en&#34;}}" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a href="/" class="cmp-breadcrumb__item-link txt-u-animate straight-line" itemprop="item" data-cmp-clickable>
+                <span itemprop="name">Home</span>
+            </a>
+            <meta itemprop="position" content="1"/>
+        </li>
+    
+        <li class="cmp-breadcrumb__item" data-cmp-data-layer="{&#34;custom-breadcrumb-88bb489008-item-1444ed3ab5&#34;:{&#34;@type&#34;:&#34;kb/components/custom-breadcrumb/item&#34;,&#34;repo:modifyDate&#34;:&#34;2023-11-07T18:00:12Z&#34;,&#34;dc:title&#34;:&#34;Tutorials&#34;,&#34;xdm:linkURL&#34;:&#34;/tutorials&#34;}}" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a href="/tutorials" class="cmp-breadcrumb__item-link txt-u-animate straight-line" itemprop="item" data-cmp-clickable>
+                <span itemprop="name">Tutorials</span>
+            </a>
+            <meta itemprop="position" content="2"/>
+        </li>
+    
+        <li class="cmp-breadcrumb__item cmp-breadcrumb__item--active" aria-current="page" data-cmp-data-layer="{&#34;custom-breadcrumb-88bb489008-item-0e33a2e045&#34;:{&#34;@type&#34;:&#34;kb/components/custom-breadcrumb/item&#34;,&#34;repo:modifyDate&#34;:&#34;2024-10-07T13:52:17Z&#34;,&#34;dc:title&#34;:&#34;CSR creation instructions for Microsoft servers&#34;,&#34;xdm:linkURL&#34;:&#34;/tutorials/csr-creation-instructions-for-microsoft-servers&#34;}}" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a href="/tutorials/csr-creation-instructions-for-microsoft-servers" class="cmp-breadcrumb__item-link txt-u-animate straight-line" itemprop="item" data-cmp-clickable>
+                <span itemprop="name">CSR creation instructions for Microsoft servers</span>
+            </a>
+            <meta itemprop="position" content="3"/>
+        </li>
+    </ol>
+</nav>
+
+    
+
+</div>
+<div class="kbheaderwithsearch aem-GridColumn aem-GridColumn--default--12">
+
+
+
+
+
+
+
+
+
+<div class="kb-header-text cmp-text--left" style="background-color:transparent;height:px;">	
+	<div class="img-container relative
+					noBgColor
+					mbg-grey">
+			 
+			 
+				
+					
+				
+					<img src="/content/dam/kb/images/homepage/Knowledge-base-hero-April23.png" alt="DigiCert KnowledgeBase - Technical Support-hero"/>
+			
+	</div>
+	<div class="search-and-text">
+		<div class="kb-header-desc"><h1 style="color: white;">Knowledge Base<br />
+</h1>
+</div>
+	       
+	        <div class="kb-search">
+	            <div data-layout="search" class="kb-search-form">
+	                <form class="search-form">
+	                    <div class="search-form__input">
+	                        <input id="hero-search-box" type="text" placeholder="How can we help?" required autofocus/>
+	                    </div>
+	                    <!--<i class="search-form__icon search"></i>-->
+	                </form>
+	            </div>
+	        </div>
+	</div>
+</div>
+
+    
+
+</div>
+<div class="article-container aem-GridColumn aem-GridColumn--default--12"><div class="title">
+<div data-cmp-data-layer="{&#34;title-b1fb306131&#34;:{&#34;@type&#34;:&#34;kb/components/title&#34;,&#34;dc:title&#34;:&#34;CSR creation instructions for Microsoft servers&#34;}}" id="title-b1fb306131" class="cmp-title">
+    <h2 class="cmp-title__text">CSR creation instructions for Microsoft servers</h2>
+</div>
+
+    
+
+</div>
+<div class="line"></div>
+<div class="article-banner">
+	
+<div class="ArticleBanner">
+	<div class="article-details">
+		<div class="docId">Solution ID : TL11</div>
+		<div class="lastModified">Last Modified : 05/11/2024</div>
+		<input type="hidden" id="article-id" name="article-id" value="TL11"/>
+	</div>
+	<div class="article-share">
+		<div class="print" onclick="window.print()">
+			<i class="article-print" aria-hidden="true"></i>
+		</div>
+		<div class="share"><i class="article-share-img" aria-hidden="true"></i>
+			<div id="socialGallery">
+		      <div class="socialToolBox">
+		        <a class="facebook" href="http://www.facebook.com/sharer.php?u=https://knowledge.digicert.com/tutorials/csr-creation-instructions-for-microsoft-servers"><i class="fa fa-facebook"></i></a>
+		        <a class="twitter" href="https://twitter.com/intent/tweet?url=https://knowledge.digicert.com/tutorials/csr-creation-instructions-for-microsoft-servers&text=%20%3A%20&via=&hashtags=null"><i class="fa fa-x-twitter"></i></a>
+		        <a class="linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://knowledge.digicert.com/tutorials/csr-creation-instructions-for-microsoft-servers"><i class="fa fa-linkedin"></i></a>
+                	<a class="copyurl tooltip"><i class="fa fa-copy"><span class="tooltiptext">Click to copy</span></i></a>
+		      </div>
+		    </div>
+		</div>
+	</div>
+</div>
+
+
+</div>
+<div class="heading-and-image">
+	<div class="article-image">
+		
+        
+            <img class="cmp-image__image" src="/content/dam/kb/icons/Tutorial.png"/>
+        
+        
+        
+        
+	</div>
+	<div class="headings">
+		<div class="text vspacebtncomp-top section">
+
+<div class="cmp-text cmp-text--left" style="background-color:transparent;">
+     <p>Create a CSR for Microsoft servers using the DigiCert® Certificate Utility for Windows.</p>
+
+        
+</div>
+
+    
+
+</div>
+<div class="pencil-banner section">
+	<div class="sub-wrapper" style="background-color:#0174c3;">
+	
+		 <div class="cmp-text rte-container right">	
+    			<p class="rte din" style="color:#fff">Protect your brand and your users with a DigiCert Verified Mark Certificate.</p>
+    			<div class="btn-container vertical">
+		  			 <a href="https://order.digicert.com/step1/vmc_basic" class="btn primary blue" target="_blank" style="margin-right:px;
+				    	margin-bottom:px;">
+				 		Buy now</a>
+	 	 		</div>
+     	</div>
+    </div>    
+    
+
+    
+</div>
+<div class="text vspacebtncomp-top section">
+
+<div class="cmp-text cmp-text--left" style="background-color:transparent;">
+     <p>Are you searching for a simple way to create a CSR that works on any Microsoft server platform? Then, use the DigiCert Certificate Utility for Windows<sup>©</sup>. To learn more about the DigiCert Certificate Utility, see <a href="https://www.digicert.com/support/tools/certificate-utility-for-windows">DigiCert Certificate Utility for Windows</a>. </p>
+<h4>Generate a CSR for Microsoft servers with the DigiCert Certificate Utility</h4>
+<p>Follow the steps below to create a CSR using the DigiCert Certificate Utility.</p>
+<ol>
+<li>On your Windows Server, download and save the <a href="https://www.digicert.com/StaticFiles/DigiCertUtil.exe">DigiCert Certificate Utility for Windows</a> executable (<b>DigiCertUtil.exe</b>).</li>
+<li>Run the DigiCert Certificate Utility for Windows (double-click <b>DigiCertUtil</b>).</li>
+<li>In the <b>DigiCert Certificate Utility for Windows©</b>, select <b>SSL</b> (gold lock) and then <b>Create CSR</b>. <br />
+<br />
+<img src="/content/dam/kb/attachments/csr/csr-creation-instructions-for-microsoft-servers/utility-csr-creation.png" alt=""/><br />
+<br />
+</li>
+<li>On the<b> Create CSR </b>page, under <b>Certificate Details</b>, provide the following information below and select <b>Generate</b>.<ol>
+<li>For <b>Certificate Type</b>, select <b>SSL</b>.</li>
+<li>In the<b> Common Name</b> box, enter the fully qualified domain name (FQDN) (e.g., www.example.com).</li>
+<li>In the <b>Subject Alternative Names</b> box, enter any SANs you want your certificate to secure (e.g., www.example2.com, www.example3.net).<br />
+You can leave this box blank if you are only securing one domain.</li>
+<li>In the <b>Organization</b> box, enter your company's legally registered name.<br />
+Make sure your legal business name matches official records, including the business entity type, such as Corp or Inc.</li>
+<li><b>Department</b> - No longer applicable<br />
+In SSL/TLS certificates, the industry deprecated support for including a department (often referred to as an organization unit) in public SSL/TLS certificates. See <a href="https://knowledge.digicert.com/alerts/digicert-will-deprecate-the-organizational-unit-field">DigiCert will deprecate the Organizational Unit field</a>.</li>
+<li>In the <b>City</b> box, enter the city where your company is legally located.</li>
+<li>In the<b> State </b>dropdown, select the state where your company is legally located.<br />
+Is your company located outside the USA? You can type the name of your providence or state in the box.</li>
+<li>In the <b>Country </b>dropdown, select the country where your company is legally located.</li>
+<li>In the <b>Key Size</b> dropdown, select<b> 2048</b> unless you have a specific reason for using a larger key size. <br />
+<br />
+<img src="/content/dam/kb/attachments/csr/csr-creation-instructions-for-microsoft-servers/create-csr.png" alt=""/><br />
+ </li>
+</ol>
+</li>
+<li>On the <b>DigiCert Certificate Utility for Windows©</b> - <b>Create CSR</b> page, do one of the following and then select <b>Close</b>:<ul>
+<li>Save the CSR file (DigiCert recommends using this option) <br />
+To save the CSR as a .txt file to your server, select <b>Save to File</b>.<br />
+</li>
+<li>Copy the CSR <br />
+If you are ready to add the CSR to the DigiCert order form, select <b>Copy CSR</b>. This copies the CSR contents onto the clipboard.<br />
+The DigiCert Certificate Utility does not store CSRs. Therefore, we recommend you paste the CSR into a text editor (such as Notepad) when using this option.<br />
+If you accidentally overwrite the clipboard contents after closing the CSR page, you must generate a new CSR. <br />
+<br />
+<img src="/content/dam/kb/attachments/csr/csr-creation-instructions-for-microsoft-servers/copy-csr.png" alt=""/><br />
+<br />
+ </li>
+</ul>
+</li>
+<li>Use a text editor (such as Notepad) to open the file. Copy the text, including the <b>-----BEGIN NEW CERTIFICATE REQUEST-----</b> and <b>-----END NEW CERTIFICATE REQUEST-----</b> tags, paste it into the DigiCert order form, and submit your order.</li>
+</ol>
+<p><b><br />
+What's next</b></p>
+<p>After receiving your SSL/TLS Certificate from DigiCert, you can use the DigiCert Certificate Utility for Windows to install it. See <a href="https://www.digicert.com/kb/util/ssl-certificate-installation-using-digicert-utility-for-microsoft-servers.htm">SSL Certificate Importing Instructions: DigiCert Certificate Tool</a>.</p>
+<p> </p>
+
+        
+</div>
+
+    
+
+</div>
+
+
+	</div>
+</div></div>
+<div class="experiencefragment aem-GridColumn aem-GridColumn--default--12">
+<div id="experiencefragment-45cffa29e4" class="cmp-experiencefragment cmp-experiencefragment--kb-footer">
+
+
+    
+    
+    
+    <div id="container-3ae39f7af4" class="cmp-container">
+        
+        <div class="kb-footer">
+<div class="popupModal hide" id="mediaPopup">
+	 <h2 class="closeVideoPlayer" style="margin:0;"></h2>
+	 <div class="popup">
+		  <video id="popupVideoPlayer" class="videoPlayer" width="100%" controls>
+		 		 <source src=""/>
+		  </video>
+		  <iframe id="popupIframeVideoPlayer" src=""></iframe>
+	 </div>
+</div>
+
+
+<!-- Place with DigiCert Seal HTML or with other scripts -->
+<script type="text/javascript">
+	var __dcid = __dcid || [];
+		__dcid.push({"cid":"DigiCertClickID_QpVPir5r","tag":"QpVPir5r","seal_format":"dynamic"});
+		(function(){
+			var cid=document.createElement("script");
+				cid.async=true;
+				cid.src="//seal.digicert.com/seals/cascade/seal.min.js";
+			var s = document.getElementsByTagName("script");
+			var ls = s[(s.length - 1)];
+				ls.parentNode.insertBefore(cid, ls.nextSibling);
+		}());
+</script>
+
+<div class="footer-top-line"></div>
+<div class="footer-kb" am-region="Footer">
+	 <ul id="aboutus-text" class="clearfix">
+	 	 <li class="aboutus-text">
+			 
+
+
+
+<div class="site-branding">
+    <a>
+    	<img src="/content/dam/digicert/DigiCert-Logo.png" alt="DigiCert Logo" loading="lazy" width="124" height="33"/>
+    </a>
+</div>
+
+
+    
+
+
+			 <p>The most-trusted global provider of high-assurance TLS/SSL, PKI, IoT and signing solutions. <br />
+</p>
+
+		</li>
+		<li id="digicert-seal" class="digicert-seal">
+			
+			
+			<div id="DigiCertClickID_QpVPir5r"></div>
+			
+		</li>
+		<li class="socialMedia">
+			<a href="https://www.linkedin.com/company/digicert-inc-/">
+			   <img src="/content/dam/digicert/icons/LinkedInIcon.svg" alt="Linkedin"/>
+		    </a>
+		
+			<a href="https://twitter.com/digicert?s=20">
+			   <img src="/content/dam/kb/icons/twitter.svg" alt="Twitter"/>
+		    </a>
+		
+			<a href="https://www.youtube.com/user/DigiCertSSL">
+			   <img src="/content/dam/digicert/icons/YouTubeIcon.svg" alt="Youtube"/>
+		    </a>
+		</li>	
+	 </ul>
+	 <ul id="footer-menu" class="menu clearfix">
+		 <li>
+			<h6 class="footer-label">
+				Support
+			</h6>
+			<i class="fa fa-angle-down"></i>
+			<ul class="sub-menu clearfix">
+				<li><a href="https://www.digicert.com/support" class=" txt-u-animate straight-line">TLS/SSL Support</a></li>
+			
+				<li><a href="https://www.digicert.com/support/pki-support" class=" txt-u-animate straight-line">PKI Support</a></li>
+			
+				<li><a href="https://www.digicert.com/help/" class=" txt-u-animate straight-line">SSL Checker</a></li>
+			
+				<li><a href="https://www.digicert.com/support/tools/certificate-utility-for-windows" class=" txt-u-animate straight-line">Certificate Utility</a></li>
+			
+				<li><a href="https://www.digicert.com/kb/csr-creation.htm" class=" txt-u-animate straight-line">Generate CSR</a></li>
+			
+				<li><a href="https://problemreport.digicert.com/" class=" txt-u-animate straight-line">Report Certificate Misuse</a></li>
+			</ul>
+		 </li>
+	
+		 <li>
+			<h6 class="footer-label">
+				Products
+			</h6>
+			<i class="fa fa-angle-down"></i>
+			<ul class="sub-menu clearfix">
+				<li><a href="https://www.digicert.com/tls-ssl/compare-certificates" class=" txt-u-animate straight-line">Compare Certificates</a></li>
+			
+				<li><a href="https://www.digicert.com/tls-ssl/tls-ssl-certificates" class=" txt-u-animate straight-line">TLS/SSL Certificates</a></li>
+			
+				<li><a href="https://www.digicert.com/tls-ssl/secure-site-pro-ssl" class=" txt-u-animate straight-line">Pro TLS/SSL Certificates</a></li>
+			
+				<li><a href="https://www.digicert.com/tls-ssl/multi-domain-ssl-certificates" class=" txt-u-animate straight-line">Multi-Domain SSL</a></li>
+			
+				<li><a href="https://www.digicert.com/tls-ssl/wildcard-ssl-certificates" class=" txt-u-animate straight-line">Wildcard Certificates</a></li>
+			
+				<li><a href="https://www.digicert.com/signing/document-signing-certificates" class=" txt-u-animate straight-line">Document Signing</a></li>
+			
+				<li><a href="https://www.digicert.com/signing/code-signing-certificates" class=" txt-u-animate straight-line">Code Signing</a></li>
+			</ul>
+		 </li>
+	
+		 <li>
+			<h6 class="footer-label">
+				Solutions
+			</h6>
+			<i class="fa fa-angle-down"></i>
+			<ul class="sub-menu clearfix">
+				<li><a href="https://www.digicert.com/tls-ssl/certcentral-tls-ssl-manager" class=" txt-u-animate straight-line">CertCentral</a></li>
+			
+				<li><a href="https://www.digicert.com/trust-lifecycle-manager" class=" txt-u-animate straight-line">DigiCert® Trust Lifecycle Manager</a></li>
+			
+				<li><a href="https://www.digicert.com/device-trust-manager" class=" txt-u-animate straight-line">DigiCert® Device Trust Manager</a></li>
+			
+				<li><a href="https://www.digicert.com/software-trust-manager" class=" txt-u-animate straight-line">DigiCert® Software Trust Manager</a></li>
+			
+				<li><a href="https://www.digicert.com/document-trust-manager" class=" txt-u-animate straight-line">DigiCert® Document Trust Manager</a></li>
+			
+				<li><a href="https://www.digicert.com/solutions/solutions-overview" class=" txt-u-animate straight-line">Solutions Overview</a></li>
+			
+				<li><a href="https://www.digicert.com/digicert-one" class=" txt-u-animate straight-line">DigiCert ONE</a></li>
+			</ul>
+		 </li>
+	</ul>
+	<ul id="mobile-socialMedia" class="clearfix">
+		<li>
+			<a href="https://www.linkedin.com/company/digicert-inc-/" style="max-width:50px;max-height:50px;">
+			   <img src="/content/dam/digicert/icons/LinkedInIcon.svg" alt="Linkedin"/>
+		    </a>
+		
+			<a href="https://twitter.com/digicert?s=20" style="max-width:50px;max-height:50px;">
+			   <img src="/content/dam/kb/icons/twitter.svg" alt="Twitter"/>
+		    </a>
+		
+			<a href="https://www.youtube.com/user/DigiCertSSL" style="max-width:50px;max-height:50px;">
+			   <img src="/content/dam/digicert/icons/YouTubeIcon.svg" alt="Youtube"/>
+		    </a>
+		</li>
+	</ul>
+	<ul id="copyright" class="clearfix">
+		<li>
+			<p>© 2022-2024, DigiCert, Inc. All rights reserved.</p>
+
+			
+				
+					<a href="javascript:void(0);" onclick="transcend.showConsentManager({ viewState: 'CompleteOptions' });">Cookie Settings</a>
+                
+				
+			
+		</li>
+	</ul>
+</div></div>
+<div class="back-to-top"><button class="backtotop" id="myBtn" title="Go to top"><i class="arrow-updated up"></i>&nbsp;&nbsp;TO TOP</button>
+
+    
+</div>
+
+        
+    </div>
+
+</div>
+
+    
+</div>
+
+    
+</div>
+</div>
+
+
+            
+    
+    
+<script src="/etc.clientlibs/kb/clientlibs/clientlib-site.js"></script>
+<script src="/etc.clientlibs/kb/clientlibs/clientlib-site-kb.js"></script>
+
+
+
+    
+
+    
+    
+<script src="/etc.clientlibs/core/wcm/components/commons/site/clientlibs/container.js"></script>
+<script src="/etc.clientlibs/kb/clientlibs/clientlib-base.js"></script>
+<script src="/libs/dam/components/scene7/common/clientlibs/viewer.js"></script>
+<script src="/etc.clientlibs/digicert/clientlibs/clientlib-base.js"></script>
+
+
+
+
+
+
+	<div class="back-to-top" style="display:none;">
+		<div class="back-to-top-container">
+			<div class="inner-container">
+				<div class="icon-container">
+					<img src="/content/dam/kb/logos/back-to-top.svg"/>
+				</div>
+	            <div class="container-text">TO TOP</div>
+			</div>
+		</div>
+	</div>
+
+
+    
+
+    
+
+    
+    
+
+
+
+    
+    
+   <!-- <div data-sly-unwrap="true"><sly data-sly-resource="kbratingform"></sly></div> -->
+
+            
+
+
+        
+    <script type="text/javascript" src="/_Incapsula_Resource?SWJIYLWA=719d34d31c8e3a6e6fffd425f7e032f3&ns=1&cb=1008677686" async></script></body>
+</html>

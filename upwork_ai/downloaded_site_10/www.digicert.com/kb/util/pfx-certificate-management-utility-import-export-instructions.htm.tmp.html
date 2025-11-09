@@ -1,0 +1,726 @@
+
+<!DOCTYPE HTML>
+<html lang="en-US">
+    <head>
+    <meta charset="UTF-8"/>
+    <title>Export Your SSL Certificate Using the DigiCert Certificate Utility (PFX Format)</title>
+    <meta name="keywords" content="EN,TLS SSL,Export,PFX,Tutorials"/>
+    <meta name="description" content="Export your SSL/TLS certificate from one Microsoft server to import on another Microsoft server"/>
+    <meta name="template" content="tutorial-template"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    
+
+    
+    
+
+	<link rel="canonical" href="/tutorials/export-your-ssl-certificate-using-the-digicert-certificate-utility-pfx-format"/>
+	
+
+
+<!--<link data-sly-use.page="com.adobe.cq.wcm.core.components.models.Page"
+      data-sly-test=""
+      rel="canonical" href="">
+	
+	<link data-sly-test=""
+      data-sly-repeat=""
+      rel="alternate" hreflang="" href="">-->
+
+    
+
+
+    
+<link rel="icon" href="/content/dam/digicert/images/DigiCertFavicon_16x16.png" sizes="16x16"/>
+<link rel="icon" href="/content/dam/digicert/images/DigiCertFavicon_32x32.png" sizes="32x32"/>
+<link rel="apple-touch-icon" href="/content/dam/digicert/images/DigiCertFavicon_32x32.png"/>
+<meta name="msapplication-TileImage" content="/content/dam/digicert/images/DigiCertFavicon_32x32.png"/>
+
+
+    
+    
+<link rel="stylesheet" href="/etc.clientlibs/kb/clientlibs/clientlib-dependencies.css" type="text/css">
+<link rel="stylesheet" href="/etc.clientlibs/kb/clientlibs/clientlib-base.css" type="text/css">
+<link rel="stylesheet" href="/etc.clientlibs/digicert/clientlibs/ui.search.css" type="text/css">
+<link rel="stylesheet" href="/etc.clientlibs/digicert/clientlibs/clientlib-base.css" type="text/css">
+
+
+
+
+    
+	<meta property="og:locale" content="en_US"/>
+	<meta name="keywords" content="en, tls-ssl, export, pfx, tutorials"/>
+	<meta class="swiftype" name="published_at" data-type="date" content="05/11/2024"/>
+    <meta class="swiftype" name="tags" data-type="string" content="en, tls-ssl, export, pfx, tutorials"/>
+	<meta class="swiftype" name="featured" data-type="integer" content="0"/>
+    <meta class="swiftype" name="download" data-type="string"/>
+    <meta class="swiftype" name="domain" data-type="integer" content="5"/>
+	<meta class="swiftype" name="langc" data-type="string" content="en_US"/>
+	
+
+
+<script>
+	  //Adobe Target prehiding snippet (must be place//Adobe Target prehiding snippet (must be placed directly above '< script src="https://assets.adobedtm.com/.../.../launch-....min.js" async> </ script>')
+	  
+	  //check if OneTrust is allowing "Personalized Experience Cookies" (i.e., Adobe Target) to load
+	  var adobeTargetOneTrustGroup = "PE";
+	  
+	  function isAdobeTargetAllowed(adobeTargetOneTrustGroup) {
+	    var OptanonConsentCookie = document.cookie.match(/OptanonConsent=.*;/);
+	    
+	    return (OptanonConsentCookie && decodeURIComponent(OptanonConsentCookie[0]).includes(adobeTargetOneTrustGroup + ":1"));
+	  }
+	  
+	  if (isAdobeTargetAllowed(adobeTargetOneTrustGroup)) {
+	    //Adobe Target prehiding snippet
+	    ;(function(win, doc, style, timeout) {
+	      var STYLE_ID = 'at-body-style';
+	      
+	      function getParent() {
+	        return doc.getElementsByTagName('head')[0];
+	      }
+	      
+	      function addStyle(parent, id, def) {
+	        if (!parent) {
+	          return;
+	        }
+	        
+	        var style = doc.createElement('style');
+	        style.id = id;
+	        style.innerHTML = def;
+	        parent.appendChild(style);
+	      }
+	      
+	      function removeStyle(parent, id) {
+	        if (!parent) {
+	          return;
+	        }
+	        
+	        var style = doc.getElementById(id);
+	        
+	        if (!style) {
+	          return;
+	        }
+	        
+	        parent.removeChild(style);
+	      }
+	      
+	      addStyle(getParent(), STYLE_ID, style);
+	      setTimeout(function() {
+	        removeStyle(getParent(), STYLE_ID);
+	      }, timeout);
+	    }(window, document, "body {opacity: 0 !important}", 3000));
+	  }
+	</script>
+<!-- Staging Adobe Tags -->
+<!--<script src="https://assets.adobedtm.com/80bda08f0087/1015fcf0b78f/launch-ENb8e5854ed93c443fa2962c8516926c96-staging.min.js" async></script>-->
+<!-- Production Adobe Tags -->
+<script src="https://assets.adobedtm.com/80bda08f0087/1015fcf0b78f/launch-EN214b022a648841a199bcc6b7b217acc1.min.js" async></script>
+
+    
+    
+    
+
+    
+
+    
+    
+<script src="/etc.clientlibs/clientlibs/granite/jquery.js"></script>
+<script src="/etc.clientlibs/kb/clientlibs/clientlib-dependencies.js"></script>
+<script src="/etc.clientlibs/clientlibs/granite/utils.js"></script>
+<script src="/etc.clientlibs/digicert/clientlibs/ui.search.js"></script>
+<script src="/etc.clientlibs/clientlibs/granite/jquery/granite.js"></script>
+<script src="/etc.clientlibs/foundation/clientlibs/jquery.js"></script>
+<script src="/etc.clientlibs/digicert/clientlibs/clientlib-dependencies.js"></script>
+
+
+
+    
+    
+<link rel="stylesheet" href="/etc.clientlibs/kb/clientlibs/clientlib-site-kb.css" type="text/css">
+
+
+
+    
+
+    
+    
+    
+    <!-- <head> -->
+	<script id="__ada" data-handle="digicert-gen" src="https://static.ada.support/embed2.js"></script>
+</head>
+    <body class="page basicpage kb-body" id="page-6b354dd77c" data-cmp-data-layer-enabled>
+        <!--  <script data-sly-test.dataLayerEnabled="">
+          window.adobeDataLayer = window.adobeDataLayer || [];
+          adobeDataLayer.push({
+              page: JSON.parse("{\x22page\u002D6b354dd77c\x22:{\x22@type\x22:\x22kb\/components\/page\x22,\x22repo:modifyDate\x22:\x222024\u002D05\u002D10T20:35:40Z\x22,\x22dc:title\x22:\x22Export Your SSL Certificate Using the DigiCert Certificate Utility (PFX Format)\x22,\x22dc:description\x22:\x22Export your SSL\/TLS certificate from one Microsoft server to import on another Microsoft server\x22,\x22xdm:template\x22:\x22\/conf\/kb\/settings\/wcm\/templates\/tutorial\u002Dtemplate\x22,\x22xdm:language\x22:\x22en\u002DUS\x22,\x22xdm:tags\x22:[\x22EN\x22,\x22TLS SSL\x22,\x22Export\x22,\x22PFX\x22,\x22Tutorials\x22],\x22repo:path\x22:\x22\/content\/kb\/us\/en\/tutorials\/export\u002Dyour\u002Dssl\u002Dcertificate\u002Dusing\u002Dthe\u002Ddigicert\u002Dcertificate\u002Dutility\u002Dpfx\u002Dformat.html\x22}}"),
+              event:'cmp:show',
+              eventInfo: {
+                  path: 'page.page\u002D6b354dd77c'
+              }
+          });
+        </script> -->
+        
+        
+            
+
+
+
+
+            
+
+
+
+            
+<div class="root responsivegrid">
+
+
+<div class="aem-Grid aem-Grid--12 aem-Grid--default--12 ">
+    
+    <div class="experiencefragment aem-GridColumn aem-GridColumn--default--12">
+<div id="experiencefragment-5cd9e92b2f" class="cmp-experiencefragment cmp-experiencefragment--kb-header">
+
+
+    
+    
+    
+    <div id="container-64ef1fbaa6" class="cmp-container">
+        
+        <div class="header"><header class="editmode-false">
+	<div class="header__logo">
+
+
+
+<div class="site-branding">
+    <a href="/">
+    	<img src="/content/dam/kb/logos/kb-new-logo.png" alt="DigiCert KnowledgeBase - Technical Support Logo" loading="lazy" width="124" height="33"/>
+    </a>
+</div>
+
+
+    
+
+</div>
+	<div class="header__navigation">
+		<div class="navigation__primary"><img class="hamburger" src="/content/dam/thawte/icons/MenuIcon.png" data-hoversrc="/content/dam/thawte/icons/MenuIcon_Hover.png"/>
+
+<nav class="cmp-navigation cmp-navigation--mobile">
+     <ul class="cmp-navigation__group">
+          <li class="cmp-navigation__item cmp-navigation__item--level-0 navigation-header">
+               <a href="#" data-content=".header__secondary-nav-content--contact" class="cmp-navigation__item-link is-header-true">
+                    Contact Us
+               </a>
+          </li>
+          <li class="cmp-navigation__item cmp-navigation__item--level-0 navigation-header">
+               <a href="#" data-content=".header__secondary-nav-content--language" class="cmp-navigation__item-link is-header-true">
+                    Language
+               </a>
+          </li>
+     </ul>
+</nav>
+
+    
+</div>
+		<ul class="navigation__secondary clearfix" style="align-items: center;">
+			<li id="contact">
+				<a class="btn primary blue-filled" href="https://www.digicert.com/contact-us">
+					<span>Contact Us</span>
+					<i class="fa fa-phone"></i></a>
+			</li>
+			<li id="language">
+				<a href="#" class="header__secondary-nav-link header__secondary-nav-link--desktop">
+				   <img alt="language" src="/content/dam/digicert/images/navigation/header/LanguageIcon_MainNavigation.png" data-hoversrc="/content/dam/digicert/icons/Language-Icon-Hover.png"/>
+				</a>
+				<div data-layout="half" class="header__secondary-nav-content header__secondary-nav-content--language">
+					<div class="header__nav-dismiss"><i class="close"></i></div>
+					<h2 class="heading">choose your language</h2>
+					<ul class="cmp-navigation__group clearfix">
+						<li><a class="cmp-navigation__item-link txt-u-animate straight-line" href="https://knowledge.digicert.com/" id="en_US">English</a></li>
+					
+						<li><a class="cmp-navigation__item-link txt-u-animate straight-line" href="https://knowledge.digicert.com/ja/jp/home.html" id="ja_JP">Japanese</a></li>
+					</ul>
+				</div>
+			</li>
+			
+			<li id="mobile_hamburger">
+				<a href="#" class="header__secondary-nav-link header__secondary-nav-link--mobile header__secondary-nav-link--menu" data-content=".navigation__primary">
+				   <i class="fa fa-bars" id="hamburger"></i>
+				</a>
+			</li>
+		</ul>
+	</div>
+</header></div>
+
+        
+    </div>
+
+</div>
+
+    
+</div>
+<div class="custom-breadcrumb aem-GridColumn aem-GridColumn--default--12">
+<nav id="custom-breadcrumb-88bb489008" class="cmp-breadcrumb" aria-label="Breadcrumb" data-cmp-data-layer="{&#34;custom-breadcrumb-88bb489008&#34;:{&#34;@type&#34;:&#34;kb/components/custom-breadcrumb&#34;,&#34;repo:modifyDate&#34;:&#34;2023-12-18T09:19:14Z&#34;}}">
+
+    <ol class="cmp-breadcrumb__list" itemscope itemtype="http://schema.org/BreadcrumbList">
+        <li class="cmp-breadcrumb__item" data-cmp-data-layer="{&#34;custom-breadcrumb-88bb489008-item-471667c32e&#34;:{&#34;@type&#34;:&#34;kb/components/custom-breadcrumb/item&#34;,&#34;repo:modifyDate&#34;:&#34;2024-09-27T13:11:53Z&#34;,&#34;dc:title&#34;:&#34;Home&#34;,&#34;xdm:linkURL&#34;:&#34;/content/kb/us/en&#34;}}" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a href="/" class="cmp-breadcrumb__item-link txt-u-animate straight-line" itemprop="item" data-cmp-clickable>
+                <span itemprop="name">Home</span>
+            </a>
+            <meta itemprop="position" content="1"/>
+        </li>
+    
+        <li class="cmp-breadcrumb__item" data-cmp-data-layer="{&#34;custom-breadcrumb-88bb489008-item-1444ed3ab5&#34;:{&#34;@type&#34;:&#34;kb/components/custom-breadcrumb/item&#34;,&#34;repo:modifyDate&#34;:&#34;2023-11-07T18:00:12Z&#34;,&#34;dc:title&#34;:&#34;Tutorials&#34;,&#34;xdm:linkURL&#34;:&#34;/tutorials&#34;}}" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a href="/tutorials" class="cmp-breadcrumb__item-link txt-u-animate straight-line" itemprop="item" data-cmp-clickable>
+                <span itemprop="name">Tutorials</span>
+            </a>
+            <meta itemprop="position" content="2"/>
+        </li>
+    
+        <li class="cmp-breadcrumb__item cmp-breadcrumb__item--active" aria-current="page" data-cmp-data-layer="{&#34;custom-breadcrumb-88bb489008-item-6b354dd77c&#34;:{&#34;@type&#34;:&#34;kb/components/custom-breadcrumb/item&#34;,&#34;repo:modifyDate&#34;:&#34;2024-05-10T20:37:37Z&#34;,&#34;dc:title&#34;:&#34;Export Your SSL Certificate Using the DigiCert Certificate Utility (PFX Format)&#34;,&#34;xdm:linkURL&#34;:&#34;/tutorials/export-your-ssl-certificate-using-the-digicert-certificate-utility-pfx-format&#34;}}" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a href="/tutorials/export-your-ssl-certificate-using-the-digicert-certificate-utility-pfx-format" class="cmp-breadcrumb__item-link txt-u-animate straight-line" itemprop="item" data-cmp-clickable>
+                <span itemprop="name">Export Your SSL Certificate Using the DigiCert Certificate Utility (PFX Format)</span>
+            </a>
+            <meta itemprop="position" content="3"/>
+        </li>
+    </ol>
+</nav>
+
+    
+
+</div>
+<div class="kbheaderwithsearch aem-GridColumn aem-GridColumn--default--12">
+
+
+
+
+
+
+
+
+
+<div class="kb-header-text cmp-text--left" style="background-color:transparent;height:px;">	
+	<div class="img-container relative
+					noBgColor
+					mbg-grey">
+			 
+			 
+				
+					
+				
+					<img src="/content/dam/kb/images/homepage/Knowledge-base-hero-April23.png" alt="DigiCert KnowledgeBase - Technical Support-hero"/>
+			
+	</div>
+	<div class="search-and-text">
+		<div class="kb-header-desc"><h1 style="color: white;">Knowledge Base<br />
+</h1>
+</div>
+	       
+	        <div class="kb-search">
+	            <div data-layout="search" class="kb-search-form">
+	                <form class="search-form">
+	                    <div class="search-form__input">
+	                        <input id="hero-search-box" type="text" placeholder="How can we help?" required autofocus/>
+	                    </div>
+	                    <!--<i class="search-form__icon search"></i>-->
+	                </form>
+	            </div>
+	        </div>
+	</div>
+</div>
+
+    
+
+</div>
+<div class="article-container aem-GridColumn aem-GridColumn--default--12"><div class="title">
+<div data-cmp-data-layer="{&#34;title-e384e0c379&#34;:{&#34;@type&#34;:&#34;kb/components/title&#34;,&#34;dc:title&#34;:&#34;Export Your SSL Certificate Using the DigiCert Certificate Utility (PFX Format)&#34;}}" id="title-e384e0c379" class="cmp-title">
+    <h2 class="cmp-title__text">Export Your SSL Certificate Using the DigiCert Certificate Utility (PFX Format)</h2>
+</div>
+
+    
+
+</div>
+<div class="line"></div>
+<div class="article-banner">
+	
+<div class="ArticleBanner">
+	<div class="article-details">
+		<div class="docId">Solution ID : TL10</div>
+		<div class="lastModified">Last Modified : 05/11/2024</div>
+		<input type="hidden" id="article-id" name="article-id" value="TL10"/>
+	</div>
+	<div class="article-share">
+		<div class="print" onclick="window.print()">
+			<i class="article-print" aria-hidden="true"></i>
+		</div>
+		<div class="share"><i class="article-share-img" aria-hidden="true"></i>
+			<div id="socialGallery">
+		      <div class="socialToolBox">
+		        <a class="facebook" href="http://www.facebook.com/sharer.php?u=https://knowledge.digicert.com/tutorials/export-your-ssl-certificate-using-the-digicert-certificate-utility-pfx-format"><i class="fa fa-facebook"></i></a>
+		        <a class="twitter" href="https://twitter.com/intent/tweet?url=https://knowledge.digicert.com/tutorials/export-your-ssl-certificate-using-the-digicert-certificate-utility-pfx-format&text=%20%3A%20&via=&hashtags=null"><i class="fa fa-x-twitter"></i></a>
+		        <a class="linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://knowledge.digicert.com/tutorials/export-your-ssl-certificate-using-the-digicert-certificate-utility-pfx-format"><i class="fa fa-linkedin"></i></a>
+                	<a class="copyurl tooltip"><i class="fa fa-copy"><span class="tooltiptext">Click to copy</span></i></a>
+		      </div>
+		    </div>
+		</div>
+	</div>
+</div>
+
+
+</div>
+<div class="heading-and-image">
+	<div class="article-image">
+		
+        
+            <img class="cmp-image__image" src="/content/dam/kb/icons/Tutorial.png"/>
+        
+        
+        
+        
+	</div>
+	<div class="headings">
+		<div class="text vspacebtncomp-top section">
+
+<div class="cmp-text cmp-text--left" style="background-color:transparent;">
+     <p><i>Export your SSL/TLS certificate from one Microsoft server to import on another Microsoft server</i></p>
+
+        
+</div>
+
+    
+
+</div>
+<div class="pencil-banner section">
+	<div class="sub-wrapper" style="background-color:#0174c3;">
+	
+		 <div class="cmp-text rte-container right">	
+    			<p class="rte din" style="color:#fff">Manage every certificate in a single platform with DigiCert CertCentral.</p>
+    			<div class="btn-container vertical">
+		  			 <a href="https://www.digicert.com/account/signup/" class="btn primary blue" target="_blank" style="margin-right:px;
+				    	margin-bottom:px;">
+				 		Sign up</a>
+	 	 		</div>
+     	</div>
+    </div>    
+    
+
+    
+</div>
+<div class="text vspacebtncomp-top section">
+
+<div class="cmp-text cmp-text--left" style="background-color:transparent;">
+     <h4>Background</h4>
+<p>Windows servers use .pfx files containing the public key (SSL certificate file) and the associated private key file. DigiCert provides your SSL certificate file (public key file). You use your server to generate the associated private key file as part of the CSR.</p>
+<p>You need public and private keys for an SSL certificate to function. If you need to transfer your SSL certificates from one server to another, export them as a .pfx file.</p>
+<h4><br />
+<a id="export-prerequisite"></a>Export Prerequisite</h4>
+<p>To create a .pfx file, the SSL certificate and its corresponding private key must be on the same computer/workstation. You may need to import the certificate to the computer where the associated private key is stored (e.g., the laptop/desktop computer where you created the CSR) before successfully exporting it as a .pfx file.</p>
+<p>For help importing the certificate, see <a href="https://www.digicert.com/kb/util/ssl-certificate-installation-using-digicert-utility-for-microsoft-servers.htm">SSL Certificate Importing Instructions: DigiCert Certificate Utility</a>.</p>
+<h4><br />
+Export Your SSL Certificate w/Private Key Using the DigiCert Certificate Utility</h4>
+<p>These instructions explain how to export an installed SSL certificate from a Microsoft server and its corresponding private key as a .pfx file for importing to another server. If you need your SSL Certificate in Apache .key format, please see <a href="https://www.digicert.com/kb/util/copy-ssl-from-windows-iis-to-apache-using-digicert-certificate-utility.htm">Export a Windows SSL Certificate to an Apache Server (PEM Format)</a>.</p>
+<ol>
+<li>On your Windows Server, download and save the <a href="https://www.digicert.com/StaticFiles/DigiCertUtil.exe">DigiCert® Certificate Utility for Windows</a> executable (<b>DigiCertUtil.exe</b>).<br />
+<br />
+</li>
+<li>Run the DigiCert® Certificate Utility for Windows (double-click <b>DigiCertUtil</b>).<br />
+<br />
+</li>
+<li>In the<b> DigiCert Certificate Utility for Windows©</b>, select <b>SSL</b> (gold lock), select the certificate you want to export as a .pfx file, and finally, select<b> Export Certificate</b>. <br />
+<br />
+<img src="/content/dam/kb/attachments/ssl-tls-certificates/export-your-ssl-certificate-using-the-digicert-certificate-utility-pfx-format/select-export-certificate.png" alt=""/><br />
+<br />
+</li>
+<li>In the <b>Certificate Export</b> wizard, select <b>Yes, export the private key,</b> select<b> pfx file</b>, and then check<b> Include all certificates in the certification path if possible</b>, and finally, select <b>Next</b>.A .pfx file uses the same format as a .p12 or PKCS12 file.<br />
+<br />
+<table cellpadding="1" cellspacing="0" border="1" width="950">
+<tbody><tr><td>If the<b> Yes, export the private key </b>option is grayed out (unusable), the certificate's matching private key is not on that computer. This prevents you from creating the .pfx certificate file.  <br />
+<br />
+To fix this problem, import the certificate to the same machine where the certificate's CSR was created. See <a href="#export-prerequisite">Export Prerequisite</a>.<br />
+<br />
+</td>
+</tr></tbody></table>
+<br />
+<br />
+<img src="/content/dam/kb/attachments/ssl-tls-certificates/export-your-ssl-certificate-using-the-digicert-certificate-utility-pfx-format/export-private-key.png" alt=""/><br />
+</li>
+<li>In the <b>Password </b>and <b>Confirm Password</b> boxes, enter and confirm your password, and then select <b>Next.<br />
+ </b>You must use this password to import this SSL certificate onto other servers and devices that accept a .pfx file. <br />
+<br />
+<img src="/content/dam/kb/attachments/ssl-tls-certificates/export-your-ssl-certificate-using-the-digicert-certificate-utility-pfx-format/confirm-passwords.png" alt=""/><br />
+<br />
+</li>
+<li>In the <b>File name</b> box, select … to browse for and select the location where you want to save the .pfx file, provide a file name, select<b> Save</b>, and then select <b>Finish</b>. <br />
+<br />
+<img src="/content/dam/kb/attachments/ssl-tls-certificates/export-your-ssl-certificate-using-the-digicert-certificate-utility-pfx-format/file-name-box.png" alt=""/><br />
+<br />
+</li>
+<li>When you receive the &quot;Your certificate and key have been successfully exported&quot; message, select<b> OK</b>.</li>
+</ol>
+<p> </p>
+<h4>Import PFX Certificate into Microsoft Windows Server</h4>
+<p>To import the certificate to your server using the DigiCert Certificate Utility, follow the instructions for that particular server type:</p>
+<ul>
+<li><a></a><a href="https://www.digicert.com/kb/util/copy-ssl-certificate-from-any-microsoft-server-to-iis10-server.htm#import-certificate">IIS 10</a></li>
+<li><a></a><a href="https://www.digicert.com/kb/util/copy-an-ssl-certificate-from-one-windows-iis8-server-to-another-iis8-server.htm">IIS 8</a></li>
+<li><a href="https://www.digicert.com/kb/util/copy-an-ssl-certificate-from-one-windows-iis-7-server-to-another-iis-7-server.htm">IIS 7</a></li>
+<li><a href="https://www.digicert.com/kb/util/copy-an-ssl-certificate-from-one-windows-iis-6-server-to-another-iis-6-server.htm">IIS 6</a></li>
+<li><a href="https://www.digicert.com/kb/util/copy-an-ssl-certificate-to-exchange-2013-server.htm">Exchange 2013</a></li>
+<li><a href="https://www.digicert.com/kb/util/copy-an-ssl-certificate-from-one-exchange-2010-server-to-another-exchange-2010-server.htm">Exchange 2010</a></li>
+<li><a href="https://www.digicert.com/kb/util/copy-an-ssl-certificate-from-one-exchange-2007-server-to-another-exchange-2007-server.htm">Exchange 2007</a></li>
+</ul>
+<h4><br />
+Troubleshooting</h4>
+<p>After importing your certificate onto the new server, if you run into certificate trust errors, try repairing them using <a></a><a href="https://www.digicert.com/kb/util/repair-intermediate-ssl-certificate-errors-using-digicert-utility-for-microsoft-servers.htm">DigiCert® Certificate Utility for Windows</a>. If this does not fix the errors, contact support.</p>
+<h4><br />
+Test Your Installation</h4>
+<p>To verify you've installed the certificate correctly, use our <a></a><a href="https://www.digicert.com/help/">DigiCert® SSL Installation Diagnostics Tool</a>. In the <b>Server Address</b> box, enter the DNS name of the site (e.g., <i>example.com</i>) that you secured with your SSL certificate. </p>
+
+        
+</div>
+
+    
+
+</div>
+
+
+	</div>
+</div></div>
+<div class="experiencefragment aem-GridColumn aem-GridColumn--default--12">
+<div id="experiencefragment-45cffa29e4" class="cmp-experiencefragment cmp-experiencefragment--kb-footer">
+
+
+    
+    
+    
+    <div id="container-3ae39f7af4" class="cmp-container">
+        
+        <div class="kb-footer">
+<div class="popupModal hide" id="mediaPopup">
+	 <h2 class="closeVideoPlayer" style="margin:0;"></h2>
+	 <div class="popup">
+		  <video id="popupVideoPlayer" class="videoPlayer" width="100%" controls>
+		 		 <source src=""/>
+		  </video>
+		  <iframe id="popupIframeVideoPlayer" src=""></iframe>
+	 </div>
+</div>
+
+
+<!-- Place with DigiCert Seal HTML or with other scripts -->
+<script type="text/javascript">
+	var __dcid = __dcid || [];
+		__dcid.push({"cid":"DigiCertClickID_QpVPir5r","tag":"QpVPir5r","seal_format":"dynamic"});
+		(function(){
+			var cid=document.createElement("script");
+				cid.async=true;
+				cid.src="//seal.digicert.com/seals/cascade/seal.min.js";
+			var s = document.getElementsByTagName("script");
+			var ls = s[(s.length - 1)];
+				ls.parentNode.insertBefore(cid, ls.nextSibling);
+		}());
+</script>
+
+<div class="footer-top-line"></div>
+<div class="footer-kb" am-region="Footer">
+	 <ul id="aboutus-text" class="clearfix">
+	 	 <li class="aboutus-text">
+			 
+
+
+
+<div class="site-branding">
+    <a>
+    	<img src="/content/dam/digicert/DigiCert-Logo.png" alt="DigiCert Logo" loading="lazy" width="124" height="33"/>
+    </a>
+</div>
+
+
+    
+
+
+			 <p>The most-trusted global provider of high-assurance TLS/SSL, PKI, IoT and signing solutions. <br />
+</p>
+
+		</li>
+		<li id="digicert-seal" class="digicert-seal">
+			
+			
+			<div id="DigiCertClickID_QpVPir5r"></div>
+			
+		</li>
+		<li class="socialMedia">
+			<a href="https://www.linkedin.com/company/digicert-inc-/">
+			   <img src="/content/dam/digicert/icons/LinkedInIcon.svg" alt="Linkedin"/>
+		    </a>
+		
+			<a href="https://twitter.com/digicert?s=20">
+			   <img src="/content/dam/kb/icons/twitter.svg" alt="Twitter"/>
+		    </a>
+		
+			<a href="https://www.youtube.com/user/DigiCertSSL">
+			   <img src="/content/dam/digicert/icons/YouTubeIcon.svg" alt="Youtube"/>
+		    </a>
+		</li>	
+	 </ul>
+	 <ul id="footer-menu" class="menu clearfix">
+		 <li>
+			<h6 class="footer-label">
+				Support
+			</h6>
+			<i class="fa fa-angle-down"></i>
+			<ul class="sub-menu clearfix">
+				<li><a href="https://www.digicert.com/support" class=" txt-u-animate straight-line">TLS/SSL Support</a></li>
+			
+				<li><a href="https://www.digicert.com/support/pki-support" class=" txt-u-animate straight-line">PKI Support</a></li>
+			
+				<li><a href="https://www.digicert.com/help/" class=" txt-u-animate straight-line">SSL Checker</a></li>
+			
+				<li><a href="https://www.digicert.com/support/tools/certificate-utility-for-windows" class=" txt-u-animate straight-line">Certificate Utility</a></li>
+			
+				<li><a href="https://www.digicert.com/kb/csr-creation.htm" class=" txt-u-animate straight-line">Generate CSR</a></li>
+			
+				<li><a href="https://problemreport.digicert.com/" class=" txt-u-animate straight-line">Report Certificate Misuse</a></li>
+			</ul>
+		 </li>
+	
+		 <li>
+			<h6 class="footer-label">
+				Products
+			</h6>
+			<i class="fa fa-angle-down"></i>
+			<ul class="sub-menu clearfix">
+				<li><a href="https://www.digicert.com/tls-ssl/compare-certificates" class=" txt-u-animate straight-line">Compare Certificates</a></li>
+			
+				<li><a href="https://www.digicert.com/tls-ssl/tls-ssl-certificates" class=" txt-u-animate straight-line">TLS/SSL Certificates</a></li>
+			
+				<li><a href="https://www.digicert.com/tls-ssl/secure-site-pro-ssl" class=" txt-u-animate straight-line">Pro TLS/SSL Certificates</a></li>
+			
+				<li><a href="https://www.digicert.com/tls-ssl/multi-domain-ssl-certificates" class=" txt-u-animate straight-line">Multi-Domain SSL</a></li>
+			
+				<li><a href="https://www.digicert.com/tls-ssl/wildcard-ssl-certificates" class=" txt-u-animate straight-line">Wildcard Certificates</a></li>
+			
+				<li><a href="https://www.digicert.com/signing/document-signing-certificates" class=" txt-u-animate straight-line">Document Signing</a></li>
+			
+				<li><a href="https://www.digicert.com/signing/code-signing-certificates" class=" txt-u-animate straight-line">Code Signing</a></li>
+			</ul>
+		 </li>
+	
+		 <li>
+			<h6 class="footer-label">
+				Solutions
+			</h6>
+			<i class="fa fa-angle-down"></i>
+			<ul class="sub-menu clearfix">
+				<li><a href="https://www.digicert.com/tls-ssl/certcentral-tls-ssl-manager" class=" txt-u-animate straight-line">CertCentral</a></li>
+			
+				<li><a href="https://www.digicert.com/trust-lifecycle-manager" class=" txt-u-animate straight-line">DigiCert® Trust Lifecycle Manager</a></li>
+			
+				<li><a href="https://www.digicert.com/device-trust-manager" class=" txt-u-animate straight-line">DigiCert® Device Trust Manager</a></li>
+			
+				<li><a href="https://www.digicert.com/software-trust-manager" class=" txt-u-animate straight-line">DigiCert® Software Trust Manager</a></li>
+			
+				<li><a href="https://www.digicert.com/document-trust-manager" class=" txt-u-animate straight-line">DigiCert® Document Trust Manager</a></li>
+			
+				<li><a href="https://www.digicert.com/solutions/solutions-overview" class=" txt-u-animate straight-line">Solutions Overview</a></li>
+			
+				<li><a href="https://www.digicert.com/digicert-one" class=" txt-u-animate straight-line">DigiCert ONE</a></li>
+			</ul>
+		 </li>
+	</ul>
+	<ul id="mobile-socialMedia" class="clearfix">
+		<li>
+			<a href="https://www.linkedin.com/company/digicert-inc-/" style="max-width:50px;max-height:50px;">
+			   <img src="/content/dam/digicert/icons/LinkedInIcon.svg" alt="Linkedin"/>
+		    </a>
+		
+			<a href="https://twitter.com/digicert?s=20" style="max-width:50px;max-height:50px;">
+			   <img src="/content/dam/kb/icons/twitter.svg" alt="Twitter"/>
+		    </a>
+		
+			<a href="https://www.youtube.com/user/DigiCertSSL" style="max-width:50px;max-height:50px;">
+			   <img src="/content/dam/digicert/icons/YouTubeIcon.svg" alt="Youtube"/>
+		    </a>
+		</li>
+	</ul>
+	<ul id="copyright" class="clearfix">
+		<li>
+			<p>© 2022-2024, DigiCert, Inc. All rights reserved.</p>
+
+			
+				
+					<a href="javascript:void(0);" onclick="transcend.showConsentManager({ viewState: 'CompleteOptions' });">Cookie Settings</a>
+                
+				
+			
+		</li>
+	</ul>
+</div></div>
+<div class="back-to-top"><button class="backtotop" id="myBtn" title="Go to top"><i class="arrow-updated up"></i>&nbsp;&nbsp;TO TOP</button>
+
+    
+</div>
+
+        
+    </div>
+
+</div>
+
+    
+</div>
+
+    
+</div>
+</div>
+
+
+            
+    
+    
+<script src="/etc.clientlibs/kb/clientlibs/clientlib-site.js"></script>
+<script src="/etc.clientlibs/kb/clientlibs/clientlib-site-kb.js"></script>
+
+
+
+    
+
+    
+    
+<script src="/etc.clientlibs/core/wcm/components/commons/site/clientlibs/container.js"></script>
+<script src="/etc.clientlibs/kb/clientlibs/clientlib-base.js"></script>
+<script src="/libs/dam/components/scene7/common/clientlibs/viewer.js"></script>
+<script src="/etc.clientlibs/digicert/clientlibs/clientlib-base.js"></script>
+
+
+
+
+
+
+	<div class="back-to-top" style="display:none;">
+		<div class="back-to-top-container">
+			<div class="inner-container">
+				<div class="icon-container">
+					<img src="/content/dam/kb/logos/back-to-top.svg"/>
+				</div>
+	            <div class="container-text">TO TOP</div>
+			</div>
+		</div>
+	</div>
+
+
+    
+
+    
+
+    
+    
+
+
+
+    
+    
+   <!-- <div data-sly-unwrap="true"><sly data-sly-resource="kbratingform"></sly></div> -->
+
+            
+
+
+        
+    <script type="text/javascript" src="/_Incapsula_Resource?SWJIYLWA=719d34d31c8e3a6e6fffd425f7e032f3&ns=4&cb=672290255" async></script></body>
+</html>

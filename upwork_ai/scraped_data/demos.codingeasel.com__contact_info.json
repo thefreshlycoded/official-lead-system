@@ -1,0 +1,24 @@
+{
+    "website_url": "https://demos.codingeasel.com/",
+    "emails": [
+        "info@codingeasel.com",
+        "support@codingeasel.com"
+    ],
+    "phones": [
+        "123-456-7890"
+    ],
+    "social_media": {
+        "facebook": "https://www.facebook.com/codingeasel",
+        "twitter": "https://twitter.com/codingeasel",
+        "linkedin": "https://www.linkedin.com/in/codingeasel",
+        "instagram": "https://www.instagram.com/codingeasel"
+    },
+    "source_section": [
+        "Footer",
+        "Contact Us",
+        "About Us",
+        "Terms of Service"
+    ],
+    "job_listing_id": 90,
+    "job_url": "https://www.upwork.com/jobs/Create-Freelancer-Figma-including-web-version-mobile-version-and-admin-panel_~021851653310292974175/?referrer_url_path=/nx/search/jobs/"
+}
