@@ -1,0 +1,249 @@
+<div class="container">
+  <h1 class="mb-3">Job Listings</h1>
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <%= form_with url: job_listings_path, method: :get, local: true, class: "d-flex gap-2" do %>
+      <input type="text" name="q" placeholder="Search title/description/url" value="<%= h @q %>" />
+      <select name="source">
+        <option value="">All Sources</option>
+        <option value="upwork" <%= "selected" if params[:source] == "upwork" %>>Upwork</option>
+        <option value="craigslist" <%= "selected" if params[:source] == "craigslist" %>>Craigslist</option>
+        <option value="linkedin" <%= "selected" if params[:source] == "linkedin" %>>LinkedIn</option>
+      </select>
+      <select name="relevant">
+        <option value="">All</option>
+        <option value="true" <%= "selected" if params[:relevant] == "true" %>>Relevant</option>
+        <option value="false" <%= "selected" if params[:relevant] == "false" %>>Not Relevant</option>
+      </select>
+      <button type="submit" class="btn btn-primary">Filter</button>
+    <% end %>
+
+    <div class="d-flex gap-2">
+      <%= form_with url: analyze_contact_info_job_listings_path, method: :post, local: true, class: "d-inline" do %>
+        <input type="hidden" name="limit" value="50" />
+        <button type="submit" class="btn btn-success" onclick="return confirm('Analyze contact info for up to 50 unscanned jobs?')">
+          🔍 Analyze Contact Info
+        </button>
+      <% end %>
+
+      <%= form_with url: analyze_job_viability_job_listings_path, method: :post, local: true, class: "d-inline" do %>
+        <input type="hidden" name="limit" value="50" />
+        <button type="submit" class="btn btn-primary" onclick="return confirm('Analyze job viability for up to 50 pending jobs?')">
+          🤖 Analyze Job Viability
+        </button>
+      <% end %>
+
+      <%= link_to "📋 Manual Evaluation", manual_evaluation_job_listings_path, class: "btn btn-info" %>
+    </div>
+  </div>
+
+  <!-- Define job categories -->
+  <% pending_jobs = [] %>
+  <% viable_jobs = [] %>
+  <% not_viable_jobs = [] %>
+
+  <% @job_listings.each do |jl| %>
+    <% if jl.viable_post_human == true %>
+      <% viable_jobs << jl %>
+    <% elsif jl.viable_post_human == false %>
+      <% not_viable_jobs << jl %>
+    <% elsif jl.viable_post == true %>
+      <% viable_jobs << jl %>
+    <% elsif jl.viable_post == false %>
+      <% not_viable_jobs << jl %>
+    <% else %>
+      <% pending_jobs << jl %>
+    <% end %>
+  <% end %>
+
+  <div class="container">
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="card border-warning">
+          <div class="card-body text-center">
+            <h5 class="card-title text-warning">⏳ Pending Analysis</h5>
+            <h2 class="text-warning"><%= pending_jobs.count %></h2>
+            <a href="#pending-section" class="btn btn-outline-warning btn-sm">Jump to Pending</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-success">
+          <div class="card-body text-center">
+            <h5 class="card-title text-success">✅ Viable Leads</h5>
+            <h2 class="text-success"><%= viable_jobs.count %></h2>
+            <a href="#viable-section" class="btn btn-outline-success btn-sm">Jump to Viable</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-danger">
+          <div class="card-body text-center">
+            <h5 class="card-title text-danger">❌ Not Viable</h5>
+            <h2 class="text-danger"><%= not_viable_jobs.count %></h2>
+            <a href="#not-viable-section" class="btn btn-outline-danger btn-sm">Jump to Not Viable</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <hr class="my-5">
+
+  <!-- Pending Jobs (Not yet analyzed) -->
+  <% if pending_jobs.any? %>
+    <div class="mb-4" id="pending-section">
+      <h3 class="text-warning">⏳ Pending Analysis (<%= pending_jobs.count %>)</h3>
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead class="table-warning">
+            <tr>
+              <th>Title</th>
+              <th>Source</th>
+              <th>Project Type</th>
+              <th>Contacts</th>
+              <th>Added</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% pending_jobs.each do |jl| %>
+              <tr>
+                <td>
+                  <strong><%= link_to (jl.title.presence || jl.job_url), jl %></strong>
+                  <div class="text-muted small"><%= jl.job_url %></div>
+                </td>
+                <td><%= jl.display_source %></td>
+                <td><%= jl.project_type %></td>
+                <td>
+                  <% if jl.scanned_for_company_details? %>
+                    <span class="text-success">✅ Scanned</span>
+                  <% else %>
+                    <span class="text-muted">❌ Not Scanned</span>
+                  <% end %>
+                </td>
+                <td><%= time_ago_in_words(jl.created_at) %> ago</td>
+                <td>
+                  <%= form_with url: analyze_contact_info_job_listing_path(jl), method: :post, local: true, class: "d-inline" do %>
+                    <button type="submit" class="btn btn-info btn-sm" onclick="return confirm('Analyze this job for contact info?')">
+                      🔍 Analyze
+                    </button>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% end %>
+
+  <hr class="my-4">
+
+  <!-- Viable Jobs -->
+  <div class="mb-4" id="viable-section">
+    <h3 class="text-success">✅ Viable Leads (<%= viable_jobs.count %>)</h3>
+    <% if viable_jobs.any? %>
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead class="table-success">
+            <tr>
+              <th>Title</th>
+              <th>Source</th>
+              <th>Company</th>
+              <th>Contacts</th>
+              <th>Score</th>
+              <th>Added</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% viable_jobs.each do |jl| %>
+              <tr>
+                <td>
+                  <strong><%= link_to (jl.title.presence || jl.job_url), jl %></strong>
+                  <div class="text-muted small"><%= jl.job_url %></div>
+                </td>
+                <td><%= jl.display_source %></td>
+                <td><%= jl.company_name.presence || '—' %></td>
+                <td>
+                  <%
+                    # Model methods already return arrays, no parsing needed
+                    emails = jl.emails || []
+                    phones = jl.phones || []
+                  %>
+                  📧 <%= emails.size %> • 📞 <%= phones.size %>
+                  <% if jl.website_url.present? %>
+                    • 🌐 <%= link_to "Site", jl.website_url, target: "_blank", class: "text-decoration-none" %>
+                  <% end %>
+                </td>
+                <td>
+                  <% if jl.ai_relevance_score %>
+                    <span class="badge bg-success"><%= number_with_precision(jl.ai_relevance_score, precision: 2) %></span>
+                  <% else %>
+                    —
+                  <% end %>
+                </td>
+                <td><%= time_ago_in_words(jl.created_at) %> ago</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="alert alert-info">
+        <p class="mb-0">No viable leads found yet. Use the analyze buttons above to scan pending jobs for contact information.</p>
+      </div>
+    <% end %>
+  </div>
+
+  <hr class="my-4">
+
+  <!-- Not Viable Jobs -->
+  <div class="mb-4" id="not-viable-section">
+    <h3 class="text-danger">❌ Not Viable (<%= not_viable_jobs.count %>)</h3>
+    <% if not_viable_jobs.any? %>
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead class="table-danger">
+            <tr>
+              <th>Title</th>
+              <th>Source</th>
+              <th>Reason</th>
+              <th>Added</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% not_viable_jobs.each do |jl| %>
+              <tr>
+                <td>
+                  <strong><%= link_to (jl.title.presence || jl.job_url), jl %></strong>
+                  <div class="text-muted small"><%= jl.job_url %></div>
+                </td>
+                <td><%= jl.display_source %></td>
+                <td>
+                  <% if jl.classification_snippet.present? %>
+                    <%= truncate(jl.classification_snippet, length: 100) %>
+                  <% else %>
+                    No contact information found
+                  <% end %>
+                </td>
+                <td><%= time_ago_in_words(jl.created_at) %> ago</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="alert alert-info">
+        <p class="mb-0">No rejected jobs yet. Jobs that don't contain contact information will appear here after analysis.</p>
+      </div>
+    <% end %>
+  </div>
+
+  <% if pending_jobs.empty? && viable_jobs.empty? && not_viable_jobs.empty? %>
+    <div class="alert alert-info">
+      <h4>No job listings found</h4>
+      <p>Try adjusting your filters or <%= link_to "running the scraper", scrapers_path %> to fetch new jobs.</p>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,22 @@
+{
+    "website_url": "https://www.houzz.com/",
+    "emails": [
+        "support@houzz.com",
+        "press@houzz.com"
+    ],
+    "phones": [
+        "1-888-999-7939"
+    ],
+    "social_media": {
+        "facebook": "https://www.facebook.com/houzz",
+        "twitter": "https://twitter.com/houzz",
+        "linkedin": "https://www.linkedin.com/company/houzz",
+        "instagram": "https://www.instagram.com/houzz/"
+    },
+    "source_section": [
+        "Footer",
+        "Contact Us"
+    ],
+    "job_listing_id": 13,
+    "job_url": "https://www.upwork.com/jobs/Website-Development-with-Free-Hosting_~021851807271516747235/?referrer_url_path=/nx/search/jobs/"
+}

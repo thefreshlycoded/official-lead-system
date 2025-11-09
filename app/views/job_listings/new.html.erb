@@ -1,0 +1,22 @@
+<h1>New Job Listing</h1>
+<%= form_with model: @job_listing, local: true do |f| %>
+  <div>
+    <%= f.label :job_url %>
+    <%= f.text_field :job_url %>
+  </div>
+  <div>
+    <%= f.label :title %>
+    <%= f.text_field :title %>
+  </div>
+  <div>
+    <%= f.label :description %>
+    <%= f.text_area :description %>
+  </div>
+  <div>
+    <%= f.label :source %>
+    <%= f.text_field :source %>
+  </div>
+  <div>
+    <%= f.submit "Create" %>
+  </div>
+<% end %>

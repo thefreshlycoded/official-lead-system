@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="en">
+<head><script src="/bry-Say-I-double-We-well-Mighties-in-finde-And-i" async></script>
+		<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<title>WebLogic 8-12x: CSR &amp; SSL Installation</title>
+	<meta name="DESCRIPTION" content="WebLogic 8-12x: Generating your WebLogic CSR with Java Keytool and then use Java Keytool and the WebLogic Admin Console to install and configure your SSL certificate." />			<link rel="canonical" href="https://www.digicert.com/kb/csr-ssl-installation/weblogic-8-12x.htm" />
+
+	<!-- CSS -->
+	<link href="https://www.digicert.com/kb/css/ks.css.php?CBR=CB6396092" rel="stylesheet" type="text/css" />
+		
+	<!--[if IE 7]>
+		<link rel="stylesheet" type="text/css" href="/css/ie7.css">
+	<![endif]-->
+
+	<!-- Inline JS -->
+	<script type="text/javascript"></script>
+
+	<!-- Scripts -->
+		<script type="text/javascript" src="/kb/js/ks.base.js.php?CBR=1CB6396092" charset="utf-8"></script>
+	
+	
+	
+
+    <script>
+        !function(e,t,n,s,u,a){e.twq||(s=e.twq=function()
+        {s.exe?s.exe.apply(s,arguments):s.queue.push(arguments); }
+            ,s.version='1.1',s.queue=[],u=t.createElement,u.async=!0,u.src='//static.ads-twitter.com/uwt.js',
+            a=t.getElementsByTagName[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
+        // Insert Twitter Pixel ID and Standard Event data below
+        twq('init','nvj49');
+        twq('track','PageView');
+    </script>
+
+	<!-- Alligators -->
+	
+	<!-- <link rel="shortcut icon" href="/kb/images/new-digicert-favicon.ico" > -->
+	<link rel="shortcut icon" href="/content/dam/digicert/images/DigiCertFavicon_32x32.png" >
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-Q35G17LVRX"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+	
+	  gtag('config', 'G-Q35G17LVRX');
+	</script>
+
+	        <script src="//assets.adobedtm.com/launch-ENabd44b5f5bf84d2490c24875509a34a5.min.js"></script>
+    	
+			</head>
+<body class="navlesspage wp-header" >
+
+<h1 >WebLogic Servers 8 – 12.x: Create CSR & Install SSL Certificate (Java Keytool)</h1>
+<div id="mainContainer">
+
+
+<div id="mainContent" class="main-content">
+    <div class="container">
+        <h2>Create a CSR and install and configure your SSL certificate on your WebLogic 8, 9, 10, 11, and 12.x server</h2>
+        <p style="font-size:16px;">
+            <b>Use these instructions to use Java Keytool for WebLogic servers to create your certificate signing request (CSR). Then, use Java Keytool and the WebLogic Administration Console to install and configure your SSL certificate on your WebLogic 8, 9, 10, 11, and 12.x server.</b>
+        </p>
+        <blockquote style="border-left: 3px solid rgb(175,175,175);margin-left: 0px;padding: 0 0 0 10px;">
+            <p>
+                <b>Restart Note:</b> After you've installed your SSL/TLS certificate and configured the server to use it, you must restart your WebLogic server.
+            </p>
+        </blockquote>
+
+        <ol class="steps">
+            <li style="list-style: upper-roman">
+                <p>
+                    To create your certificate signing request (CSR), see <a href="#create_csr_java_keytool">WebLogic Server 8 – 12x: Create Your CSR with Java Keytool</a>.
+                </p>
+            </li>
+            <li style="list-style: upper-roman">
+                <p>
+                    To install your SSL certificate, see <a href="#ssl_certificate_install">WebLogic Server 8 – 12x: Install and Configure Your SSL/TLS Certificate</a>.
+                </p>
+            </li>
+        </ol>
+        <div>
+            <div id="create_csr_java_keytool" style="position: relative;top:-67px;z-index:-9999;height:0px;"></div>
+
+            <h2 class="h2-large">I. WebLogic Server 8 – 12x: Create Your CSR with Java Keytool</h2>
+            <p>
+                Use the instructions in this section to first create a new Keystore file and then to create your own Java Keytool commands for generating your WebLogic server CSR.
+            </p>
+            <blockquote style="border-left: 4px solid rgb(255,83,13);margin-left: 0px;padding: 0 0 0 10px;">
+                <p>
+                    <b>Important:</b> To avoid getting errors when you install and configure your SSL certificate, we recommend you generate a new Keystore before you create the CSR. This applies to certificate reissues and renewals.
+                </p>
+            </blockquote>
+            <h3 style="color: #4d70b0;">Step 1: Use Keytool to Create a New Keystore</h3>
+            <ol class="steps">
+                <li>
+                    <p>
+                        <b>Run Command</b>
+                    </p>
+                    <div class="supportBox" style="width: 675px;">
+                        <code>
+                            <b>keytool -genkey -alias server -keyalg RSA -keystore <span class="blue-bold">your_domain</span>.jks</b>
+                        </code>
+                    </div><br>
+                    <p>
+                        In the command above, <span class="blue-bold">your_domain</span> should be the name of the domain you want to secure with this SSL certificate. When ordering a Wildcard certificate, do not include the asterisk (&#42;) in the filename (e.g., <em>your_domain</em>). That is not a valid Keytool character.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Create New Keystore</b>
+                    </p>
+                    <ol>
+                        <li style="list-style-type: lower-latin;">
+                            <p>
+                                When prompted, enter the information for your SSL certificate.
+                            </p>
+                            <blockquote style="border-left: 4px solid rgb(255,83,13);margin-left: 0px;padding: 0 0 0 10px;">
+                                <p>
+                                    <b>Important:</b> When prompted for the first and last name, <b>DO NOT</b> type your first and last name. Instead, type the domain name the certificate is being issued for (e.g., <em>www.yourdomain.com</em>, <em>mail.yourdomain.com</em>, <em>*.yourdomain.com</em>).
+                                </p>
+                            </blockquote>
+                        </li>
+                        <li style="list-style-type: lower-latin;">
+                            <p>
+                                When asked to verify your information, type &quot;y&quot; or &quot;yes&quot; to confirm.
+                            </p>
+                        </li>
+                        <li style="list-style-type: lower-latin;">
+                            <p>
+                                <b>Create a password</b>
+                            </p>
+                            <p>
+                                Next, you will need to create a password. You will use this password to generate your CSR and to import your certificate. Store this password in a safe, secure place (such as a trusted and secured password manager).
+                            </p>
+                        </li>
+                    </ol>
+            </ol>
+
+            <h3 style="color: #4d70b0;">Step 2: Generate a Certificate Signing Request (CSR) from Your New Keystore</h3>
+            <p>
+                <b style="margin-right: 5px;">Recommended:</b> Save yourself some time. Use the <a target="_blank" href="/easy-csr/keytool.htm">DigiCert Java Keytool CSR Wizard</a> to generate a Keytool command to create your WebLogic CSR. Just fill out the form, click <b>Generate</b>, and then paste your customized Java Keytool command into your terminal.
+            </p>
+            <p>
+                <a target="_blank" href="/easy-csr/keytool.htm"><img src="/kb/images/easy-csr-keytool-preview.gif" alt="Preview of Keytool CSR Wizard" /></a>
+            </p>
+
+            <h3>How to Generate a CSR for WebLogic 8 - 12x Using Java Keytool</h3>
+            <p>
+                If you prefer to build your own Keytool commands to generate your WebLogic CSR, follow the instructions below.
+            </p>
+            <ol class="steps">
+                <li>
+                    <p>
+                        <b>Run Command</b>
+                    </p>
+                    <p>
+                        In Keytool, type the following command:
+                    </p>
+                    <div class="supportBox" style="width: 800px;">
+                        <code>
+                            <b>keytool -certreq -alias server -keyalg RSA -file <span class="blue-bold">your_domain</span>.csr -keystore your_domain.jks</b>
+                        </code>
+                    </div><br>
+                    <p>
+                        In the command above, <span class="blue-bold">your_domain</span> should be the name of the domain you want to secure with this SSL certificate. When ordering a Wildcard certificate, do not include the asterisk (&#42;) in the filename (e.g., your_domain). That is not a valid Keytool character.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Generate CSR</b>
+                    </p>
+                    <ol>
+                        <li style="list-style-type: lower-latin;">
+                            <p>
+                                When prompted, type the password you created earlier (when you created your new Keystore).
+                            </p>
+                        </li>
+                        <li style="list-style-type: lower-latin;">
+                            <p>
+                                Your CSR should now be created.
+                            </p>
+                        </li>
+                    </ol>
+                </li>
+                <li>
+                    <p>
+                        <b>Back-up Keystore File</b>
+                    </p>
+                    <p>
+                        We recommend that you create a back-up copy of the Keystore file before continuing on. Having a back-up of the Keystore file can help resolve issues that may occur during certificate installation.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Order Your SSL/TLS Certificate</b>
+                    </p>
+                    <ol>
+                        <li style="list-style-type: lower-latin;">
+                            <p>
+                                Open the your_domain.csr file you created with a text editor.
+                            </p>
+                        </li>
+                        <li style="list-style-type: lower-latin;">
+                            <p>
+                                Copy the text, including the <span style="color: orangered">-----BEGIN NEW CERTIFICATE REQUEST-----</span> and <span style="color: orangered">-----END NEW CERTIFICATE REQUEST-----</span> tags, and paste it in to the <a target="_blank" href="https://order.digicert.com/step1/ssl_basic">DigiCert order form</a>.
+                            </p>
+                            <div id="support-guides">
+                                <p class="sg3" style="line-height: 55px !important;">Ready to order your SSL certificate?</p>
+                                <a href="https://order.digicert.com/step1/ssl_basic" title="Purchase an SSL Certificate Now" class="sg2">Buy Now</a>
+                                <a href="/tls-ssl/basic-tls-ssl-certificates" title="Learn About IIS SSL Certificates" class="sg1">Learn More</a>
+                            </div>
+                        </li>
+                    </ol>
+                </li>
+                <li>
+                    <p>
+                        <b>Install Certificate</b>
+                    </p>
+                    <p>
+                        After you've received your SSL certificate from DigiCert, you can install it on your server.
+                    </p>
+                </li>
+            </ol>
+        </div>
+
+        <div>
+            <div id="ssl_certificate_install" style="position: relative;top:-67px;z-index:-9999;height:0px;"></div>
+
+            <h2 class="h2-large">II. WebLogic Server 8 – 12x: Install and Configure Your SSL/TLS Certificate</h2>
+
+            <p>
+                If you still need to create a certificate signing request (CSR) and order your certificate, see <a href="#create_csr_java_keytool">WebLogic Server 8 – 12x: Create Your CSR with Java Keytool</a>.
+            </p>
+            <p>
+                After we've validated and issued your SSL certificate, you can install it on your WebLogic 8, 9, 10, 11, or 12.x server (where the CSR was generated) and configure the server to use the certificate.
+            </p>
+            <h3 style="color: #4d70b0;">Step 1: Use Java Keytool to Install Your SSL Certificate in WebLogic</h3>
+
+            <ol class="steps">
+                <li>
+                    <p>
+                        <b>Download Certificate</b>
+                    </p>
+                    <p>
+                        Download the your_domain_com.p7b certificate file from your DigiCert Account.
+                    </p>
+                    <p>
+                        On the <b>My Orders</b> tab, click the order number link and then click <b>Download</b>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Install the Certificate File in Your Keystore</b>
+                    </p>
+                    <ol class="steps">
+                        <li style="list-style-type: lower-latin;">
+                            <p>
+                                Run the command below to install the certificate.
+                            </p>
+                            <div class="supportBox" style="width: 800px;margin-bottom: 15px;">
+                                <code>
+                                    <b>keytool -import -trustcacerts -alias server -file <span class="blue-bold">/your_domain_com</span>.p7b <br>
+                                        -keystore <span class="blue-bold">your_domain_com</span>.jks</b>
+                                </code>
+                            </div>
+                            <blockquote style="border-left: 3px solid rgb(175,175,175);margin-left: 0px;padding: 0 0 0 10px;">
+                                <p>
+                                    <b>Note:</b> Make sure to replace <span class="blue-bold">your_domain_com</span> with the domain the certificate is securing.
+                                </p>
+                            </blockquote>
+                        </li>
+                        <li style="list-style-type: lower-latin;">
+                            <p>
+                                You should get a confirmation that the &quot;<em>Certificate reply was installed in keystore</em>&quot;.
+                            </p>
+                        </li>
+                        <li style="list-style-type: lower-latin;">
+                            <p>
+                                If you are prompted to trust the certificate, type &quot;y&quot; or &quot;yes&quot;.
+                            </p>
+                        </li>
+                        <li style="list-style-type: lower-latin;">
+                            <p>
+                                The installation of this file loads all the necessary certificates to your Keystore.
+                            </p>
+                        </li>
+                    </ol>
+                </li>
+                <li>
+                    <p>
+                        Now you just need to configure your server to use the certificate.
+                    </p>
+                </li>
+            </ol>
+
+            <h3 style="color: #4d70b0;">Step II: Configure the Keystore for Use in WebLogic</h3>
+
+            <ol>
+                <li>
+                    <p>
+                        On your WebLogic server, expand the <b>Servers</b> node and select the server you need to configure.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Next, go to <b>Configuration-->Keystores and SSL</b>.
+                    </p>
+                    <blockquote style="border-left: 3px solid rgb(175,175,175);margin-left: 0px;padding: 0 0 0 10px;">
+                        <p>
+                            <b>Note:</b> Under <b>Keystore Configuration</b>, several default Keystores or previously installed Keystores may be displayed.
+                        </p>
+                    </blockquote>
+                </li>
+                <li>
+                    <p>
+                        To enable your new keystore, under <b>Keystore Configuration</b>, click the <b>Change...</b> link
+                    </p>
+                </li>
+                <li>
+                   <p>
+                       Select <b>Custom Identity and Java Standard Trust</b> as your keystore configuration type, and then click <b>Continue</b>.
+                   </p>
+                </li>
+                <li>
+                   <p>
+                       Under <b>Custom Identity Keystore File Name</b>, type the full path to the <span class="blue-bold">your_domain.jks</span> file on your WebLogic server.
+                   </p>
+                </li>
+                <li>
+                    <p>
+                        For <b>Custom Identity Keystore Type</b>, select <b>jks</b>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        For <b>Custom Identity Keystore PassPhrase</b>, type the password you created when creating the Keystore.
+                    </p>
+                    <blockquote style="border-left: 3px solid rgb(175,175,175);margin-left: 0px;padding: 0 0 0 10px;">
+                        <p>
+                            <b>Note:</b> If you have forgotten that password, you will need to begin the process of creating your Keystore from the beginning (see <a href="#create_csr_java_keytool">WebLogic Server 8 – 12x: Create Your CSR with Java Keytool</a>).
+                        </p>
+                    </blockquote>
+                </li>
+                <li>
+                    <p>
+                        When asked again, type your Keystore password and confirm.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Click <b>Continue</b>. Then click <b>Finish</b>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Go back and expand the <b>Server</b> node and select the server you are configuring.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Next, go to <b>Configuration-->Keystores and SSL</b> and under <b>Keystore Configuration</b>, click the <b>Change…</b> link
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        On the <b>Configure SSL</b> page, select <b>Key Stores</b> as the method in which identity and trust is stored for the WebLogic server.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Specify the <b>Private Key Alias</b> and <b>Passphrase</b> that were used when creating your Keystore.
+                    </p>
+                    <blockquote style="border-left: 3px solid rgb(175,175,175);margin-left: 0px;padding: 0 0 0 10px;">
+                        <p>
+                            <b>Note:</b> If you followed our instructions or used our command generator, &quot;server&quot; is your alias. The passphrase is the keystore password.
+                        </p>
+                    </blockquote>
+                </li>
+                <li>
+                    <p>
+                        Click <b>Continue</b>. Then click <b>Finish</b>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Reboot the WebLogic server.
+                    </p>
+                    <p>
+                        Congratulations! Your Keystore should now be installed and enabled on your WebLogic server.
+                    </p>
+                </li>
+            </ol>
+        </div>
+
+        <div style="margin-bottom: 50px;">
+            <h2>Testing Your SSL/TLS Certificate Installation</h2>
+                <p>
+                    <b>DigiCert<sup>&#174;</sup> SSL Installation Diagnostic Tool</b>
+                </p>
+                <p>
+                    If your site's publicly accessible, use our <a target="_blank" href="/help/">Server Certificate Tester</a> to test your SSL/TLS certificate installation; it detects common installation problems.
+                </p>
+        </div>
+
+    </div>
+</div>
+<div class="container-inset">
+    <div class="container">
+        <div class="columns">
+
+            <div class="column">
+                <h4>Related Links</h4>
+                <ul>
+                    <li><a href="/kb/csr-creation.htm">Generate CSR Creation</a></li>
+                    <li><a href="/kb/csr-ssl-installation/apache-openssl.htm#ssl_certificate_install">Apache SSL Installation</a></li>
+                    <li><a href="/easy-csr/openssl.htm">OpenSSL CSR Wizard</a></li>
+                </ul>
+            </div>
+
+            <div class="column">
+                <h4>SSL Certificates</h4>
+                <ul>
+                    <li><a href="/tls-ssl/basic-tls-ssl-certificates" class="selected">Standard SSL</a></li>
+                    <li><a href="/tls-ssl/compare-certificates">Standard SSL Comparison</a></li>
+                    <li><a href="/tls-ssl/wildcard-ssl-certificates">Wildcard SSL</a></li>
+                    <li><a href="/tls-ssl/basic-tls-ssl-certificates">EV Certificates</a></li>
+                    <li><a href="/es/wildcard-ssl-certificates/">Certificado Wildcard SSL</a></li>
+                </ul>
+            </div>
+
+            <div class="column">
+                <h4>SSL Support</h4>
+                <ul>
+                    <li><a href="/what-is-an-ssl-certificate">Secure Sockets Layer</a></li>
+                    <li><a href="/easy-csr/openssl.htm">openssl csr</a></li>
+                    <li><a href="/easy-csr/exchange2007.htm">exchange certificate signing request</a></li>
+                    <li><a href="/kb/csr-ssl-installation/apache-openssl.htm">Apache SSL</a></li>
+                    <li><a href="/es/ev-ssl-certification/">Certificado SSL Para Apache</a></li>
+                </ul>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+</div>
+
+</div><!-- end #mainContainer -->
+
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900" rel="stylesheet">
+<link rel="stylesheet" id="wp-block-library-css" href="/wp-includes/css/dist/block-library/style.min.css?ver=6.1.1" type="text/css" media="all">
+<link rel="stylesheet" id="classic-theme-styles-css" href="/wp-includes/css/classic-themes.min.css?ver=1" type="text/css" media="all">
+<link rel="stylesheet" id="jquery-ui-smoothness-css" href="/wp-content/plugins/digicert-reviews/jquery-ui.min.css?ver=6.1.1" type="text/css" media="all">
+<link rel="stylesheet" id="digicert-reviews-css" href="/wp-content/plugins/digicert-reviews/digicert-reviews.css?ver=6.1.1" type="text/css" media="all">
+<link rel="stylesheet" id="wp-pagenavi-css" href="/wp-content/plugins/wp-pagenavi/pagenavi-css.css?ver=2.70" type="text/css" media="all">
+<link rel="stylesheet" id="digicert_custom-style-css" href="/wp-content/themes/digicert_custom/style.css?ver=6.1.1" type="text/css" media="all">
+<link rel="stylesheet" id="polylang-css" href="/wp-content/themes/digicert_custom/polylang.css?ver=6.1.1" type="text/css" media="all">
+<link rel="stylesheet" id="owl-styles-css" href="/wp-content/themes/digicert_custom/css/owl.carousel.css?ver=6.1.1" type="text/css" media="all">
+<link rel="stylesheet" id="mean-styles-css" href="/wp-content/themes/digicert_custom/css/meanmenu.css?ver=6.1.1" type="text/css" media="all">
+<link rel="stylesheet" id="just-styles-css" href="/wp-content/themes/digicert_custom/just.css?ver=6.1.1" type="text/css" media="all">
+<link rel="stylesheet" id="featherlight-css-css" href="/wp-content/themes/digicert_custom/css/featherlight.css?ver=6.1.1" type="text/css" media="all">
+<link rel="stylesheet" id="featherlight-gallery-css-css" href="/wp-content/themes/digicert_custom/js/featherlight.gallery.min.css?ver=6.1.1" type="text/css" media="all">
+<link rel="stylesheet" id="animate-css" href="/wp-content/themes/digicert_custom/css/animate.css?ver=6.1.1" type="text/css" media="all">
+<link rel="stylesheet" href="/wp-content/themes/digicert_custom/aos.css">
+<link rel="stylesheet" href="/wp-content/themes/digicert_custom/custom-style.css?v=7.24.20">
+<link rel="stylesheet" href="/wp-content/themes/digicert_custom/custom-style1.css?v=7.24.20">
+<link rel="stylesheet" href="/wp-content/themes/digicert_custom/mpki_style.css">
+<link rel="stylesheet" href="/wp-content/themes/digicert_custom/iot.css"><link rel="stylesheet" type="text/css" media="all" href="/kb/css/wp-transitional.css?CBR=CB6396092" />
+<header id="masthead" class="site-header" role="banner"><div class="relative-fix">
+         <div class="container">
+            <div class="site-branding">
+               <a href="/">
+                  <img src="/wp-content/uploads/2018/10/DigiCert-Logo.png" height="33" width="124" alt="DigiCert"><!--<img id="site-logo"
+                             src="/img/DigiCert-Logo.svg"
+                             alt="">--></a>
+            </div>
+<!-- .site-branding -->
+            
+            
+            <nav id="site-navigation" class="main-navigation" role="navigation"><div class="menu-menu-1-container"><ul id="primary-menu" class="menu">
+<li id="menu-item-21350" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-21350">
+<a>TLS/SSL</a>
+<ul class="sub-menu">
+<li id="menu-item-11855" class="container no-link menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-11855">
+<a>WRAPPER</a>
+	<ul class="sub-menu">
+<li id="menu-item-23999" class="no-padding hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-23999"><div class="menu-widget menu-widget-small menu-widget-id-23999">
+<h3>Identity on the brink</h3>
+<a class="featherlink blend" style="font-size: 14px; margin-left: 10px;" href="#" data-featherlight="&lt;iframe src='//player.vimeo.com/video/390559024?autoplay=1&amp;api=1' frameborder='0' width='800' height='450' allowfullscreen&gt;"><img src="/wp-content/uploads/2020/02/identity.jpg" alt="Identity on the brink"><span class="icon-PlayButton_Filled"></span></a> </div></li>
+		<li id="menu-item-46020" class="fourth menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-46020">
+<a href="https://www.digicert.com/tls-ssl/secure-site-pro-ssl">Pro TLS/SSL Certificates</a>
+		<ul class="sub-menu">
+<li id="menu-item-46021" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-46021"><a href="https://www.digicert.com/tls-ssl/secure-site-pro-ssl">Secure Site Pro SSL</a></li>
+			<li id="menu-item-46022" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-46022"><a href="https://www.digicert.com/secure-site-pro-ssl/">Secure Site Pro EV SSL</a></li>
+			<li id="menu-item-52606" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52606"><a href="https://www.digicert.com/tls-ssl/post-quantum-cryptography"><nobr class="desktop">Post Quantum Cryptography</nobr></a></li>
+			<li id="menu-item-52574" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52574"><a href="https://www.digicert.com/tls-ssl/certcentral-tls-ssl-manager">Management Tools</a></li>
+		</ul>
+</li>
+		<li id="menu-item-52611" class="fourth menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52611">
+<a href="https://www.digicert.com/tls-ssl/business-tls-ssl-certificates">Business TLS/SSL Certificates</a>
+		<ul class="sub-menu">
+<li id="menu-item-52615" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52615"><a href="https://www.digicert.com/tls-ssl/business-tls-ssl-certificates">Secure Site SSL</a></li>
+			<li id="menu-item-52613" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52613"><a href="https://www.digicert.com/tls-ssl/business-tls-ssl-certificates">Secure Site EV SSL</a></li>
+			<li id="menu-item-52614" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52614"><a href="https://www.digicert.com/tls-ssl/multi-domain-ssl-certificates">Secure Site Multi-Domain SSL</a></li>
+			<li id="menu-item-52612" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52612"><a href="https://www.digicert.com/tls-ssl/multi-domain-ssl-certificates">Secure Site EV Multi-Domain SSL</a></li>
+			<li id="menu-item-52616" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52616"><a href="https://www.digicert.com/tls-ssl/wildcard-ssl-certificates">Secure Site Wildcard SSL</a></li>
+			<li id="menu-item-52575" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52575"><a href="https://www.digicert.com/tls-ssl/certcentral-tls-ssl-manager">Management Tools</a></li>
+		</ul>
+</li>
+		<li id="menu-item-52620" class="toggle fourth menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52620">
+<a href="https://www.digicert.com/what-is-an-ssl-certificate">Basic TLS/SSL Certificates</a>
+		<ul class="sub-menu">
+<li id="menu-item-52621" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52621"><a href="https://www.digicert.com/tls-ssl/basic-tls-ssl-certificates">Standard SSL</a></li>
+			<li id="menu-item-52593" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52593"><a href="https://www.digicert.com/tls-ssl/basic-tls-ssl-certificates">Extended Validation SSL</a></li>
+			<li id="menu-item-52603" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52603"><a href="https://www.digicert.com/tls-ssl/multi-domain-ssl-certificates">Multi-Domain SSL</a></li>
+			<li id="menu-item-52592" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52592"><a href="https://www.digicert.com/tls-ssl/multi-domain-ssl-certificates">EV Multi-Domain SSL</a></li>
+			<li id="menu-item-52624" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52624"><a href="https://www.digicert.com/tls-ssl/wildcard-ssl-certificates">Wildcard SSL</a></li>
+			<li id="menu-item-52576" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52576"><a href="https://www.digicert.com/tls-ssl/certcentral-tls-ssl-manager">Management Tools</a></li>
+		</ul>
+</li>
+		<li id="menu-item-52588" class="toggle fourth menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52588">
+<a href="https://www.digicert.com/tls-ssl/digital-certificates">Other Certificates</a>
+		<ul class="sub-menu">
+<li id="menu-item-53130" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-53130"><a href="https://www.digicert.com/solutions/security-solutions-for-psd2-compliance">PSD2 Compliance</a></li>
+			<li id="menu-item-52579" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52579"><a href="https://www.digicert.com/signing/code-signing-certificates">Code Signing</a></li>
+			<li id="menu-item-52580" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52580"><a href="https://www.digicert.com/signing/code-signing-certificates">EV Code Signing</a></li>
+			<li id="menu-item-52642" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52642"><a href="https://www.digicert.com/document-trust-manager">DigiCert® Document Trust Manager</a></li>
+			<li id="menu-item-52578" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52578"><a href="https://www.digicert.com/tls-ssl/client-certificates">Client (S/MIME)</a></li>
+			<li id="menu-item-52585" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52585"><a href="https://www.digicert.com/solutions/security-solutions-for-devices">Device</a></li>
+			<li id="menu-item-52594" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52594"><a href="https://www.digicert.com/solutions/security-solutions-for-google-amp">TLS for Google AMP</a></li>
+			<li id="menu-item-52623" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52623"><a href="https://www.digicert.com/tls-ssl/verified-mark-certificates"><nobr>Verified Mark Certificates (VMC)</nobr></a></li>
+		</ul>
+</li>
+		<li id="menu-item-11865" class="no-label menu-item-object-yawp_wim menu-item menu-item-type-custom menu-item-object-custom menu-item-11865"><div class="menu-widget menu-widget-full menu-widget-id-11865">
+<h3>Submenu Footer – Buttons</h3>
+<p style="text-align: center;"><a class="button buy" href="https://order.digicert.com/">Buy</a><a class="button blend" href="https://docs.digicert.com/en/certcentral/manage-certificates/renew-an-ssl-tls-certificate.html">Renew</a><a class="button blend" href="https://www.digicert.com/tls-ssl/compare-certificates">COMPARE</a><a class="button blend" href="https://www.digicert.com/what-is-ssl-tls-and-https">WHAT ARE SSL, TLS &amp; HTTPS?</a></p>
+<style>header#masthead #primary-menu > li#menu-item-39578 > ul.sub-menu > li > ul.sub-menu > li{
+    padding-left: 10px;
+    padding-right: 10px;
+}</style>
+</div></li>
+	</ul>
+</li>
+</ul>
+</li>
+<li id="menu-item-21997" class="toggle pki menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-21997">
+<a>PKI</a>
+<ul class="sub-menu">
+<li id="menu-item-21998" class="container no-link menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-21998">
+<a href="#">WRAPPER</a>
+	<ul class="sub-menu">
+<li id="menu-item-41186" class="no-padding hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-41186"><div class="menu-widget menu-widget-small menu-widget-id-41186">
+<h3>It’s time to redefine PKI</h3>
+<a class="featherlink blend" style="font-size: 14px; margin-left: 10px;" href="#" data-featherlight="&lt;iframe src='//player.vimeo.com/video/390554299?autoplay=1&amp;api=1' frameborder='0' width='800' height='450' allowfullscreen&gt;"><img src="/wp-content/uploads/2020/02/snowbird_image-1.jpg" alt="It's time to redefine PKI"><span class="icon-PlayButton_Filled"></span></a> </div></li>
+		<li id="menu-item-52587" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52587">
+<a href="https://www.digicert.com/trust-lifecycle-manager">DigiCert® Trust Lifecycle Manager</a>
+		<ul class="sub-menu">
+<li id="menu-item-52609" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52609"><a href="https://www.digicert.com/pki/enterprise-pki-manager/secure-email">Secure Email Use Case</a></li>
+			<li id="menu-item-52610" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52610"><a href="https://www.digicert.com/pki/enterprise-pki-manager/secure-network-access">Secure Network Access Use Case</a></li>
+			<li id="menu-item-52617" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52617"><a href="https://www.digicert.com/pki/enterprise-pki-manager/secure-smart-cards">Secure Smart Card Use Case</a></li>
+			<li id="menu-item-52607" class="hide-on-desktop menu-item menu-item-type-custom menu-item-object-custom menu-item-52607"><a href="https://www.digicert.com/pki/enterprise-pki-manager/secure-devices">Secure Device Use Case</a></li>
+			<li id="menu-item-52608" class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-52608"><a href="https://www.digicert.com/pki/enterprise-pki-manager/secure-devices">Secure Device Use Case</a></li>
+		</ul>
+</li>
+		<li id="menu-item-22000" class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-22000">
+<a> </a>
+		<ul class="sub-menu">
+<li id="menu-item-52618" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52618"><a href="https://www.digicert.com/software-trust-manager">DigiCert® Software Trust Manager</a></li>
+		</ul>
+</li>
+		<li id="menu-item-22001" class="no-label menu-item-object-yawp_wim menu-item menu-item-type-custom menu-item-object-custom menu-item-22001"><div class="menu-widget menu-widget-full menu-widget-id-22001">
+<h3>MPKI-footer</h3>
+<p style="text-align: center; padding: 20px;">Contact a PKI Specialist 1.801.701.9600</p> </div></li>
+	</ul>
+</li>
+</ul>
+</li>
+<li id="menu-item-22014" class="toggle pki iot menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-22014">
+<a>IoT</a>
+<ul class="sub-menu">
+<li id="menu-item-22015" class="container no-link menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-22015">
+<a href="#">WRAPPER</a>
+	<ul class="sub-menu">
+<li id="menu-item-24001" class="no-padding hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-24001"><div class="menu-widget menu-widget-small menu-widget-id-24001">
+<h3>Panasonic Trusts DigiCert for IoT Solutions</h3>
+<a class="featherlink blend" style="font-size: 14px; margin-left: 10px;" href="#" data-featherlight="&lt;iframe src='//player.vimeo.com/video/307750809?autoplay=1&amp;api=1' frameborder='0' width='800' height='450' allowfullscreen&gt;"><img src="/wp-content/uploads/2019/04/panasonic.png" alt="Panasonic Tusts DigiCert for IoT Solutions"><span class="icon-PlayButton_Filled"></span></a> </div></li>
+		<li id="menu-item-52595" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-52595">
+<a href="https://www.digicert.com/iot-trust-manager">DigiCert® IoT Trust Manager</a>
+		<ul class="sub-menu">
+<li id="menu-item-52596" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52596"><a href="https://www.digicert.com/iot/iot-device-manager/iot-of-healthcare">IoT of Healthcare</a></li>
+			<li id="menu-item-52599" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52599"><a href="https://www.digicert.com/iot/iot-device-manager/industrial-iot">Industrial IoT</a></li>
+			<li id="menu-item-52600" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52600"><a href="https://www.digicert.com/iot/iot-device-manager/smart-city">Smart City</a></li>
+			<li id="menu-item-52601" class="hide-on-desktop menu-item menu-item-type-custom menu-item-object-custom menu-item-52601"><a href="https://www.digicert.com/iot/iot-device-manager/iot-of-transportation">IoT of Transportation</a></li>
+			<li id="menu-item-52597" class="hide-on-desktop menu-item menu-item-type-custom menu-item-object-custom menu-item-52597"><a href="https://www.digicert.com/iot/iot-device-manager/iot-home-and-consumer">IoT Home and Consumer</a></li>
+		</ul>
+</li>
+		<li id="menu-item-22087" class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-22087">
+<a> </a>
+		<ul class="sub-menu">
+<li id="menu-item-52598" class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-52598"><a href="https://www.digicert.com/iot/iot-device-manager/iot-home-and-consumer">IoT Home and Consumer</a></li>
+			<li id="menu-item-52602" class="hide-on-mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-52602"><a href="https://www.digicert.com/iot/iot-device-manager/iot-of-transportation">IoT of Transportation</a></li>
+			<li id="menu-item-52584" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-52584"><a href="https://www.digicert.com/pki/enterprise-pki-manager">Custom Certificate Profiles</a></li>
+		</ul>
+</li>
+		<li id="menu-item-22024" class="no-label menu-item-object-yawp_wim menu-item menu-item-type-custom menu-item-object-custom menu-item-22024"><div class="menu-widget menu-widget-full menu-widget-id-22024">
+<h3>Submenu Footer – IoT</h3>
+<p style="text-align: center; padding: 20px;">Contact an IoT Specialist 1.801.701.9600</p> </div></li>
+	</ul>
+</li>
+</ul>
+</

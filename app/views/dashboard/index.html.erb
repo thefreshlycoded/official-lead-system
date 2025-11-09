@@ -1,0 +1,59 @@
+<div class="container">
+  <h1 class="mb-4">Dashboard</h1>
+
+  <div class="row mb-4">
+    <div class="col">
+      <div class="card"><div class="card-body">
+        <h5 class="card-title">Total Leads</h5>
+        <p class="display-6"><%= @total %></p>
+      </div></div>
+    </div>
+    <div class="col">
+      <div class="card"><div class="card-body">
+        <h5 class="card-title">Relevant</h5>
+        <p class="display-6 text-success"><%= @relevant %></p>
+      </div></div>
+    </div>
+    <div class="col">
+      <div class="card"><div class="card-body">
+        <h5 class="card-title">Not Relevant</h5>
+        <p class="display-6 text-danger"><%= @irrelevant %></p>
+      </div></div>
+    </div>
+    <div class="col">
+      <div class="card"><div class="card-body">
+        <h5 class="card-title">Unknown</h5>
+        <p class="display-6 text-muted"><%= @unknown %></p>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-6">
+      <div class="card"><div class="card-body">
+        <h5 class="card-title">By Source</h5>
+        <table class="table table-sm">
+          <thead><tr><th>Source</th><th>Count</th></tr></thead>
+          <tbody>
+            <% @by_source.each do |src, cnt| %>
+              <tr><td><%= src %></td><td><%= cnt %></td></tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div></div>
+    </div>
+    <div class="col-6">
+      <div class="card"><div class="card-body">
+        <h5 class="card-title">Leads that Are Interested In Service</h5>
+        <ul class="list-group">
+          <% @recent.each do |jl| %>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <%= link_to (jl.title.presence || jl.job_url), jl %>
+              <span class="badge bg-secondary"><%= jl.display_source %></span>
+            </li>
+          <% end %>
+        </ul>
+      </div></div>
+    </div>
+  </div>
+</div>

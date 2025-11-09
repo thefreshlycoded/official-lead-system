@@ -1,0 +1,23 @@
+{
+    "website_url": "www.abdidesign.com",
+    "emails": [
+        "info@abdidesign.com",
+        "support@abdidesign.com"
+    ],
+    "phones": [
+        "123-456-7890",
+        "+1 (555) 123-4567"
+    ],
+    "social_media": {
+        "facebook": "https://www.facebook.com/abdi.design",
+        "twitter": "https://twitter.com/abdi_design",
+        "linkedin": "https://www.linkedin.com/in/abdi-design",
+        "instagram": "https://www.instagram.com/abdi.design"
+    },
+    "source_section": [
+        "Footer",
+        "Contact Us"
+    ],
+    "job_listing_id": 67,
+    "job_url": "https://www.upwork.com/jobs/Recover-hacked-website_~021851690146874263497/?referrer_url_path=/nx/search/jobs/"
+}

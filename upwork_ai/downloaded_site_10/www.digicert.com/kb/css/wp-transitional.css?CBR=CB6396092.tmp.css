@@ -1,0 +1,197 @@
+/* ************************************************************************* */
+/* FIXES THAT AFFECT COMMON ELEMENTS ACROSS MULTIPLE PAGE GO IN THIS SECTION
+/* ************************************************************************* */
+
+/* Change the width to match that of the Wordpress header */
+
+.wp-header #mainContainer .container {
+	width: 1000px;
+	padding-left: 2px;
+}
+
+/*
+div a[name] {
+	height: 60px;
+	display: inline-block;
+}
+
+h3 a[name] {
+	height: 90px;
+	display: inline-block;
+}
+*/
+/* Fix header height */
+.wp-header header#masthead {
+	height: auto;
+	/*position: absolute;*/
+}
+
+/* WP HEADER: Fix the navigation items in the imported header */
+
+.wp-header header#masthead ul {
+	position: inherit;
+	right: auto;
+	top: auto;
+	margin: auto;
+}
+
+.wp-header header#masthead ul li {
+	list-style: inherit;
+	font-size: inherit;
+	margin-left: inherit;
+	clear: right;
+}
+
+/* WP HEADER: Remove float to fix the spacing in the account menu */
+.wp-header header#masthead ul#account-menu li {
+	float: none;
+}
+
+/* WP HEADER: Remove the non-functional search button */
+.wp-header header#masthead ul#account-menu li.menu-item.search {
+	display: none;
+}
+
+/* WP HEADER: Fix the Phone Number Display in the account menu */
+.wp-header header#masthead ul li a {
+	color: inherit;
+	text-decoration: inherit;
+	display: inherit;
+	height: auto;
+	line-height: inherit;
+}
+
+.wp-header header#masthead .phone {
+	height: inherit;
+	font-size: inherit;
+	position: inherit;
+	top: inherit;
+	right: inherit;
+	font-family: inherit;
+	margin: inherit;
+}
+
+/* WP HEADER: Fix sub-menu and hover-box top position */
+.wp-header header#masthead ul.sub-menu {
+	margin-top: -5px;
+}
+
+.wp-header header#masthead div.hover-box {
+	margin-top: -5px;
+}
+
+/* WP HEADER: Fix extra width caused by left: 999em. */
+.wp-header header#masthead ul#account-menu .hover-box
+{
+	left: inherit;
+	display: none;
+}
+
+/* WP HEADER: Fix problem with contact support hover triggering because box is invisible but present */
+.wp-header header#masthead ul#account-menu li:hover .hover-box
+{
+	display: block;
+}
+
+/* WP HEADER: Fix the width and height of the language hover box in header menu */
+#language-hover.hover-box {
+	min-width: 135px;
+	min-height: 80px;
+}
+
+/* PAGE LAYOUT: If there is a banner on the page move it up to compensate for not having a navigation bar */
+.wp-header .banner {
+	top: 67px;
+}
+
+/* PAGE LAYOUT: If there is a secondary navigation on the page move it up to compensate for not having a navigation bar */
+.wp-header .nav-secondary {
+	top: 182px;
+}
+
+/* PAGE LAYOUT: Restore the font size of the h1 tags to the old font and size */
+.wp-header h1 {
+	font-family: "UbuntuLight", Arial, sans-serif;
+	color: #4d4d4d;
+	font-weight: 700;
+}
+
+.wp-header h1, h1 font {
+	font-size: 26px;
+}
+
+/* PAGE LAYOUT: Fix h1 and content top position for banner only pages that have a banner but not a secondary nav */
+.banneronlypage.wp-header h1 {
+	top: 200px;
+	position: inherit !important;
+}
+
+.banneronlypage.wp-header #mainContainer {
+	margin-top: 200px;
+}
+
+/* PAGE LAYOUT: fix h1 and content top position for banner only pages that have a banner and a secondary nav */
+.bannerpage.wp-header h1 {
+	top: 225px;
+}
+
+.bannerpage.wp-header #mainContainer {
+	margin-top: 275px;
+}
+
+/* PAGE LAYOUT: fix the support search form */
+.wp-header #supportSearchForm {
+	padding-right: 14px;
+}
+
+/* PAGE LAYOUT: fix box sizing for platformbox elements */
+
+.wp-header .platformbox {
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+}
+
+/* PAGE LAYOUT: Fix ks-button color */
+.wp-header a.ks-button:not(.button) {
+	color: white;
+	text-decoration: none;
+}
+
+/* PAGE LAYOUT Fix h2 subheaders */
+.wp-header .main-content h2
+{
+	margin-top: 20px;
+}
+
+/* PAGE LAYOUT Fix <code> colors */
+.wp-header code
+{
+	color: black;
+	background-color: transparent;
+	font-size: 100%;
+	font-family: "Courier New",Courier,sans-serif;
+}
+
+/* PAGE LAYOUT Fix marketo form labels */
+.wp-header .mktoForm label.mktoLabel {
+	display: block;
+}
+
+/* ************************************************************************* */
+/* PAGE SPECIFIC FIXES GO IN THIS SECTION
+/* ************************************************************************* */
+
+/* Fix width of left column on /ssl.htm */
+.wp-header .container.primary-container .two-column.left {
+	width: 583px
+}
+
+.wp-header .container.primary-container .two-column.right {
+	padding-left: 0;
+}
+
+.wp-header img[src*="/kb/images/spacer.gif"] {
+	width: 50px;
+	height: 10px
+}

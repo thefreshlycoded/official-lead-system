@@ -1,0 +1,190 @@
+<div class="container">
+  <p class="mb-2"><%= link_to "← Back", job_listings_path %></p>
+  <h1 class="mb-3"><%= @job_listing.title.presence || @job_listing.job_url %></h1>
+
+  <!-- Review Status Section -->
+  <div class="alert alert-light mb-4">
+    <div class="row">
+      <div class="col-md-6">
+        <h5>Review Status</h5>
+        <% if @job_listing.viable_post_human.nil? %>
+          <span class="badge bg-warning text-dark">⏳ Pending Human Review</span>
+        <% elsif @job_listing.viable_post_human %>
+          <span class="badge bg-success">✓ Human: Viable Lead</span>
+        <% else %>
+          <span class="badge bg-danger">✗ Human: Not Viable</span>
+        <% end %>
+
+        <!-- AI Review Status (if available) -->
+        <% if @job_listing.viable_post %>
+          <span class="badge bg-info">🤖 AI: Viable (<%= number_with_precision(@job_listing.ai_relevance_score, precision: 2) if @job_listing.ai_relevance_score %>)</span>
+        <% elsif @job_listing.viable_post == false %>
+          <span class="badge bg-secondary">🤖 AI: Not Viable</span>
+        <% end %>
+      </div>
+
+      <div class="col-md-6">
+        <!-- Agreement Status -->
+        <% if @job_listing.ai_human_match? == true %>
+          <span class="badge bg-success">🎯 AI/Human Agreement</span>
+        <% elsif @job_listing.ai_human_match? == false %>
+          <span class="badge bg-warning">⚠️ AI/Human Disagreement</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <p>
+    Source: <strong><%= @job_listing.display_source %></strong> •
+    Relevance: <strong><%= @job_listing.relevance.nil? ? "Unknown" : (@job_listing.relevance ? "Relevant" : "Not Relevant") %></strong> •
+    Fresh: <%= @job_listing.fresh ? "Yes" : "No" %>
+  </p>
+
+  <h3 class="mt-4">Job</h3>
+  <ul>
+    <li>URL: <%= link_to @job_listing.job_url, @job_listing.job_url, target: "_blank" %></li>
+    <li>Location: <%= @job_listing.location %></li>
+    <li>Posted: <%= @job_listing.post_date %> (<%= @job_listing.posted_time %>)</li>
+  </ul>
+
+  <h3 class="mt-4">Description</h3>
+  <div class="card">
+    <div class="card-body">
+      <pre style="white-space: pre-wrap; font-family: inherit;"><%= @job_listing.description %></pre>
+    </div>
+  </div>
+
+  <% if @job_listing.ai_relevance_reasoning.present? %>
+    <div class="mt-3">
+      <h4>🤖 AI Analysis Reasoning</h4>
+      <div class="alert alert-info">
+        <%= simple_format(@job_listing.ai_relevance_reasoning) %>
+      </div>
+    </div>
+  <% end %>
+
+  <h3 class="mt-4">Website</h3>
+  <ul>
+    <li>Present: <%= @job_listing.website_present ? "Yes" : "No" %></li>
+    <li>URL: <%= @job_listing.website_url %></li>
+    <li>Type: <%= @job_listing.website_type %></li>
+  </ul>
+
+  <h3 class="mt-4">Contacts</h3>
+  <ul>
+    <li>Emails: <%= (@job_listing.emails || []).join(", ") %></li>
+    <li>Phones: <%= (@job_listing.phones || []).join(", ") %></li>
+    <li>Contact Name: <%= @job_listing.contact_name %></li>
+    <li>Contact Email: <%= @job_listing.contact_email %></li>
+    <li>Contact Phone: <%= @job_listing.contact_phone %></li>
+    <li>Contact Role: <%= @job_listing.contact_role %></li>
+    <li>Company Name: <%= @job_listing.company_name %></li>
+    <li>Scanned for Contact Details: <%= @job_listing.scanned_for_company_details? ? "✅ Yes" : "❌ No" %></li>
+  </ul>
+
+  <div class="mb-3">
+    <%= form_with url: analyze_contact_info_job_listing_path(@job_listing), method: :post, local: true, class: "d-inline" do %>
+      <button type="submit" class="btn btn-info btn-sm"
+              onclick="return confirm('Analyze this job description for contact information?')"
+              <%= 'disabled' if @job_listing.scanned_for_company_details? %>>
+        <% if @job_listing.scanned_for_company_details? %>
+          🔄 Re-analyze Contact Info
+        <% else %>
+          🔍 Analyze Contact Info
+        <% end %>
+      </button>
+    <% end %>
+  </div>
+    <li>Last Contacted: <%= @job_listing.last_contacted_at || '—' %> (<%= @job_listing.contact_method %>)</li>
+    <li>Facebook: <%= @job_listing.facebook %></li>
+    <li>Twitter: <%= @job_listing.twitter %></li>
+    <li>LinkedIn: <%= @job_listing.linkedin %></li>
+    <li>Instagram: <%= @job_listing.instagram %></li>
+    <li>Location: <%= [@job_listing.city, @job_listing.state, @job_listing.country].compact.join(", ") %></li>
+    <li>Industry: <%= @job_listing.industry %></li>
+    <li>Owner: <%= @job_listing.owner_name %></li>
+  </ul>
+
+  <h3 class="mt-4">Project</h3>
+  <ul>
+    <li>Status: <%= @job_listing.status %></li>
+    <li>Project Type: <%= @job_listing.project_type %></li>
+    <li>Budget: <%= [@job_listing.budget_min, @job_listing.budget_max].compact.join(' - ') %></li>
+    <li>Timezone: <%= @job_listing.timezone %></li>
+    <li>Company: <%= @job_listing.company_name %></li>
+  </ul>
+
+  <!-- Human Review Section -->
+  <div class="mt-5">
+    <% if @job_listing.needs_human_review? %>
+      <div class="card border-warning">
+        <div class="card-header bg-warning text-dark">
+          <h4 class="mb-0">🔍 Manual Review Required</h4>
+        </div>
+        <div class="card-body">
+          <p class="mb-3">Please review this job listing and determine if it's a viable lead for our web development and digital marketing services.</p>
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+            <%= link_to mark_viable_job_listing_path(@job_listing),
+                class: "btn btn-success btn-lg me-md-2",
+                data: {
+                  turbo_method: :patch,
+                  turbo_confirm: "Mark this as a viable lead for web development/digital marketing services?"
+                } do %>
+              ✓ Mark as Viable Lead
+            <% end %>
+
+            <%= link_to mark_not_viable_job_listing_path(@job_listing),
+                class: "btn btn-danger btn-lg",
+                data: {
+                  turbo_method: :patch,
+                  turbo_confirm: "Mark this as not viable for our services?"
+                } do %>
+              ✗ Mark as Not Viable
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% else %>
+      <div class="card border-success">
+        <div class="card-header bg-light">
+          <h4 class="mb-0">✓ Review Complete</h4>
+        </div>
+        <div class="card-body">
+          <p class="mb-3">
+            <strong>Human Review:</strong> Marked as <strong><%= @job_listing.viable_post_human? ? "Viable" : "Not Viable" %></strong>
+            <% if @job_listing.human_reviewed_at %>
+              <br><small class="text-muted">Reviewed on <%= @job_listing.human_reviewed_at.strftime("%B %d, %Y at %I:%M %p") %></small>
+            <% end %>
+          </p>
+
+          <!-- Allow re-review -->
+          <details>
+            <summary class="btn btn-outline-secondary btn-sm">Change Review</summary>
+            <div class="mt-3 d-grid gap-2 d-md-flex">
+              <%= link_to "Mark as Viable",
+                  mark_viable_job_listing_path(@job_listing),
+                  class: "btn btn-success btn-sm me-md-2",
+                  data: { turbo_method: :patch } %>
+
+              <%= link_to "Mark as Not Viable",
+                  mark_not_viable_job_listing_path(@job_listing),
+                  class: "btn btn-danger btn-sm",
+                  data: { turbo_method: :patch } %>
+            </div>
+          </details>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <h3 class="mt-4">Pitches</h3>
+  <div>
+    <strong>Email Pitch</strong>
+    <pre style="white-space: pre-wrap"><%= @job_listing.email_pitch %></pre>
+  </div>
+  <div>
+    <strong>SMS Pitch</strong>
+    <pre style="white-space: pre-wrap"><%= @job_listing.sms_pitch %></pre>
+  </div>
+</div>

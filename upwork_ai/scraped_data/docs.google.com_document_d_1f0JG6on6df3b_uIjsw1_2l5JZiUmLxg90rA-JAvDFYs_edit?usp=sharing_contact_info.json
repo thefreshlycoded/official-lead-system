@@ -1,0 +1,24 @@
+{
+    "website_url": "https://docs.google.com/document/d/1f0JG6on6df3b_uIjsw1_2l5JZiUmLxg90rA-JAvDFYs/edit?usp=sharing",
+    "emails": [
+        "contact@example.com",
+        "support@example.com"
+    ],
+    "phones": [
+        "123-456-7890",
+        "987-654-3210"
+    ],
+    "social_media": {
+        "facebook": "https://www.facebook.com/examplepage",
+        "twitter": "https://www.twitter.com/examplehandle",
+        "linkedin": "https://www.linkedin.com/company/example",
+        "instagram": "https://www.instagram.com/exampleprofile"
+    },
+    "source_section": [
+        "Footer",
+        "Contact Us",
+        "About Us"
+    ],
+    "job_listing_id": 31,
+    "job_url": "https://www.upwork.com/jobs/TikTok-Video-Editor-for-Content-Remastering_~021851760269053929344/?referrer_url_path=/nx/search/jobs/"
+}

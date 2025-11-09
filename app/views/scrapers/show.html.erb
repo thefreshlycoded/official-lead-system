@@ -1,0 +1,135 @@
+<div class="container">
+  <p class="mb-2"><%= link_to "← Back", scrapers_path %></p>
+  <h1 class="mb-3"><%= @scraper.name %></h1>
+  <ul>
+    <li>Kind: <%= @scraper.kind %></li>
+    <li>Status: <%= @scraper.display_status %></li>
+    <li>Enabled: <%= @scraper.enabled ? "Yes" : "No" %></li>
+    <li>Last run: <%= @scraper.last_run_at ? time_ago_in_words(@scraper.last_run_at) + " ago" : "—" %></li>
+    <li>Total leads collected: <%= @scraper.total_leads_collected %></li>
+  </ul>
+
+  <%= button_to "Scrape latest leads (24h)", run_scraper_path(@scraper), method: :post, class: "btn btn-primary mb-3", id: "scrape-button" %>
+
+  <!-- Scraper Status Display -->
+  <div id="scraper-status" style="display: none;" class="card mb-3">
+    <div class="card-header">
+      <h5 class="mb-0">Scraper Status</h5>
+    </div>
+    <div class="card-body">
+      <div id="status-messages"></div>
+      <button id="continue-button" style="display: none;" class="btn btn-success mt-2">Continue Scraping</button>
+    </div>
+  </div>
+
+  <div class="text-muted small">Status: <%= @scraper.display_status %></div>
+  <% if @new_since_last_run %>
+    <div class="alert alert-info mt-2">New leads since last run: <%= @new_since_last_run %>. Refresh this page after the scraper finishes.</div>
+  <% end %>
+
+  <h3 class="mt-4">Recent Leads from <%= @scraper.name %></h3>
+  <table class="table table-sm">
+    <thead><tr><th>Title</th><th>Relevance</th><th>Added</th></tr></thead>
+    <tbody>
+      <% @recent_leads.each do |jl| %>
+        <tr>
+          <td><%= link_to (jl.title.presence || jl.job_url), jl %></td>
+          <td><%= jl.relevance.nil? ? "?" : (jl.relevance ? "✅" : "❌") %></td>
+          <td><%= time_ago_in_words(jl.created_at) %> ago</td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<script>
+let scraperId = <%= @scraper.id %>;
+let statusPolling = null;
+let scraperRunning = false;
+
+document.addEventListener('DOMContentLoaded', function() {
+  const scrapeButton = document.getElementById('scrape-button');
+  const statusDiv = document.getElementById('scraper-status');
+  const messagesDiv = document.getElementById('status-messages');
+  const continueButton = document.getElementById('continue-button');
+
+  // Override the form submission to show status immediately
+  scrapeButton.closest('form').addEventListener('submit', function(e) {
+    scraperRunning = true;
+    statusDiv.style.display = 'block';
+    scrapeButton.disabled = true;
+    messagesDiv.innerHTML = '<div class="alert alert-info">Starting scraper...</div>';
+
+    // Clear previous messages
+    fetch(`/scrapers/${scraperId}/clear_messages`, { method: 'POST' });
+
+    // Start polling for status updates
+    startStatusPolling();
+  });
+
+  continueButton.addEventListener('click', function() {
+    fetch(`/scrapers/${scraperId}/continue`, { method: 'POST' })
+      .then(response => response.json())
+      .then(data => {
+        continueButton.style.display = 'none';
+        addMessage('Continuing with scraping...', 'info');
+      });
+  });
+
+  function startStatusPolling() {
+    statusPolling = setInterval(checkStatus, 2000); // Check every 2 seconds
+  }
+
+  function stopStatusPolling() {
+    if (statusPolling) {
+      clearInterval(statusPolling);
+      statusPolling = null;
+    }
+  }
+
+  function checkStatus() {
+    if (!scraperRunning) return;
+
+    fetch(`/scrapers/${scraperId}/scraper_status`)
+      .then(response => response.json())
+      .then(data => {
+        // Update messages
+        messagesDiv.innerHTML = '';
+        data.messages.forEach(msg => {
+          addMessage(msg.message, 'info', msg.timestamp);
+        });
+
+        // Show continue button if waiting
+        if (data.waiting_for_continue) {
+          continueButton.style.display = 'block';
+        } else {
+          continueButton.style.display = 'none';
+        }
+
+        // Check if scraper finished (you might want to add logic to detect completion)
+        if (data.status === 'idle' && data.messages.length > 0) {
+          const lastMessage = data.messages[data.messages.length - 1];
+          if (lastMessage.message.includes('completed') || lastMessage.message.includes('finished')) {
+            stopStatusPolling();
+            scraperRunning = false;
+            scrapeButton.disabled = false;
+            addMessage('Scraping completed! Refresh to see new leads.', 'success');
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Status check failed:', error);
+      });
+  }
+
+  function addMessage(message, type = 'info', timestamp = null) {
+    const alertClass = type === 'success' ? 'alert-success' :
+                     type === 'warning' ? 'alert-warning' : 'alert-info';
+    const timeStr = timestamp ? new Date(timestamp).toLocaleTimeString() : new Date().toLocaleTimeString();
+    messagesDiv.innerHTML += `<div class="alert ${alertClass} mb-2">
+      <small class="text-muted">[${timeStr}]</small> ${message}
+    </div>`;
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+});
+</script>

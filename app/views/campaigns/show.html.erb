@@ -1,0 +1,17 @@
+<div class="container">
+  <p class="mb-2"><%= link_to "← Back", campaigns_path %></p>
+  <h1 class="mb-3"><%= @campaign.name %></h1>
+  <p><%= @campaign.description %></p>
+  <ul>
+    <li>Status: <%= @campaign.status %></li>
+    <li>Leads: <%= @campaign.leads_count %></li>
+    <li>Launched: <%= @campaign.launched_at || '—' %></li>
+  </ul>
+
+  <h3 class="mt-4">Recent Leads</h3>
+  <ul>
+    <% @recent_leads.each do |jl| %>
+      <li><%= link_to (jl.title.presence || jl.job_url), jl %></li>
+    <% end %>
+  </ul>
+</div>

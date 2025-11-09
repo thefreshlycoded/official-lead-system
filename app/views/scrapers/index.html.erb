@@ -1,0 +1,27 @@
+<div class="container">
+  <h1 class="mb-3">Scrapers</h1>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Kind</th>
+        <th>Status</th>
+        <th>Enabled</th>
+        <th>Last Run</th>
+        <th>Total Leads</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @scrapers.each do |s| %>
+        <tr>
+          <td><%= link_to s.name, s %></td>
+          <td><%= s.kind %></td>
+          <td><%= s.display_status %></td>
+          <td><%= s.enabled ? "Yes" : "No" %></td>
+          <td><%= s.last_run_at ? time_ago_in_words(s.last_run_at) + " ago" : "—" %></td>
+          <td><%= s.total_leads_collected %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

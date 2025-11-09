@@ -1,0 +1,302 @@
+<div class="container manual-evaluation-page mt-5">
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h2">📋 Manual Job Evaluation</h1>
+          <p class="text-muted">Review and categorize job listings for viability</p>
+        </div>
+        <div>
+          <%= render 'job_listings/pending_count_badge', count: @job_listings.count %>
+          <%= link_to "← Back to Listings", job_listings_path, class: "btn btn-outline-secondary" %>
+        </div>
+      </div>
+      <hr>
+    </div>
+  </div>
+
+  <div id="flash-container" class="position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 1080; min-width: 320px; max-width: 90%; pointer-events: none;">
+    <%= render 'shared/flash_messages', flash_hash: flash %>
+  </div>
+
+  <% if @job_listings.empty? %>
+    <div class="alert alert-success text-center py-5">
+      <h4>🎉 All Done!</h4>
+      <p class="mb-0">No pending jobs to review. Great work!</p>
+    </div>
+  <% else %>
+    <div class="row">
+      <% accent_classes = %w[manual-card-accent-blue manual-card-accent-green manual-card-accent-orange manual-card-accent-purple] %>
+      <% @job_listings.each_with_index do |job, index| %>
+  <div id="<%= dom_id(job, :card) %>" class="col-md-12 mb-4 manual-card-wrapper">
+          <div class="card manual-card h-100 <%= accent_classes[index % accent_classes.length] %>">
+            <div class="card-header bg-light">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <h5 class="card-title mb-1">
+                    <%= link_to job.title || "Untitled", job_listing_path(job), class: "text-decoration-none" %>
+                  </h5>
+                  <% posted_timestamp = job.posted_at %>
+                  <small class="text-muted">
+                    Posted: <%= posted_timestamp.strftime("%b %d, %Y %l:%M %p") %>
+                    <% if job.company_name.present? %>
+                      | Company: <%= job.company_name %>
+                    <% end %>
+                  </small>
+                </div>
+                <span class="badge bg-secondary">
+                  Job #<%= index + 1 %>
+                </span>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <!-- Job Details -->
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <p>
+                    <strong>📍 Location:</strong>
+                    <% if job.location.present? %>
+                      <%= job.location %>
+                    <% elsif job.city.present? %>
+                      <%= "#{job.city}#{', ' + job.state if job.state.present?}#{', ' + job.country if job.country.present?}" %>
+                    <% else %>
+                      <span class="text-muted">Not specified</span>
+                    <% end %>
+                  </p>
+                  <p>
+                    <strong>🏷️ Source:</strong>
+                    <%= job.source || "Unknown" %>
+                  </p>
+                </div>
+                <div class="col-md-6">
+                  <p>
+                    <strong>💼 Budget:</strong>
+                    <% if job.budget_min.present? && job.budget_max.present? %>
+                      $<%= number_with_delimiter(job.budget_min) %> - $<%= number_with_delimiter(job.budget_max) %>
+                    <% elsif job.budget_min.present? %>
+                      $<%= number_with_delimiter(job.budget_min) %>+
+                    <% else %>
+                      <span class="text-muted">Not specified</span>
+                    <% end %>
+                  </p>
+                  <p>
+                    <strong>📝 Type:</strong>
+                    <%= job.project_type || "Not specified" %>
+                  </p>
+                </div>
+              </div>
+
+              <!-- Description -->
+              <div class="mb-3">
+                <strong>📄 Description:</strong>
+                <div class="alert alert-light mt-2 mb-0">
+                  <%= truncate(job.description, length: 500) %>
+                </div>
+              </div>
+
+              <!-- Contact Info Found -->
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <strong>📧 Emails Found:</strong>
+                  <% if job.emails.any? %>
+                    <div class="mt-2">
+                      <% job.emails.each do |email| %>
+                        <span class="badge bg-success me-1"><%= email %></span>
+                      <% end %>
+                    </div>
+                  <% else %>
+                    <span class="text-muted d-block mt-2">None</span>
+                  <% end %>
+                </div>
+                <div class="col-md-6">
+                  <strong>☎️ Phone Numbers Found:</strong>
+                  <% if job.phones.any? %>
+                    <div class="mt-2">
+                      <% job.phones.each do |phone| %>
+                        <span class="badge bg-success me-1"><%= phone %></span>
+                      <% end %>
+                    </div>
+                  <% else %>
+                    <span class="text-muted d-block mt-2">None</span>
+                  <% end %>
+                </div>
+              </div>
+
+              <!-- AI Analysis Recommendation -->
+              <% if job.viable_post.present? || job.classification_snippet.present? %>
+                <div class="alert <%= job.viable_post ? 'alert-success' : 'alert-warning' %>">
+                  <strong>
+                    <% if job.viable_post %>
+                      ✅ AI Recommendation: Viable
+                    <% else %>
+                      ⚠️ AI Recommendation: Not Viable
+                    <% end %>
+                  </strong>
+                  <% if job.classification_snippet.present? %>
+                    <div class="mt-2 small">
+                      <%= job.classification_snippet %>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+
+              <!-- Existing Review Data -->
+              <% if job.contact_email.present? || job.contact_phone.present? || job.contact_name.present? %>
+                <div class="alert alert-info mb-0">
+                  <strong>📞 Manual Contact Data:</strong>
+                  <% if job.contact_name.present? %>
+                    <div class="small mt-2">
+                      <strong>Name:</strong> <%= job.contact_name %>
+                    </div>
+                  <% end %>
+                  <% if job.contact_email.present? %>
+                    <div class="small">
+                      <strong>Email:</strong> <%= job.contact_email %>
+                    </div>
+                  <% end %>
+                  <% if job.contact_phone.present? %>
+                    <div class="small">
+                      <strong>Phone:</strong> <%= job.contact_phone %>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+
+            <div class="card-footer bg-light">
+              <div class="d-flex gap-2 justify-content-end">
+                <%= link_to job_listing_path(job), class: "btn btn-sm btn-outline-secondary" do %>
+                  👁️ View Full
+                <% end %>
+
+                <%= button_to mark_viable_manual_job_listing_path(job),
+                    method: :patch,
+                    class: "btn btn-sm btn-success",
+                    data: { confirm: "Mark as viable?" } do %>
+                  ✅ Mark Viable
+                <% end %>
+
+                <%= button_to mark_not_viable_manual_job_listing_path(job),
+                    method: :patch,
+                    class: "btn btn-sm btn-danger",
+                    data: { confirm: "Mark as not viable?" } do %>
+                  ❌ Mark Not Viable
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<style>
+  .card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  }
+
+  .card-header {
+    border-bottom: 2px solid #e9ecef;
+  }
+
+  .card-footer {
+    border-top: 1px solid #e9ecef;
+  }
+
+  .btn-group-compact {
+    display: flex;
+    gap: 0.5rem;
+  }
+</style>
+
+<style>
+  #flash-container .alert {
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  }
+
+  body {
+    padding-top: 4rem;
+  }
+
+  .manual-card {
+    border-left: 4px solid transparent;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .manual-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .manual-card-accent-blue {
+    border-left-color: #0d6efd;
+    background: linear-gradient(90deg, rgba(13,110,253,0.18), rgba(255,255,255,0.95));
+  }
+
+  .manual-card-accent-green {
+    border-left-color: #198754;
+    background: linear-gradient(90deg, rgba(25,135,84,0.18), rgba(255,255,255,0.95));
+  }
+
+  .manual-card-accent-orange {
+    border-left-color: #fd7e14;
+    background: linear-gradient(90deg, rgba(253,126,20,0.2), rgba(255,255,255,0.95));
+  }
+
+  .manual-card-accent-purple {
+    border-left-color: #6f42c1;
+    background: linear-gradient(90deg, rgba(111,66,193,0.2), rgba(255,255,255,0.95));
+  }
+
+  .manual-card-wrapper.manual-card-removing {
+    animation: manualCardSlideOut 0.45s ease forwards;
+  }
+
+  .manual-card-wrapper.manual-card-removing .manual-card {
+    animation: manualCardAurora 0.45s ease forwards;
+  }
+
+  @keyframes manualCardSlideOut {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    40% { transform: translateY(-6px) scale(0.98); }
+    70% { transform: translateY(2px) scale(0.96); }
+    100% { opacity: 0; transform: translateY(16px) scale(0.9); }
+  }
+
+  @keyframes manualCardAurora {
+    0% { box-shadow: 0 6px 14px rgba(0,0,0,0.12); filter: saturate(1); }
+    45% { box-shadow: 0 12px 24px rgba(13,110,253,0.25); filter: saturate(1.35); }
+    100% { box-shadow: 0 0 0 rgba(0,0,0,0); filter: blur(2px) saturate(0.85); }
+  }
+</style>
+
+<script>
+  (function() {
+    if (window.manualCardRemovalInitialized) { return; }
+    window.manualCardRemovalInitialized = true;
+
+    document.addEventListener("turbo:before-stream-render", function(event) {
+      const stream = event.target;
+      if (!stream || stream.action !== "remove") { return; }
+
+      const targetId = stream.getAttribute("target");
+      if (!targetId) { return; }
+
+      const element = document.getElementById(targetId);
+      if (!element || !element.classList.contains("manual-card-wrapper")) { return; }
+      if (!element.closest('.manual-evaluation-page')) { return; }
+
+      event.preventDefault();
+      element.classList.add("manual-card-removing");
+      element.addEventListener("animationend", function() {
+        stream.performAction();
+      }, { once: true });
+    });
+  })();
+</script>
