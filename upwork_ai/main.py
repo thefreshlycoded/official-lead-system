@@ -14,7 +14,7 @@ logging.basicConfig(
     level=logging.DEBUG,  # Log everything from DEBUG level and above
     format="%(asctime)s - %(levelname)s - %(message)s",  # Log format
     handlers=[
-        logging.FileHandler("scraper.log"),  # Save logs to a file
+        logging.FileHandler("scraper.log", mode='a', encoding='utf-8'),  # Append to log file with UTF-8 encoding
         logging.StreamHandler()  # logger.info logs to the console
     ]
 )
@@ -22,11 +22,33 @@ logging.basicConfig(
 # Create a logger instance
 logger = logging.getLogger(__name__)
 
+# Log startup information
+logger.info("🔄 Logger initialized - all operations will be logged to scraper.log and console")
+logger.info(f"📅 Script started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+logger.info(f"🖥️  Running from: {os.getcwd()}")
+logger.info(f"🐍 Python version: {sys.version}")
+logger.info(f"📂 Log file location: {os.path.abspath('scraper.log')}")
+
+# Log environment variables for debugging
+logger.info("🔧 Environment check:")
+chrome_bin = os.environ.get("CHROME_BIN")
+if chrome_bin:
+    logger.info(f"   CHROME_BIN: {chrome_bin}")
+else:
+    logger.info(f"   CHROME_BIN: Not set (will auto-detect)")
+
+openai_key = os.environ.get("OPENAI_API_KEY")
+if openai_key:
+    logger.info(f"   OPENAI_API_KEY: Set (length: {len(openai_key)} chars)")
+else:
+    logger.warning(f"   OPENAI_API_KEY: Not set - AI features may not work")
+
 from datetime import datetime, timedelta
 from sqlalchemy import create_engine, Column, String, Integer, DateTime, Boolean, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
+import sys
 
 # Setting up SQLAlchemy - Connect to Rails database (lead_system_development)
 DATABASE_URL = "postgresql://postgres@localhost:5432/lead_system_development"
@@ -101,8 +123,10 @@ def setup_driver():
 
     # Use subprocess=False to allow interactive login
     # Pass version parameter to match installed Chrome version (141)
+    logger.info("🚗 Initializing undetected Chrome driver...")
     driver = uc.Chrome(options=chrome_options, use_subprocess=False, version_main=141)
     driver.set_window_size(1920, 1080)
+    logger.info(f"🖼️  Window size set to 1920x1080")
 
     # Add anti-bot detection JavaScript
     try:
@@ -131,17 +155,20 @@ def manual_login(driver):
 
     # Wait for page to load
     time.sleep(3)
-    logger.info("Login page loaded. Browser window is open.")
-    logger.info("Please manually log in to Upwork in the browser window.")
+    logger.info("🌐 Login page loaded. Browser window is open.")
+    logger.info("👤 Please manually log in to Upwork in the browser window.")
+    logger.info("📝 Make sure to complete any 2FA or security checks if prompted.")
 
     # Wait for user to complete login
     input("\n⏳ Once you're logged in and ready, press 'Enter' to continue...")
-    logger.info("Manual login completed by the user.")
+    logger.info("✅ Manual login completed by the user - proceeding with scraping...")
 
 
 # Function to randomly wait to simulate human interaction
 def human_delay(min_time=2, max_time=5):
-    time.sleep(random.uniform(min_time, max_time))
+    delay_time = random.uniform(min_time, max_time)
+    logger.debug(f"😴 Human delay: waiting {delay_time:.1f} seconds...")
+    time.sleep(delay_time)
 
 # Function to convert relative time like '1 hour ago' and '2 hours ago' into a datetime object
 def parse_post_date(post_date_str):
@@ -227,9 +254,15 @@ def get_job_urls(driver, max_hours_old=30, consecutive_old_limit=5):
 
             logger.info(f"   ✅ Found {len(job_elements)} job elements and {len(date_elements)} date elements on page {page_number}")
 
-            if len(job_elements) == 0 or len(date_elements) == 0:
-                logger.info(f"   ⛔ No more jobs found or date elements are missing on page {page_number}. Stopping pagination.")
+            if len(job_elements) == 0:
+                logger.info(f"   ⛔ No job elements found on page {page_number}. This might be end of results or a page load issue.")
+                logger.info(f"   🔍 Page URL was: {jobs_url}")
                 break
+
+            if len(date_elements) == 0:
+                logger.warning(f"   ⚠️  No date elements found on page {page_number}. Will try to continue but job filtering may be affected.")
+                logger.info(f"   🔍 Page URL was: {jobs_url}")
+                # Don't break here - we might still be able to collect job URLs without dates
 
             # Filter out None URLs and ensure we have valid job URLs
             job_urls = [job.get_attribute('href') for job in job_elements if job.get_attribute('href') is not None]
@@ -306,6 +339,8 @@ def get_job_urls(driver, max_hours_old=30, consecutive_old_limit=5):
 
         except Exception as e:
             logger.error(f"   ❌ Error scraping page {page_number}: {e}")
+            logger.error(f"   🔍 Failed URL: {jobs_url}")
+            logger.warning(f"   ♻️  Will try to continue with next page...")
             continue
 
     logger.info(f"📊 Job URL collection complete! Final stats:")
@@ -319,7 +354,10 @@ def get_job_urls(driver, max_hours_old=30, consecutive_old_limit=5):
 
 
 def is_job_in_database(job_url):
-    return session.query(JobListing).filter_by(job_url=job_url).first() is not None
+    result = session.query(JobListing).filter_by(job_url=job_url).first() is not None
+    if result:
+        logger.debug(f"🔄 Job URL already exists in database: {job_url[:60]}...")
+    return result
 # Function to scrape details of each job
 def scrape_job_details(driver, job_url):
     logger.debug(f"      🔍 Starting detailed scrape of: {job_url}")
@@ -625,13 +663,17 @@ def save_job_listings_to_db(job_urls_with_dates):
     logger.info(f"   📊 Prepared for commit: {jobs_added} new jobs, {jobs_skipped} already existed")
 
     try:
+        logger.info(f"   💾 Attempting to commit {jobs_added} jobs to database...")
         session.commit()
         logger.info(f"   ✅ Successfully committed {jobs_added} new jobs to database!")
         if jobs_skipped > 0:
-            logger.info(f"   ℹ️  {jobs_skipped} jobs were already in database")
+            logger.info(f"   ℹ️  {jobs_skipped} jobs were already in database (duplicates skipped)")
+        logger.info(f"   📊 Database totals: +{jobs_added} new, {jobs_skipped} existing")
     except Exception as e:
-        logger.error(f"   ❌ Error committing to database: {e}")
+        logger.error(f"   ❌ Critical database error during commit: {e}")
+        logger.error(f"   🔄 Rolling back transaction to maintain database integrity...")
         session.rollback()
+        logger.error(f"   💥 Database rollback complete - no partial data saved")
         raise
 
 # Function to debug and inspect a job detail page
@@ -863,33 +905,81 @@ def main(debug=False):
 
         logger.info("\n" + "="*80)
         logger.info("🏁 SCRAPING SESSION COMPLETE")
+        logger.info("="*80)
+        logger.info(f"⏰ TIMING:")
         logger.info(f"   Start time: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
         logger.info(f"   End time: {end_time.strftime('%Y-%m-%d %H:%M:%S')}")
         logger.info(f"   Total duration: {total_duration}")
+        logger.info(f"   Average time per job: {(total_duration.total_seconds() / total_jobs_processed):.1f}s" if total_jobs_processed > 0 else "   No jobs processed")
+        logger.info(f"📊 RESULTS:")
         logger.info(f"   Jobs processed: {total_jobs_processed}")
         logger.info(f"   Jobs scraped: {total_jobs_scraped}")
         logger.info(f"   Jobs saved: {total_jobs_saved}")
+        logger.info(f"   Failed jobs: {total_jobs_processed - total_jobs_saved}")
         if total_jobs_processed > 0:
-            logger.info(f"   Success rate: {(total_jobs_saved/total_jobs_processed)*100:.1f}%")
+            success_rate = (total_jobs_saved/total_jobs_processed)*100
+            logger.info(f"   Success rate: {success_rate:.1f}%")
+            if success_rate >= 90:
+                logger.info(f"   🎉 Excellent success rate!")
+            elif success_rate >= 75:
+                logger.info(f"   👍 Good success rate")
+            elif success_rate >= 50:
+                logger.info(f"   ⚠️  Moderate success rate - check for issues")
+            else:
+                logger.warning(f"   🚨 Low success rate - investigate errors")
+        logger.info(f"📁 LOG FILE: Check scraper.log for detailed information")
         logger.info("="*80)
 
+        # Clean up resources
+        logger.info("🧹 Cleaning up resources...")
         if driver:
             try:
+                logger.info("   🔧 Closing Chrome driver...")
                 driver.quit()
-                logger.info("🔧 Chrome driver closed.")
-            except:
-                logger.warning("⚠️  Error closing Chrome driver")
+                logger.info("   ✅ Chrome driver closed successfully")
+            except Exception as e:
+                logger.warning(f"   ⚠️  Error closing Chrome driver: {e}")
+        else:
+            logger.info("   ℹ️  No Chrome driver to close")
+            
         if session is not None:
             try:
+                logger.info("   💾 Closing database session...")
                 session.close()
-                logger.info("💾 Database session closed.")
-            except:
-                logger.warning("⚠️  Error closing database session")
+                logger.info("   ✅ Database session closed successfully")
+            except Exception as e:
+                logger.warning(f"   ⚠️  Error closing database session: {e}")
+        else:
+            logger.info("   ℹ️  No database session to close")
+            
+        logger.info("🧹 Resource cleanup complete")
 
 
 if __name__ == "__main__":
     import sys
+    
+    # Parse command line arguments
+    logger.info(f"🚀 Script invoked with arguments: {sys.argv}")
     debug_mode = "--debug" in sys.argv or "-d" in sys.argv
+    
     if debug_mode:
-        logger.info("🔍 Running in DEBUG mode - will inspect first job and exit")
-    main(debug=debug_mode)
+        logger.info("🔍 DEBUG MODE ENABLED")
+        logger.info("   Will inspect first job page structure and save HTML")
+        logger.info("   Will NOT perform full scraping - debugging only")
+    else:
+        logger.info("🏃 PRODUCTION MODE - Full scraping will be performed")
+    
+    logger.info("   Available command line options:")
+    logger.info("     --debug or -d : Enable debug mode")
+    logger.info("     (no args)     : Run full production scraping")
+    
+    try:
+        main(debug=debug_mode)
+        logger.info("🎯 Script execution completed successfully!")
+    except KeyboardInterrupt:
+        logger.warning("🛑 Script interrupted by user (Ctrl+C)")
+        sys.exit(1)
+    except Exception as e:
+        logger.error(f"💥 Script failed with critical error: {e}")
+        logger.error(f"🔍 Check scraper.log for detailed error information")
+        sys.exit(1)
