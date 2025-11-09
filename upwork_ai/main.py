@@ -195,7 +195,7 @@ def parse_post_date(post_date_str):
         logger.error(f"❌ Error parsing post date: {post_date_str}. Exception: {e}")
         return now
 
-def get_job_urls(driver, max_hours_old=36, consecutive_old_limit=5):
+def get_job_urls(driver, max_hours_old=30, consecutive_old_limit=5):
     logger.info(f"🎯 Starting job URL collection with parameters:")
     logger.info(f"   → Max job age: {max_hours_old/24:.1f} days ({max_hours_old} hours)")
     logger.info(f"   → Stop after {consecutive_old_limit} consecutive old jobs")
@@ -263,12 +263,24 @@ def get_job_urls(driver, max_hours_old=36, consecutive_old_limit=5):
                         duplicate_count = 0
 
                     job_date_str = job_dates[i] if i < len(job_dates) else "Unknown"
+
+                    # First check: Skip jobs that explicitly say "X days ago" where X >= 2
+                    if re.search(r'\b([2-9]|\d{2,})\s+days?\s+ago', job_date_str.lower()):
+                        logger.debug(f"      ❌ Job explicitly says '{job_date_str}' - skipping jobs 2+ days old")
+                        consecutive_old_count += 1
+                        total_too_old += 1
+                        if consecutive_old_count >= consecutive_old_limit:
+                            logger.info(f"   ⛔ Reached limit of {consecutive_old_limit} consecutive old jobs. Stopping pagination.")
+                            logger.info(f"   📊 Final stats: {total_added} jobs added, {total_duplicates} duplicates, {total_too_old} too old, {total_processed} total processed")
+                            return all_job_urls
+                        continue
+
                     job_post_date = parse_post_date(job_date_str)
                     job_age_in_hours = (datetime.now() - job_post_date).total_seconds() / 3600
                     job_age_in_days = job_age_in_hours / 24
                     logger.debug(f"      📅 Posted: {job_date_str} | Age: {job_age_in_days:.1f} days ({job_age_in_hours:.1f} hours)")
 
-                    # Check if job is older than the specified limit (excludes "2 days ago" and older)
+                    # Second check: Skip jobs older than 36 hours (1.5 days)
                     if job_age_in_hours >= max_hours_old:
                         logger.debug(f"      ❌ Job is older than {max_hours_old/24:.1f} days. Skipping.")
                         consecutive_old_count += 1
@@ -746,9 +758,9 @@ def main(debug=False):
         manual_login(driver)
 
         logger.info("\n🔍 PHASE 3: JOB URL COLLECTION")
-        # Scrape job URLs - using 36 hours to capture all "yesterday" jobs but exclude "2 days ago"
-        job_urls_with_dates = get_job_urls(driver, max_hours_old=36, consecutive_old_limit=5)
-        logger.info(f"✅ Job URL collection complete! Found {len(job_urls_with_dates)} fresh job URLs within 36-hour limit.")
+        # Scrape job URLs - using 30 hours to capture "yesterday" jobs but exclude "2+ days ago"
+        job_urls_with_dates = get_job_urls(driver, max_hours_old=30, consecutive_old_limit=5)
+        logger.info(f"✅ Job URL collection complete! Found {len(job_urls_with_dates)} fresh job URLs within 30-hour limit.")
 
         logger.info("\n💾 PHASE 4: DATABASE INSERTION")
         save_job_listings_to_db(job_urls_with_dates)

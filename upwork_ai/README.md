@@ -1,3 +1,13 @@
+- make API
+
+
+- AI Services go out to
+
+
+
+
+
+
 # Standalone Upwork Scraper
 
 This is a simplified, standalone Python scraper that:
@@ -6,6 +16,10 @@ This is a simplified, standalone Python scraper that:
 - Scrapes recent "www" jobs
 - Saves directly to PostgreSQL database
 - No Rails integration required
+
+
+
+
 
 ## Quick Start
 
