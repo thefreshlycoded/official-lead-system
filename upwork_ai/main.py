@@ -195,7 +195,7 @@ def parse_post_date(post_date_str):
         logger.error(f"❌ Error parsing post date: {post_date_str}. Exception: {e}")
         return now
 
-def get_job_urls(driver, max_hours_old=72, consecutive_old_limit=5):
+def get_job_urls(driver, max_hours_old=36, consecutive_old_limit=5):
     logger.info(f"🎯 Starting job URL collection with parameters:")
     logger.info(f"   → Max job age: {max_hours_old/24:.1f} days ({max_hours_old} hours)")
     logger.info(f"   → Stop after {consecutive_old_limit} consecutive old jobs")
@@ -268,7 +268,7 @@ def get_job_urls(driver, max_hours_old=72, consecutive_old_limit=5):
                     job_age_in_days = job_age_in_hours / 24
                     logger.debug(f"      📅 Posted: {job_date_str} | Age: {job_age_in_days:.1f} days ({job_age_in_hours:.1f} hours)")
 
-                    # Check if job is older than 2 days (48 hours)
+                    # Check if job is older than the specified limit (excludes "2 days ago" and older)
                     if job_age_in_hours >= max_hours_old:
                         logger.debug(f"      ❌ Job is older than {max_hours_old/24:.1f} days. Skipping.")
                         consecutive_old_count += 1
@@ -746,9 +746,9 @@ def main(debug=False):
         manual_login(driver)
 
         logger.info("\n🔍 PHASE 3: JOB URL COLLECTION")
-        # Scrape job URLs - using 24 hours (1 day) for daily runs
-        job_urls_with_dates = get_job_urls(driver, max_hours_old=24, consecutive_old_limit=5)
-        logger.info(f"✅ Job URL collection complete! Found {len(job_urls_with_dates)} fresh job URLs within 24-hour limit.")
+        # Scrape job URLs - using 36 hours to capture all "yesterday" jobs but exclude "2 days ago"
+        job_urls_with_dates = get_job_urls(driver, max_hours_old=36, consecutive_old_limit=5)
+        logger.info(f"✅ Job URL collection complete! Found {len(job_urls_with_dates)} fresh job URLs within 36-hour limit.")
 
         logger.info("\n💾 PHASE 4: DATABASE INSERTION")
         save_job_listings_to_db(job_urls_with_dates)
