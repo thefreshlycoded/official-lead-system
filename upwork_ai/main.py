@@ -746,10 +746,9 @@ def main(debug=False):
         manual_login(driver)
 
         logger.info("\n🔍 PHASE 3: JOB URL COLLECTION")
-        # Scrape job URLs - using 72 hours for initial run to ensure we get some data
-        # TODO: Once you have baseline data, you can reduce this to 18-24 hours for daily runs
-        job_urls_with_dates = get_job_urls(driver, max_hours_old=72, consecutive_old_limit=5)
-        logger.info(f"✅ Job URL collection complete! Found {len(job_urls_with_dates)} fresh job URLs within 72-hour limit.")
+        # Scrape job URLs - using 24 hours (1 day) for daily runs
+        job_urls_with_dates = get_job_urls(driver, max_hours_old=24, consecutive_old_limit=5)
+        logger.info(f"✅ Job URL collection complete! Found {len(job_urls_with_dates)} fresh job URLs within 24-hour limit.")
 
         logger.info("\n💾 PHASE 4: DATABASE INSERTION")
         save_job_listings_to_db(job_urls_with_dates)
