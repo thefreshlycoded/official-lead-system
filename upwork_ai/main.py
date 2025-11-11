@@ -8,6 +8,9 @@ import time
 import random
 import pdb
 import logging
+import os
+import sys
+from datetime import datetime, timedelta
 
 # Configure the logging system
 logging.basicConfig(
@@ -43,12 +46,8 @@ if openai_key:
 else:
     logger.warning(f"   OPENAI_API_KEY: Not set - AI features may not work")
 
-from datetime import datetime, timedelta
 from sqlalchemy import create_engine, Column, String, Integer, DateTime, Boolean, Text
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-import os
-import sys
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 # Setting up SQLAlchemy - Connect to Rails database (lead_system_development)
 DATABASE_URL = "postgresql://postgres@localhost:5432/lead_system_development"
@@ -812,7 +811,25 @@ def main(debug=False):
             logger.info("\n🔍 DEBUG MODE: Inspecting first job and exiting...")
             fresh_jobs = session.query(JobListing).filter_by(fresh=True).limit(1).all()
             if fresh_jobs:
-                debug_job_page(driver, fresh_jobs[0].job_url)
+                job_to_debug = fresh_jobs[0]
+                logger.info(f"   🎯 Found job to debug: {job_to_debug.job_url}")
+                logger.info(f"   📅 Posted: {job_to_debug.post_date}")
+                logger.info(f"   🔍 Starting debug inspection...")
+                debug_job_page(driver, job_to_debug.job_url)
+            else:
+                logger.warning("   ⚠️  No fresh jobs found in database to debug!")
+                logger.info("   💡 Try running without --debug first to collect some jobs")
+
+                # Let's check if there are ANY jobs in the database
+                total_jobs = session.query(JobListing).count()
+                if total_jobs > 0:
+                    logger.info(f"   📊 Found {total_jobs} total jobs in database, but none are marked as fresh")
+                    any_job = session.query(JobListing).first()
+                    if any_job:
+                        logger.info(f"   🔍 Will debug the first available job instead: {any_job.job_url}")
+                        debug_job_page(driver, any_job.job_url)
+                else:
+                    logger.info("   📭 Database is completely empty - no jobs to debug")
             return
 
         logger.info("\n📄 PHASE 5: DETAILED SCRAPING")
@@ -941,7 +958,7 @@ def main(debug=False):
                 logger.warning(f"   ⚠️  Error closing Chrome driver: {e}")
         else:
             logger.info("   ℹ️  No Chrome driver to close")
-            
+
         if session is not None:
             try:
                 logger.info("   💾 Closing database session...")
@@ -951,28 +968,28 @@ def main(debug=False):
                 logger.warning(f"   ⚠️  Error closing database session: {e}")
         else:
             logger.info("   ℹ️  No database session to close")
-            
+
         logger.info("🧹 Resource cleanup complete")
 
 
 if __name__ == "__main__":
     import sys
-    
+
     # Parse command line arguments
     logger.info(f"🚀 Script invoked with arguments: {sys.argv}")
     debug_mode = "--debug" in sys.argv or "-d" in sys.argv
-    
+
     if debug_mode:
         logger.info("🔍 DEBUG MODE ENABLED")
         logger.info("   Will inspect first job page structure and save HTML")
         logger.info("   Will NOT perform full scraping - debugging only")
     else:
         logger.info("🏃 PRODUCTION MODE - Full scraping will be performed")
-    
+
     logger.info("   Available command line options:")
     logger.info("     --debug or -d : Enable debug mode")
     logger.info("     (no args)     : Run full production scraping")
-    
+
     try:
         main(debug=debug_mode)
         logger.info("🎯 Script execution completed successfully!")

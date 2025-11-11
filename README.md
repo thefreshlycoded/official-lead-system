@@ -1,3 +1,57 @@
+- Oro CRM ----- Stammer.ai
+
+- With the chatbot AI and CRM
+- Add some add dollars into leads, calling leads to close them
+- Restaurants and Automotive, hair salons and barber shops
+
+- CRM For people selling AI Services ---- Agency's Specific Stammer -----
+
+- Landing Pages Restaurant Specific CRMz
+    3 Product Pages
+      * Chat bot service - give examples of restaurant and automotive (Package the restaurant and automotive to a specific landing page) ----- AI bot efficiency, add ons talk just like him
+      *
+      *
+-
+
+
+
+-
+
+
+
+
+Voice chat - twilio AI services
+
+text over orders w links
+    Niche specific - one on one with customer to know the business needs
+
+POS - system and how to connect with it
+
+Printer
+
+Signal To know there system is down
+
+Reliable internet service - Verizon, starlink
+
+
+
+- With the chatbot AI and CRM
+-
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Official Lead SystemCurrent Tasks
 
   - Add Joel to Main website Repo
