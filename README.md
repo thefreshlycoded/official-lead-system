@@ -1,3 +1,8 @@
+./run_silent.sh today
+
+
+./run_silent.sh today
+
 - Oro CRM ----- Stammer.ai
 
 - With the chatbot AI and CRM
@@ -68,12 +73,20 @@ A Rails application with integrated web scraping for job opportunity management.
 
       - Start off with a simple bot
 
-```bash        CRM what should be tracked
+```bash
+cd upwork_ai
 
-cd upwork_ai          How to make it agnostic to frameworks, JS library?
+# Get TODAY'S jobs only (default - excludes yesterday)
+python main.py
 
-python main.py  -
+# OR use quick shortcuts:
+./quick_scrape.sh today     # 24 hours - today only
+./quick_scrape.sh fresh     # 12 hours - very fresh
+./quick_scrape.sh recent    # 6 hours - most recent
+./quick_scrape.sh extended  # 36 hours - includes some yesterday
 
+# OR custom hours:
+python main.py --hours=18   # Custom filter
 ```
 
 

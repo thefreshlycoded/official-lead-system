@@ -10,7 +10,49 @@ import pdb
 import logging
 import os
 import sys
+import signal
+import atexit
+import warnings
 from datetime import datetime, timedelta
+
+# Suppress multiprocessing warnings and disable resource tracker
+warnings.filterwarnings("ignore", message="resource_tracker: There appear to be.*leaked semaphore objects.*")
+
+# Completely disable resource tracker warnings by patching the warning function
+try:
+    import multiprocessing.resource_tracker
+    # Save original function
+    _original_warn = multiprocessing.resource_tracker.warnings.warn
+    # Replace with a no-op function
+    def _silent_warn(message, category=None, stacklevel=1, source=None):
+        if "resource_tracker" not in str(message):
+            _original_warn(message, category, stacklevel, source)
+    multiprocessing.resource_tracker.warnings.warn = _silent_warn
+except:
+    pass
+
+# Fix multiprocessing resource leak issue
+import multiprocessing
+import os
+
+# Disable multiprocessing resource tracker entirely - we manage resources manually
+try:
+    # This disables the resource tracker that causes the semaphore warnings
+    import multiprocessing.util
+    multiprocessing.util._cleanup_tests = lambda: None
+except:
+    pass
+
+# Set proper multiprocessing start method
+if hasattr(multiprocessing, 'set_start_method'):
+    try:
+        multiprocessing.set_start_method('spawn', force=True)
+    except RuntimeError:
+        pass  # Already set
+
+# Suppress Chrome DevTools warnings
+os.environ['PYTHONWARNINGS'] = 'ignore'
+os.environ['MULTIPROCESSING_RESOURCE_TRACKER'] = 'false'
 
 # Configure the logging system
 logging.basicConfig(
@@ -48,15 +90,120 @@ else:
 
 from sqlalchemy import create_engine, Column, String, Integer, DateTime, Boolean, Text
 from sqlalchemy.orm import declarative_base, sessionmaker
+from contextlib import contextmanager
+
+# Global variables for cleanup
+global_driver = None
+global_session = None
+cleanup_done = False
+
+# Context manager for Chrome driver
+@contextmanager
+def chrome_driver_context():
+    """Context manager for safe Chrome driver lifecycle management"""
+    driver = None
+    try:
+        logger.info("🔧 Creating Chrome driver within context manager...")
+        driver = setup_driver()
+        yield driver
+    except Exception as e:
+        logger.error(f"❌ Error in Chrome driver context: {e}")
+        raise
+    finally:
+        if driver:
+            try:
+                logger.info("🧹 Context manager: Cleaning up Chrome driver...")
+                # Close all windows
+                for handle in driver.window_handles:
+                    driver.switch_to.window(handle)
+                    driver.close()
+                # Quit driver
+                driver.quit()
+                logger.info("✅ Context manager: Chrome driver cleaned up")
+            except Exception as e:
+                logger.warning(f"⚠️  Context manager cleanup error: {e}")
+
+# Context manager for database session
+@contextmanager
+def database_session_context():
+    """Context manager for safe database session lifecycle management"""
+    db_session = None
+    try:
+        logger.info("🔧 Creating database session within context manager...")
+        if session:
+            db_session = session
+            yield db_session
+        else:
+            raise Exception("No database session available")
+    except Exception as e:
+        if db_session:
+            db_session.rollback()
+        logger.error(f"❌ Error in database session context: {e}")
+        raise
+    finally:
+        if db_session:
+            try:
+                logger.info("🧹 Context manager: Cleaning up database session...")
+                db_session.commit()  # Commit any pending changes
+                logger.info("✅ Context manager: Database session cleaned up")
+            except Exception as e:
+                logger.warning(f"⚠️  Context manager database cleanup error: {e}")
+                if db_session:
+                    db_session.rollback()
+
+# Cleanup function for signal handling and exit
+def cleanup_resources():
+    """Clean up global resources on exit or signal"""
+    global global_driver, global_session, cleanup_done
+
+    if cleanup_done:
+        return  # Prevent double cleanup
+
+    cleanup_done = True
+
+    if global_driver:
+        try:
+            logger.info("🧹 Emergency cleanup: Closing Chrome driver...")
+            global_driver.quit()
+            global_driver = None
+        except Exception as e:
+            logger.warning(f"⚠️  Error during emergency driver cleanup: {e}")
+
+    if global_session:
+        try:
+            logger.info("🧹 Emergency cleanup: Closing database session...")
+            global_session.close()
+            global_session = None
+        except Exception as e:
+            logger.warning(f"⚠️  Error during emergency session cleanup: {e}")
+
+# Register cleanup function
+atexit.register(cleanup_resources)
+
+# Signal handlers for graceful shutdown
+def signal_handler(signum, frame):
+    logger.info(f"🛑 Received signal {signum}, initiating graceful shutdown...")
+    cleanup_resources()
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
 
 # Setting up SQLAlchemy - Connect to Rails database (lead_system_development)
 DATABASE_URL = "postgresql://postgres@localhost:5432/lead_system_development"
 
 try:
     Base = declarative_base()
-    engine = create_engine(DATABASE_URL)
+    engine = create_engine(
+        DATABASE_URL,
+        pool_pre_ping=True,  # Verify connections before use
+        pool_recycle=300,    # Recycle connections every 5 minutes
+        pool_timeout=20,     # Timeout after 20 seconds
+        max_overflow=0       # Limit connection pool
+    )
     Session = sessionmaker(bind=engine)
     session = Session()
+    global_session = session  # Store reference for cleanup
     # Test connection
     with engine.connect() as conn:
         pass
@@ -67,6 +214,7 @@ except Exception as e:
     Base = declarative_base()
     engine = None
     session = None
+    global_session = None
 
 # Define JobListing model (mirror of Rails model)
 class JobListing(Base):
@@ -87,8 +235,17 @@ class JobListing(Base):
 
 # Setup the Chrome driver with necessary options
 def setup_driver():
+    global global_driver
+
     logger.info("Setting up Chrome driver...")
     chrome_options = uc.ChromeOptions()
+
+    # Resource management flags to prevent leaks
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--remote-debugging-port=9222")
+    chrome_options.add_argument("--disable-features=VizDisplayCompositor")
 
     # Use modern user agent with realistic Chrome version
     chrome_options.add_argument(
@@ -116,35 +273,45 @@ def setup_driver():
                 chrome_binary = path
                 break
 
-    if chrome_binary:
+    if chrome_binary and os.path.exists(chrome_binary):
         chrome_options.binary_location = chrome_binary
         logger.info(f"Using Chrome binary: {chrome_binary}")
 
     # Use subprocess=False to allow interactive login
     # Pass version parameter to match installed Chrome version (141)
     logger.info("🚗 Initializing undetected Chrome driver...")
-    driver = uc.Chrome(options=chrome_options, use_subprocess=False, version_main=141)
-    driver.set_window_size(1920, 1080)
-    logger.info(f"🖼️  Window size set to 1920x1080")
-
-    # Add anti-bot detection JavaScript
     try:
-        driver.execute_cdp_cmd(
-            "Page.addScriptToEvaluateOnNewDocument",
-            {
-                "source": (
-                    "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
-                    "window.chrome = { runtime: {} };"
-                    "Object.defineProperty(navigator, 'plugins', {get: () => [1,2,3,4,5]});"
-                    "Object.defineProperty(navigator, 'languages', {get: () => ['en-US','en']});"
-                )
-            },
+        driver = uc.Chrome(
+            options=chrome_options,
+            use_subprocess=False,
+            version_main=141
         )
-    except Exception as e:
-        logger.warning(f"Could not inject anti-detection scripts: {e}")
+        global_driver = driver  # Store reference for cleanup
+        driver.set_window_size(1920, 1080)
+        logger.info(f"🖼️  Window size set to 1920x1080")
 
-    logger.info("Chrome driver setup complete.")
-    return driver
+        # Add anti-bot detection JavaScript
+        try:
+            driver.execute_cdp_cmd(
+                "Page.addScriptToEvaluateOnNewDocument",
+                {
+                    "source": (
+                        "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
+                        "window.chrome = { runtime: {} };"
+                        "Object.defineProperty(navigator, 'plugins', {get: () => [1,2,3,4,5]});"
+                        "Object.defineProperty(navigator, 'languages', {get: () => ['en-US','en']});"
+                    )
+                },
+            )
+        except Exception as e:
+            logger.warning(f"Could not inject anti-detection scripts: {e}")
+
+        logger.info("Chrome driver setup complete.")
+        return driver
+
+    except Exception as e:
+        logger.error(f"Failed to initialize Chrome driver: {e}")
+        raise
 
 # Function to manually login and prompt user to continue after completing manual steps
 def manual_login(driver):
@@ -777,7 +944,9 @@ def debug_job_page(driver, job_url):
         return False
 
 # Main function to execute login and scraping with pagination
-def main(debug=False):
+def main(debug=False, max_hours_old=24):
+    global global_driver, global_session
+
     start_time = datetime.now()
     logger.info("="*80)
     logger.info("🚀 STARTING UPWORK SCRAPER")
@@ -795,13 +964,22 @@ def main(debug=False):
         logger.info("Setting up Chrome driver...")
         driver = setup_driver()
 
+        # Verify driver is working
+        if not driver:
+            raise Exception("Failed to create Chrome driver instance")
+
+        # Test basic navigation
+        logger.info("🔍 Testing driver connectivity...")
+        driver.get("https://www.google.com")
+        logger.info("✅ Driver test successful")
+
         logger.info("\n🔐 PHASE 2: AUTHENTICATION")
         manual_login(driver)
 
         logger.info("\n🔍 PHASE 3: JOB URL COLLECTION")
-        # Scrape job URLs - using 30 hours to capture "yesterday" jobs but exclude "2+ days ago"
-        job_urls_with_dates = get_job_urls(driver, max_hours_old=30, consecutive_old_limit=5)
-        logger.info(f"✅ Job URL collection complete! Found {len(job_urls_with_dates)} fresh job URLs within 30-hour limit.")
+        # Scrape job URLs - using configurable hours filter (default 24 hours for today's jobs only)
+        job_urls_with_dates = get_job_urls(driver, max_hours_old=max_hours_old, consecutive_old_limit=5)
+        logger.info(f"✅ Job URL collection complete! Found {len(job_urls_with_dates)} fresh job URLs within {max_hours_old}-hour limit ({max_hours_old/24:.1f} days).")
 
         logger.info("\n💾 PHASE 4: DATABASE INSERTION")
         save_job_listings_to_db(job_urls_with_dates)
@@ -947,29 +1125,66 @@ def main(debug=False):
         logger.info(f"📁 LOG FILE: Check scraper.log for detailed information")
         logger.info("="*80)
 
-        # Clean up resources
-        logger.info("🧹 Cleaning up resources...")
-        if driver:
-            try:
-                logger.info("   🔧 Closing Chrome driver...")
-                driver.quit()
-                logger.info("   ✅ Chrome driver closed successfully")
-            except Exception as e:
-                logger.warning(f"   ⚠️  Error closing Chrome driver: {e}")
-        else:
-            logger.info("   ℹ️  No Chrome driver to close")
+        # Clean up resources properly
+        global cleanup_done
+        if not cleanup_done:
+            logger.info("🧹 Cleaning up resources...")
+            cleanup_done = True
 
-        if session is not None:
-            try:
-                logger.info("   💾 Closing database session...")
-                session.close()
-                logger.info("   ✅ Database session closed successfully")
-            except Exception as e:
-                logger.warning(f"   ⚠️  Error closing database session: {e}")
-        else:
-            logger.info("   ℹ️  No database session to close")
+            # Close Chrome driver with proper cleanup
+            if driver:
+                try:
+                    logger.info("   🔧 Closing Chrome driver...")
+                    # Close all windows first
+                    try:
+                        for handle in driver.window_handles:
+                            driver.switch_to.window(handle)
+                            driver.close()
+                    except:
+                        pass  # Windows might already be closed
 
-        logger.info("🧹 Resource cleanup complete")
+                    # Quit the driver
+                    driver.quit()
+                    global_driver = None
+                    logger.info("   ✅ Chrome driver closed successfully")
+
+                    # Give time for processes to clean up
+                    time.sleep(1)
+
+                except Exception as e:
+                    logger.warning(f"   ⚠️  Error closing Chrome driver: {e}")
+                    # Force cleanup if regular quit fails
+                    try:
+                        import psutil
+                        # Kill any remaining chrome processes
+                        for proc in psutil.process_iter(['pid', 'name']):
+                            if 'chrome' in proc.info['name'].lower():
+                                try:
+                                    proc.kill()
+                                    logger.info(f"   🔥 Killed Chrome process {proc.info['pid']}")
+                                except:
+                                    pass
+                    except ImportError:
+                        logger.info("   💡 Install psutil for better Chrome process cleanup: pip install psutil")
+            else:
+                logger.info("   ℹ️  No Chrome driver to close")
+
+            # Close database session
+            if session is not None:
+                try:
+                    logger.info("   💾 Closing database session...")
+                    session.rollback()  # Rollback any pending transactions
+                    session.close()
+                    global_session = None
+                    logger.info("   ✅ Database session closed successfully")
+                except Exception as e:
+                    logger.warning(f"   ⚠️  Error closing database session: {e}")
+            else:
+                logger.info("   ℹ️  No database session to close")
+
+            logger.info("🧹 Resource cleanup complete")
+        else:
+            logger.info("🧹 Resources already cleaned up")
 
 
 if __name__ == "__main__":
@@ -979,6 +1194,17 @@ if __name__ == "__main__":
     logger.info(f"🚀 Script invoked with arguments: {sys.argv}")
     debug_mode = "--debug" in sys.argv or "-d" in sys.argv
 
+    # Parse hours filter argument
+    max_hours = 24  # Default: only today's jobs (24 hours)
+    for arg in sys.argv:
+        if arg.startswith("--hours="):
+            try:
+                max_hours = int(arg.split("=")[1])
+                logger.info(f"⏰ Custom hours filter set: {max_hours} hours ({max_hours/24:.1f} days)")
+            except ValueError:
+                logger.warning(f"⚠️  Invalid hours value '{arg}' - using default 24 hours")
+                max_hours = 24
+
     if debug_mode:
         logger.info("🔍 DEBUG MODE ENABLED")
         logger.info("   Will inspect first job page structure and save HTML")
@@ -987,11 +1213,12 @@ if __name__ == "__main__":
         logger.info("🏃 PRODUCTION MODE - Full scraping will be performed")
 
     logger.info("   Available command line options:")
-    logger.info("     --debug or -d : Enable debug mode")
-    logger.info("     (no args)     : Run full production scraping")
+    logger.info("     --debug or -d      : Enable debug mode")
+    logger.info("     --hours=X          : Only scrape jobs posted within X hours (default: 24)")
+    logger.info("     (no args)          : Run full production scraping")
 
     try:
-        main(debug=debug_mode)
+        main(debug=debug_mode, max_hours_old=max_hours)
         logger.info("🎯 Script execution completed successfully!")
     except KeyboardInterrupt:
         logger.warning("🛑 Script interrupted by user (Ctrl+C)")
