@@ -13,6 +13,8 @@ import sys
 import signal
 import atexit
 import warnings
+import requests
+import json
 from datetime import datetime, timedelta
 
 # Suppress multiprocessing warnings and disable resource tracker
@@ -446,17 +448,18 @@ def get_job_urls(driver, max_hours_old=30, consecutive_old_limit=5):
                         logger.info(f"      ⚠️  Skipping empty or invalid job URL at index {i}")
                         continue
 
-                    # Check for duplicates first
-                    if is_job_in_database(job_url):
-                        logger.debug(f"      🔄 Job URL already in database. Skipping.")
-                        duplicate_count += 1
-                        total_duplicates += 1
-                        # If we see too many consecutive duplicates, we might be hitting old content
-                        if duplicate_count >= 10:
-                            logger.info(f"   ⛔ Found {duplicate_count} consecutive duplicates. Likely hitting old content. Stopping pagination.")
-                            logger.info(f"   📊 Final stats: {total_added} jobs added, {total_duplicates} duplicates, {total_too_old} too old, {total_processed} total processed")
-                            return all_job_urls
-                        continue
+                    # Note: Duplicate checking now handled by Rails API
+                    # The Rails API will handle deduplication based on job_url uniqueness
+                    # if is_job_in_database(job_url):
+                    #     logger.debug(f"      🔄 Job URL already in database. Skipping.")
+                    #     duplicate_count += 1
+                    #     total_duplicates += 1
+                    #     # If we see too many consecutive duplicates, we might be hitting old content
+                    #     if duplicate_count >= 10:
+                    #         logger.info(f"   ⛔ Found {duplicate_count} consecutive duplicates. Likely hitting old content. Stopping pagination.")
+                    #         logger.info(f"   📊 Final stats: {total_added} jobs added, {total_duplicates} duplicates, {total_too_old} too old, {total_processed} total processed")
+                    #         return all_job_urls
+                    #     continue
                     else:
                         # Reset duplicate counter when we find a new job
                         duplicate_count = 0
@@ -797,6 +800,104 @@ def scrape_job_details(driver, job_url):
     logger.debug(f"      🏁 Finished scraping job details")
     return job_details
 
+# Function to upload job listings to Rails API
+def upload_job_to_rails_api(job_data, api_url="http://localhost:4200/api/upload_job_listings/upload"):
+    """
+    Upload a single job to the Rails API
+
+    Args:
+        job_data (dict): Job data with keys: job_url, title, description, location, post_date, posted_time, fresh, source, listing_type
+        api_url (str): Rails API endpoint URL
+
+    Returns:
+        bool: True if successful, False if failed
+    """
+    try:
+        # Prepare the payload in the format expected by Rails API
+        payload = {
+            "job": {
+                "job_url": job_data.get('job_url'),
+                "title": job_data.get('title'),
+                "description": job_data.get('description'),
+                "location": job_data.get('location', 'Remote'),
+                "post_date": job_data.get('post_date'),
+                "posted_time": job_data.get('posted_time'),
+                "fresh": job_data.get('fresh', True),
+                "source": job_data.get('source', 'upwork'),
+                "listing_type": job_data.get('listing_type', 'job')
+            }
+        }
+
+        # Make the POST request
+        headers = {
+            'Content-Type': 'application/json'
+        }
+
+        logger.debug(f"   🌐 Making API request to: {api_url}")
+        logger.debug(f"   📋 Payload: {json.dumps(payload, indent=2)}")
+
+        response = requests.post(api_url, json=payload, headers=headers, timeout=30)
+
+        if response.status_code == 200 or response.status_code == 201:
+            logger.debug(f"   ✅ API upload successful: {response.status_code}")
+            return True
+        else:
+            logger.error(f"   ❌ API upload failed: {response.status_code} - {response.text}")
+            return False
+
+    except requests.exceptions.RequestException as e:
+        logger.error(f"   ❌ API request error: {e}")
+        return False
+    except Exception as e:
+        logger.error(f"   ❌ Unexpected error uploading to API: {e}")
+        return False
+
+# Function to upload job listings to Rails API (batch)
+def upload_job_listings_to_api(job_urls_with_dates, api_url="http://localhost:4200/api/upload_job_listings/upload"):
+    """
+    Upload multiple job listings to Rails API
+
+    Args:
+        job_urls_with_dates: List of tuples (job_url, job_date_str, job_post_date)
+    """
+    logger.info(f"🌐 Uploading {len(job_urls_with_dates)} job URLs to Rails API...")
+
+    jobs_uploaded = 0
+    jobs_failed = 0
+
+    for i, (job_url, job_date_str, job_post_date) in enumerate(job_urls_with_dates, 1):
+        logger.debug(f"   [{i}/{len(job_urls_with_dates)}] Uploading job: {job_url[:60]}...")
+
+        # Prepare job data for initial upload (just URL and basic info)
+        job_data = {
+            'job_url': job_url,
+            'title': None,  # Will be filled later when scraping details
+            'description': None,  # Will be filled later when scraping details
+            'location': None,  # Will be filled later when scraping details
+            'post_date': job_post_date.isoformat() if job_post_date else job_date_str,
+            'posted_time': None,  # Will be filled later when scraping details
+            'fresh': True,
+            'source': 'upwork',
+            'listing_type': 'job'
+        }
+
+        # Upload to API
+        if upload_job_to_rails_api(job_data, api_url):
+            jobs_uploaded += 1
+            logger.debug(f"      ✅ Uploaded: {job_url[:60]}... (post_date: {job_date_str})")
+        else:
+            jobs_failed += 1
+            logger.debug(f"      ❌ Failed to upload: {job_url[:60]}...")
+
+    logger.info(f"   📊 Upload results: {jobs_uploaded} successful, {jobs_failed} failed")
+
+    if jobs_failed > 0:
+        logger.warning(f"   ⚠️  {jobs_failed} jobs failed to upload - check API connectivity and logs")
+    else:
+        logger.info(f"   ✅ All {jobs_uploaded} jobs successfully uploaded to Rails API!")
+
+    return jobs_uploaded, jobs_failed
+
 # Function to save job listings to PostgreSQL
 def save_job_listings_to_db(job_urls_with_dates):
     logger.info(f"💾 Saving {len(job_urls_with_dates)} job URLs to database...")
@@ -944,7 +1045,7 @@ def debug_job_page(driver, job_url):
         return False
 
 # Main function to execute login and scraping with pagination
-def main(debug=False, max_hours_old=24):
+def main(debug=False, max_hours_old=24, api_url="http://localhost:4200/api/upload_job_listings/upload"):
     global global_driver, global_session
 
     start_time = datetime.now()
@@ -981,114 +1082,105 @@ def main(debug=False, max_hours_old=24):
         job_urls_with_dates = get_job_urls(driver, max_hours_old=max_hours_old, consecutive_old_limit=5)
         logger.info(f"✅ Job URL collection complete! Found {len(job_urls_with_dates)} fresh job URLs within {max_hours_old}-hour limit ({max_hours_old/24:.1f} days).")
 
-        logger.info("\n💾 PHASE 4: DATABASE INSERTION")
-        save_job_listings_to_db(job_urls_with_dates)
-
         # Debug mode: inspect first job and exit
         if debug:
             logger.info("\n🔍 DEBUG MODE: Inspecting first job and exiting...")
-            fresh_jobs = session.query(JobListing).filter_by(fresh=True).limit(1).all()
-            if fresh_jobs:
-                job_to_debug = fresh_jobs[0]
-                logger.info(f"   🎯 Found job to debug: {job_to_debug.job_url}")
-                logger.info(f"   📅 Posted: {job_to_debug.post_date}")
+            if job_urls_with_dates:
+                job_url_to_debug = job_urls_with_dates[0][0]  # Get first job URL
+                logger.info(f"   🎯 Debugging job: {job_url_to_debug}")
                 logger.info(f"   🔍 Starting debug inspection...")
-                debug_job_page(driver, job_to_debug.job_url)
+                debug_job_page(driver, job_url_to_debug)
             else:
-                logger.warning("   ⚠️  No fresh jobs found in database to debug!")
-                logger.info("   💡 Try running without --debug first to collect some jobs")
-
-                # Let's check if there are ANY jobs in the database
-                total_jobs = session.query(JobListing).count()
-                if total_jobs > 0:
-                    logger.info(f"   📊 Found {total_jobs} total jobs in database, but none are marked as fresh")
-                    any_job = session.query(JobListing).first()
-                    if any_job:
-                        logger.info(f"   🔍 Will debug the first available job instead: {any_job.job_url}")
-                        debug_job_page(driver, any_job.job_url)
-                else:
-                    logger.info("   📭 Database is completely empty - no jobs to debug")
+                logger.warning("   ⚠️  No job URLs found to debug!")
+                logger.info("   💡 Try running with a longer time range to collect some jobs")
             return
 
-        logger.info("\n📄 PHASE 5: DETAILED SCRAPING")
-        fresh_jobs = session.query(JobListing).filter_by(fresh=True).all()
-        logger.info(f"Processing {len(fresh_jobs)} fresh job listings for detailed data extraction...")
+        logger.info("\n📄 PHASE 4: DETAILED SCRAPING & API UPLOAD")
+        logger.info(f"Processing {len(job_urls_with_dates)} job listings for detailed data extraction and API upload...")
 
         success_count = 0
         error_count = 0
 
-        for idx, job in enumerate(fresh_jobs, 1):
+        for idx, (job_url, job_date_str, job_post_date) in enumerate(job_urls_with_dates, 1):
             total_jobs_processed += 1
-            logger.info(f"\n📋 [{idx}/{len(fresh_jobs)}] Processing Job ID {job.id}")
-            logger.info(f"   URL: {job.job_url}")
-            logger.info(f"   Posted: {job.post_date}")
+            logger.info(f"\n📋 [{idx}/{len(job_urls_with_dates)}] Processing Job")
+            logger.info(f"   URL: {job_url}")
+            logger.info(f"   Posted: {job_date_str}")
 
             try:
                 logger.debug(f"   🔍 Starting detailed scraping...")
-                job_details = scrape_job_details(driver, job.job_url)
+                job_details = scrape_job_details(driver, job_url)
                 total_jobs_scraped += 1
 
                 if job_details:
                     try:
-                        # Log what we're about to save
-                        logger.info(f"   � Updating job with extracted details:")
+                        # Log what we're about to upload
+                        logger.info(f"   🌐 Uploading job with extracted details:")
                         logger.info(f"      - Title: {'✅' if job_details.get('title') else '❌'} {job_details.get('title', 'NOT FOUND')[:50]}{'...' if job_details.get('title') and len(job_details.get('title')) > 50 else ''}")
                         logger.info(f"      - Description: {'✅' if job_details.get('description') else '❌'} {len(job_details.get('description', ''))} chars")
                         logger.info(f"      - Location: {'✅' if job_details.get('location') else '❌'} {job_details.get('location', 'NOT FOUND')}")
                         logger.info(f"      - Posted time: {'✅' if job_details.get('posted_time') else '❌'} {job_details.get('posted_time', 'NOT FOUND')}")
 
-                        job.title = job_details.get('title')
-                        job.description = job_details.get('description')
-                        job.location = job_details.get('location')
-                        job.posted_time = job_details.get('posted_time')
-                        job.job_link = job_details.get('job_link')
-                        job.fresh = False
-                        session.commit()
+                        # Prepare complete job data for API upload
+                        complete_job_data = {
+                            'job_url': job_url,
+                            'title': job_details.get('title'),
+                            'description': job_details.get('description'),
+                            'location': job_details.get('location', 'Remote'),
+                            'post_date': job_post_date.isoformat() if job_post_date else job_date_str,
+                            'posted_time': job_details.get('posted_time'),
+                            'fresh': False,  # Mark as processed since we have details
+                            'source': 'upwork',
+                            'listing_type': 'job'
+                        }
 
-                        success_count += 1
-                        total_jobs_saved += 1
-                        logger.info(f"   ✅ SUCCESS: Job ID {job.id} updated in database")
+                        # Upload complete job data to API
+                        if upload_job_to_rails_api(complete_job_data, api_url):
+                            success_count += 1
+                            total_jobs_saved += 1
+                            logger.info(f"   ✅ SUCCESS: Job uploaded to API with complete details")
+                        else:
+                            error_count += 1
+                            logger.error(f"   ❌ API UPLOAD ERROR for job {job_url}")
 
-                    except Exception as db_error:
+                    except Exception as upload_error:
                         error_count += 1
-                        logger.error(f"   ❌ DATABASE ERROR for job {job.job_url}: {db_error}")
-                        session.rollback()
-                        # Mark as not fresh anyway so we don't retry endlessly
-                        try:
-                            job.fresh = False
-                            session.commit()
-                        except:
-                            session.rollback()
+                        logger.error(f"   ❌ UPLOAD ERROR for job {job_url}: {upload_error}")
                 else:
                     error_count += 1
-                    logger.warning(f"   ⚠️  NO DETAILS SCRAPED for {job.job_url}, marking as not fresh")
-                    try:
-                        job.fresh = False
-                        session.commit()
-                    except:
-                        session.rollback()
+                    logger.warning(f"   ⚠️  NO DETAILS SCRAPED for {job_url}")
+                    # Still try to upload basic job info without details
+                    basic_job_data = {
+                        'job_url': job_url,
+                        'title': None,
+                        'description': None,
+                        'location': 'Remote',
+                        'post_date': job_post_date.isoformat() if job_post_date else job_date_str,
+                        'posted_time': None,
+                        'fresh': True,  # Mark as fresh since we couldn't get details
+                        'source': 'upwork',
+                        'listing_type': 'job'
+                    }
+                    if upload_job_to_rails_api(basic_job_data, api_url):
+                        logger.info(f"   📤 Uploaded basic job info (details failed)")
+                    else:
+                        logger.error(f"   ❌ Failed to upload even basic job info")
 
                 # Progress update every 10 jobs
-                if idx % 10 == 0 or idx == len(fresh_jobs):
+                if idx % 10 == 0 or idx == len(job_urls_with_dates):
                     elapsed = datetime.now() - start_time
-                    logger.info(f"\n📊 PROGRESS UPDATE [{idx}/{len(fresh_jobs)}]")
+                    logger.info(f"\n📊 PROGRESS UPDATE [{idx}/{len(job_urls_with_dates)}]")
                     logger.info(f"   ✅ Successful: {success_count}")
                     logger.info(f"   ❌ Errors: {error_count}")
                     logger.info(f"   ⏱️  Elapsed: {elapsed}")
                     if idx > 0:
                         avg_time = elapsed.total_seconds() / idx
-                        remaining = (len(fresh_jobs) - idx) * avg_time
+                        remaining = (len(job_urls_with_dates) - idx) * avg_time
                         logger.info(f"   🔮 ETA: {remaining/60:.1f} minutes remaining")
 
             except Exception as e:
                 error_count += 1
-                logger.error(f"   ❌ SCRAPING ERROR for job {job.job_url}: {e}")
-                # Try to mark as not fresh to avoid infinite retries
-                try:
-                    job.fresh = False
-                    session.commit()
-                except:
-                    session.rollback()
+                logger.error(f"   ❌ SCRAPING ERROR for job {job_url}: {e}")
                 # Continue to next job instead of crashing
                 continue
 
@@ -1196,6 +1288,7 @@ if __name__ == "__main__":
 
     # Parse hours filter argument
     max_hours = 24  # Default: only today's jobs (24 hours)
+    api_url = "http://localhost:4200/api/upload_job_listings/upload"  # Default Rails API URL
     for arg in sys.argv:
         if arg.startswith("--hours="):
             try:
@@ -1204,6 +1297,9 @@ if __name__ == "__main__":
             except ValueError:
                 logger.warning(f"⚠️  Invalid hours value '{arg}' - using default 24 hours")
                 max_hours = 24
+        elif arg.startswith("--api-url="):
+            api_url = arg.split("=", 1)[1]
+            logger.info(f"🌐 Custom API URL set: {api_url}")
 
     if debug_mode:
         logger.info("🔍 DEBUG MODE ENABLED")
@@ -1215,10 +1311,11 @@ if __name__ == "__main__":
     logger.info("   Available command line options:")
     logger.info("     --debug or -d      : Enable debug mode")
     logger.info("     --hours=X          : Only scrape jobs posted within X hours (default: 24)")
+    logger.info("     --api-url=URL      : Set custom Rails API endpoint (default: http://localhost:4200/api/upload_job_listings/upload)")
     logger.info("     (no args)          : Run full production scraping")
 
     try:
-        main(debug=debug_mode, max_hours_old=max_hours)
+        main(debug=debug_mode, max_hours_old=max_hours, api_url=api_url)
         logger.info("🎯 Script execution completed successfully!")
     except KeyboardInterrupt:
         logger.warning("🛑 Script interrupted by user (Ctrl+C)")
