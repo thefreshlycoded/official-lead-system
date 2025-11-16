@@ -150,6 +150,25 @@ class JobListingsController < ApplicationController
     end
   end
 
+  def upload_listing
+    job_data = upload_listing_params
+
+    if job_data[:job_url].blank?
+      redirect_to job_listings_path, alert: "Job URL is required"
+      return
+    end
+
+    job_listing = JobListing.find_or_initialize_by(job_url: job_data[:job_url])
+    job_listing.assign_attributes(job_data)
+
+    if job_listing.save
+      action = job_listing.previously_new_record? ? "created" : "updated"
+      redirect_to job_listing, notice: "✅ Job listing successfully #{action}!"
+    else
+      redirect_to job_listings_path, alert: "❌ Failed to save job listing: #{job_listing.errors.full_messages.join(', ')}"
+    end
+  end
+
   private
 
   def set_job_listing
@@ -158,5 +177,9 @@ class JobListingsController < ApplicationController
 
   def job_listing_params
     params.require(:job_listing).permit(:job_url, :title, :description, :location, :post_date, :posted_time, :job_link, :fresh, :source, :listing_type, :relevance, :website_present, :website_url, :website_type, :classification_snippet, :facebook, :twitter, :linkedin, :instagram, :city, :state, :country, :industry, :owner_name, :manual_review, :email_pitch, :sms_pitch, :company_name, :contact_name, :contact_email, :contact_phone, :contact_role, :last_contacted_at, :contact_method, :status, :project_type, :budget_min, :budget_max, :timezone, emails: [], phones: [])
+  end
+
+  def upload_listing_params
+    params.require(:job_listing).permit(:job_url, :title, :description, :location, :post_date, :posted_time, :job_link, :fresh, :source, :listing_type, :relevance, :website_present, :website_url, :website_type, :classification_snippet, :facebook, :twitter, :linkedin, :instagram, :city, :state, :country, :industry, :owner_name, :manual_review, :email_pitch, :sms_pitch, :company_name, :contact_name, :contact_email, :contact_phone, :contact_role, :last_contacted_at, :contact_method, :status, :project_type, :budget_min, :budget_max, :timezone, :viable_post, :viable_post_human, :scanned_for_relevance, :scanned_for_company_details, :ai_relevance_score, :ai_relevance_reasoning, :company_research_completed, :company_research_notes, :viability_analysis, emails: [], phones: [])
   end
 end

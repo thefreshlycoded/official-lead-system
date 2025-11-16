@@ -1,0 +1,14 @@
+{
+  "job": {
+    "job_url": "https://www.upwork.com/jobs/~0123456789abcdef",
+    "title": "Full Stack Developer for E-commerce Platform",
+    "description": "We are looking for an experienced full stack developer to build a modern e-commerce platform using React and Node.js. The ideal candidate should have experience with payment gateways, database design, and cloud deployment.",
+    "location": "Remote",
+    "post_date": "2025-11-16",
+    "posted_time": "2 hours ago",
+    "job_link": "https://www.upwork.com/jobs/~0123456789abcdef",
+    "fresh": true,
+    "source": "upwork",
+    "listing_type": "job"
+  }
+}

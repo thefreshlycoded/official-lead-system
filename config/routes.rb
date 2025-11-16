@@ -22,6 +22,7 @@ Rails.application.routes.draw do
       post :analyze_contact_info
       post :analyze_job_viability
       get :manual_evaluation
+      post :upload_listing
     end
   end
   resources :scrapers, only: [:index, :show] do
@@ -43,6 +44,12 @@ Rails.application.routes.draw do
 
   namespace :api do
     resources :job_listings, only: [:index, :create]
+    resources :upload_job_listings, only: [] do
+      collection do
+        post :upload
+        post :batch_upload
+      end
+    end
     resources :scrapers, only: [] do
       member do
         post :complete

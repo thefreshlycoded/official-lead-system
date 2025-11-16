@@ -1,0 +1,40 @@
+{
+  "jobs": [
+    {
+      "job_url": "https://www.upwork.com/jobs/~batch001",
+      "title": "React Developer Needed",
+      "description": "Looking for a React developer to build a dashboard application.",
+      "location": "Remote",
+      "post_date": "2025-11-16",
+      "posted_time": "1 hour ago",
+      "job_link": "https://www.upwork.com/jobs/~batch001",
+      "fresh": true,
+      "source": "upwork",
+      "listing_type": "job"
+    },
+    {
+      "job_url": "https://www.upwork.com/jobs/~batch002",
+      "title": "Python Backend Developer",
+      "description": "Need an experienced Python developer for API development using Django/FastAPI.",
+      "location": "Remote",
+      "post_date": "2025-11-16",
+      "posted_time": "3 hours ago",
+      "job_link": "https://www.upwork.com/jobs/~batch002",
+      "fresh": true,
+      "source": "upwork",
+      "listing_type": "job"
+    },
+    {
+      "job_url": "https://www.upwork.com/jobs/~batch003",
+      "title": "DevOps Engineer for Cloud Migration",
+      "description": "Seeking a DevOps engineer to help migrate our infrastructure to AWS with Kubernetes.",
+      "location": "Remote",
+      "post_date": "2025-11-16",
+      "posted_time": "5 hours ago",
+      "job_link": "https://www.upwork.com/jobs/~batch003",
+      "fresh": true,
+      "source": "upwork",
+      "listing_type": "job"
+    }
+  ]
+}
